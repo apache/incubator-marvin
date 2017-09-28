@@ -17,8 +17,8 @@ package org.marvin.manager
 
 import akka.actor.{Actor, ActorLogging}
 import org.apache.hadoop.conf.Configuration
-import org.marvin.EngineMetadata
 import org.marvin.manager.ArtifactSaver.SaverMessage
+import org.marvin.model.EngineMetadata
 import org.marvin.util.HdfsUtil
 
 object ArtifactSaver {

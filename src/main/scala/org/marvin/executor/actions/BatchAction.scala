@@ -16,15 +16,16 @@ limitations under the License.
 package org.marvin.executor.actions
 
 import akka.actor.{Actor, ActorLogging, Props}
-import org.marvin.EngineMetadata
 import org.marvin.executor.actions.ActionHandler.BatchType
-import org.marvin.executor.actions.BatchAction.{BatchMessage, BatchReloadMessage}
+import org.marvin.executor.actions.BatchAction.{BatchHealthCheckMessage, BatchMessage, BatchReloadMessage}
 import org.marvin.manager.ArtifactSaver
 import org.marvin.manager.ArtifactSaver.SaverMessage
+import org.marvin.model.EngineMetadata
 
 object BatchAction {
   case class BatchMessage(actionName:String, params:String)
   case class BatchReloadMessage(actionName: String, artifacts:String, protocol:String)
+  case class BatchHealthCheckMessage(actionName: String, artifacts: String)
 }
 
 class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLogging {
@@ -47,6 +48,10 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
     case BatchReloadMessage(actionName, artifacts, protocol) =>
       log.info(s"Sending the message to reload the $artifacts of $actionName using protocol $protocol")
       sender ! this.actionHandler.reload(actionName, artifacts, protocol)
+
+    case BatchHealthCheckMessage(actionName, artifacts) =>
+      log.debug(s"Sending message to batch health check. Following artifacts included: $artifacts.")
+      sender ! this.actionHandler.healthCheck(actionName, artifacts)
 
     case _ =>
       log.info("Received a bad format message...")

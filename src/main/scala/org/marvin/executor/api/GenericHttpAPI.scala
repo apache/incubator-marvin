@@ -18,19 +18,20 @@ package org.marvin.executor.api
 import java.io.FileNotFoundException
 import java.lang.Throwable
 
+import actions.HealthCheckResponse.Status
 import akka.actor.{ActorRef, ActorSystem, Props, Terminated}
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl.server.{HttpApp, Route}
 import akka.pattern.ask
 import akka.util.Timeout
-import org.marvin.executor.actions.BatchAction.BatchMessage
-import org.marvin.executor.actions.OnlineAction.OnlineMessage
-import org.marvin.EngineMetadata
+import org.marvin.executor.actions.BatchAction.{BatchHealthCheckMessage, BatchMessage}
+import org.marvin.executor.actions.OnlineAction.{OnlineHealthCheckMessage, OnlineMessage}
 import org.marvin.executor.actions.{BatchAction, OnlineAction}
 import org.marvin.manager.ArtifactLoader
 import org.marvin.manager.ArtifactLoader.{BatchArtifactLoaderMessage, OnlineArtifactLoaderMessage}
 import org.marvin.util.{ConfigurationContext, JsonUtil}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import akka.http.scaladsl.model._
 
 import scala.concurrent._
 import scala.io.{Source, StdIn}
@@ -39,7 +40,8 @@ import org.marvin.executor.api.exception.EngineExceptionAndRejectionHandler._
 import spray.json.DefaultJsonProtocol._
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.Directives._
-import org.marvin.model.MarvinEExecutorException
+import org.marvin.executor.api.model.HealthStatus
+import org.marvin.model.{EngineMetadata, MarvinEExecutorException}
 
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
@@ -59,6 +61,7 @@ object GenericHttpAPI extends HttpMarvinApp {
 
   implicit val httpEngineResponseFormat = jsonFormat1(HttpEngineResponse)
   implicit val httpEngineRequestFormat = jsonFormat2(HttpEngineRequest)
+  implicit val healthStatusFormat = jsonFormat2(HealthStatus)
 
 
   override def routes: Route =
@@ -147,9 +150,43 @@ object GenericHttpAPI extends HttpMarvinApp {
               }
             }
           }
+        } ~
+        get {
+          path("predictor" / "health") {
+            onComplete(api.onlineActionHealthCheck("predictor")) { response =>
+              matchHealthTry(response)
+            }
+          } ~
+          path("tpreparator" / "health") {
+            onComplete(api.batchActionHealthCheck("tpreparator")) { response =>
+              matchHealthTry(response)
+            }
+          } ~
+          path("trainer" / "health") {
+            onComplete(api.batchActionHealthCheck("trainer")) { response =>
+              matchHealthTry(response)
+            }
+          } ~
+          path("evaluator" / "health") {
+            onComplete(api.batchActionHealthCheck("evaluator")) { response =>
+              matchHealthTry(response)
+            }
+          }
         }
       }
     }
+
+  def matchHealthTry(response: Try[HealthStatus]) = response match {
+    case Success(healthStatus) => {
+      if(healthStatus.status.equals("OK"))
+        complete(healthStatus)
+      else
+        complete(HttpResponse(StatusCodes.ServiceUnavailable,
+          entity = HttpEntity(ContentTypes.`application/json`,
+            healthStatusFormat.write(healthStatus).toString())))
+    }
+    case Failure(e) => throw e
+  }
 
   def main(args: Array[String]): Unit = {
     val engineFilePath = s"${ConfigurationContext.getStringConfigOrDefault("engineHome", ".")}/engine.metadata"
@@ -170,7 +207,7 @@ trait GenericHttpAPI {
   protected def setupSystem(engineFilePath:String, paramsFilePath:String): ActorSystem = {
     val metadata = readJsonIfFileExists[EngineMetadata](engineFilePath)
     GenericHttpAPI.metadata = metadata
-    GenericHttpAPI.defaultParams = readJsonIfFileExists(paramsFilePath)
+    GenericHttpAPI.defaultParams = readJsonIfFileExists[Map[String, String]](paramsFilePath).mkString(",")
 
     val system = ActorSystem("MarvinExecutorSystem")
 
@@ -182,7 +219,7 @@ trait GenericHttpAPI {
     system
   }
 
-  private def readJsonIfFileExists[T: ClassTag](filePath: String): T ={
+  private def readJsonIfFileExists[T: ClassTag](filePath: String): T = {
     Try(JsonUtil.fromJson[T](Source.fromFile(filePath).mkString)) match {
       case Success(json) => json
       case Failure(ex) => {
@@ -215,8 +252,44 @@ trait GenericHttpAPI {
   protected def onlineRequest(actionName: String, params: String, message: String): Future[String] = {
     val onlineMessage = OnlineMessage(actionName=actionName, params=params, message=message)
     implicit val futureTimeout = GenericHttpAPI.onlineActionTimeout
+    implicit val ec = GenericHttpAPI.system.dispatcher
     val futureResponse: Future[String] = (GenericHttpAPI.onlineActor ? onlineMessage).mapTo[String]
     futureResponse
+  }
+
+  protected def onlineActionHealthCheck(actionName: String): Future[HealthStatus] = {
+    val onlineHealthCheck = OnlineHealthCheckMessage(
+      actionName = actionName, artifacts = getArtifactsToLoad(actionName).mkString(","))
+    implicit val futureTimeout = GenericHttpAPI.onlineActionTimeout
+    implicit val ec = GenericHttpAPI.system.dispatcher
+    (GenericHttpAPI.onlineActor ? onlineHealthCheck).mapTo[Status] collect asHealthStatus
+  }
+
+  protected def batchActionHealthCheck(actionName: String): Future[HealthStatus] = {
+    val batchHealthCheck = BatchHealthCheckMessage(
+      actionName = actionName, artifacts = getArtifactsToLoad(actionName).mkString(","))
+    implicit val futureTimeout = GenericHttpAPI.onlineActionTimeout
+    implicit val ec = GenericHttpAPI.system.dispatcher
+    (GenericHttpAPI.batchActor ? batchHealthCheck).mapTo[Status] collect asHealthStatus
+  }
+
+  private def getArtifactsToLoad(actionName: String): List[String] = {
+    GenericHttpAPI.metadata.actions.foreach{case action =>
+      if(action.name.equals(actionName)) return action.artifactsToLoad
+    }
+    throw new IllegalArgumentException(s"$actionName is not a valid action.")
+  }
+
+  private def asHealthStatus: PartialFunction[Status, HealthStatus] = new PartialFunction[Status, HealthStatus] {
+    override def apply(status: Status): HealthStatus = {
+      val statusTyped = status.asInstanceOf[Status]
+      if(statusTyped.isOk){
+        HealthStatus(status = "OK", additionalMessage = "")
+      } else {
+        HealthStatus(status = "NOK", additionalMessage = "Engine did not returned a healthy status.")
+      }
+    }
+    override def isDefinedAt(status: Status): Boolean = status != null
   }
 
   protected def onlineReloadRequest(actionName: String, protocol: String): String = {
