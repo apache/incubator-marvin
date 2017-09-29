@@ -74,4 +74,4 @@ Options:
 - p - the port to bind the server.
 - e - the PATH to the engine executor jar if you want to use a custom jar.
 
-> Marvin is a project started in B2W Digital offices and released open source on September 2017.
+> Marvin is a project started at B2W Digital offices and released open source on September 2017.
