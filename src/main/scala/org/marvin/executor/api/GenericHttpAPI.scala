@@ -208,7 +208,7 @@ trait GenericHttpAPI {
   protected def setupSystem(engineFilePath:String, paramsFilePath:String): ActorSystem = {
     val metadata = readJsonIfFileExists[EngineMetadata](engineFilePath)
     GenericHttpAPI.metadata = metadata
-    GenericHttpAPI.defaultParams = readJsonIfFileExists[Map[String, String]](paramsFilePath).mkString(",")
+    GenericHttpAPI.defaultParams = JsonUtil.toJson(readJsonIfFileExists[Map[String, String]](paramsFilePath))
 
     val system = ActorSystem("MarvinExecutorSystem")
 
