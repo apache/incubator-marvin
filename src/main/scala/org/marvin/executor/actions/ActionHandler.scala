@@ -17,10 +17,11 @@ package org.marvin.executor.actions
 
 import io.grpc.ManagedChannelBuilder
 import org.marvin.executor.actions.ActionHandler.{BatchType, OnlineType}
-import org.marvin.{EngineActionMetadata, EngineMetadata}
 import actions.BatchActionHandlerGrpc.BatchActionHandlerBlockingStub
+import actions.HealthCheckResponse.Status
 import actions.OnlineActionHandlerGrpc.OnlineActionHandlerBlockingStub
-import actions.{BatchActionHandlerGrpc, BatchActionRequest, OnlineActionHandlerGrpc, OnlineActionRequest, ReloadRequest, ReloadResponse}
+import actions._
+import org.marvin.model.{EngineActionMetadata, EngineMetadata}
 
 import scala.collection.mutable
 
@@ -82,6 +83,22 @@ class ActionHandler(metadata:EngineMetadata, actionType:ActionHandler.ActionType
 
       case _ =>
         return "Action type is not supported!!!"
+    }
+  }
+
+  def healthCheck(actionName: String, artifacts: String): Status = {
+    val request = HealthCheckRequest(artifacts = artifacts)
+
+    this.actionType match {
+      case OnlineType =>
+        this.clients(actionName).asInstanceOf[OnlineActionHandlerBlockingStub].HealthCheck(request).status
+
+      case BatchType =>
+        this.clients(actionName).asInstanceOf[BatchActionHandlerBlockingStub].HealthCheck(request).status
+
+      case _ =>
+        throw new UnsupportedOperationException(s"The action type ${this.actionType.toString} is not implemented.")
+
     }
   }
 }

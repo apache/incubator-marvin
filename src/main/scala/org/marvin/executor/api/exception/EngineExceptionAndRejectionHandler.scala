@@ -15,7 +15,7 @@ limitations under the License.
   */
 package org.marvin.executor.api.exception
 
-import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
+import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ExceptionHandler, MissingQueryParamRejection, RejectionHandler}
 import grizzled.slf4j.Logger
@@ -36,16 +36,16 @@ object EngineExceptionAndRejectionHandler {
       case ex: IllegalArgumentException => {
         logger.debug("Endpoint thrown illegal argument exception.", ex)
         val error = ErrorResponse(errorMessage = ex.getMessage)
-        complete(HttpResponse(StatusCodes.BadRequest, entity = errorFormatter.write(error).toString()))
+        complete(HttpResponse(StatusCodes.BadRequest, entity = toResponseEntityJson(error)))
       }
       case ex: TimeoutException => {
         logger.debug("Endpoint thrown timeout exception", ex)
         val error = ErrorResponse(errorMessage = "The engine was not able to provide a response within the specified timeout.")
-        complete(HttpResponse(StatusCodes.InternalServerError, entity = errorFormatter.write(error).toString()))
+        complete(HttpResponse(StatusCodes.InternalServerError, entity = toResponseEntityJson(error)))
       }
       case _ => {
         val error = ErrorResponse(errorMessage = "Unexpected error.")
-        complete(HttpResponse(StatusCodes.InternalServerError, entity = errorFormatter.write(error).toString()))
+        complete(HttpResponse(StatusCodes.InternalServerError, entity = toResponseEntityJson(error)))
       }
     }
 
@@ -57,8 +57,13 @@ object EngineExceptionAndRejectionHandler {
           logger.debug("Missing query parameters.")
           val error = ErrorResponse(errorMessage = s"Missing query parameter. [${rj.parameterName}]")
 
-          complete(HttpResponse(StatusCodes.BadRequest, entity = errorFormatter.write(error).toString()))
+          complete(HttpResponse(StatusCodes.BadRequest, entity = toResponseEntityJson(error)))
         }
       }
       .result()
+
+  def toResponseEntityJson(error: ErrorResponse): ResponseEntity = {
+    HttpEntity(ContentTypes.`application/json`,
+      errorFormatter.write(error).toString())
+  }
 }

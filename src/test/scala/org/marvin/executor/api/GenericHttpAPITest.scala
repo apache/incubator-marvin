@@ -380,6 +380,16 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
         }
       caught.getMessage() shouldEqual "The file [not_existent_params_file] does not exists. Check your engine configuration."
     }
+
+    "do not throw exception and setup the system when params files are valid" in {
+      val httpApi = new GenericHttpAPIOpen()
+
+      val validMetadataFile = getClass.getResource("/valid.metadata").getPath()
+      val validParamsFile = getClass.getResource("/valid.params").getPath()
+
+      val system = httpApi.setupSystem(validMetadataFile, validParamsFile)
+      system shouldNot be(null)
+    }
   }
 
   def setupProbe() : TestProbe = {
@@ -387,6 +397,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
     val timeout = Timeout(2 seconds)
     GenericHttpAPI.system = system
     GenericHttpAPI.onlineActionTimeout = timeout
+    GenericHttpAPI.healthCheckTimeout = timeout
     probe
   }
 }

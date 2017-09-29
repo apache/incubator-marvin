@@ -16,13 +16,14 @@ limitations under the License.
 package org.marvin.executor.actions
 
 import akka.actor.{Actor, ActorLogging}
-import org.marvin.EngineMetadata
 import org.marvin.executor.actions.ActionHandler.OnlineType
-import org.marvin.executor.actions.OnlineAction.{OnlineMessage, OnlineReloadMessage}
+import org.marvin.executor.actions.OnlineAction.{OnlineHealthCheckMessage, OnlineMessage, OnlineReloadMessage}
+import org.marvin.model.EngineMetadata
 
 object OnlineAction {
   case class OnlineMessage(actionName:String, message:String, params:String)
   case class OnlineReloadMessage(actionName: String, artifacts:String, protocol:String)
+  case class OnlineHealthCheckMessage(actionName: String, artifacts: String)
 }
 
 class OnlineAction(engineMetadata: EngineMetadata) extends Actor with ActorLogging {
@@ -41,6 +42,10 @@ class OnlineAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggi
     case OnlineReloadMessage(actionName, artifacts, protocol) =>
       log.info(s"Sending the message to reload the $artifacts of $actionName using protocol $protocol")
       sender ! this.actionHandler.reload(actionName=actionName, artifacts=artifacts, protocol=protocol)
+
+    case OnlineHealthCheckMessage(actionName, artifacts) =>
+      log.debug("Sending online health check request.")
+      sender ! this.actionHandler.healthCheck(actionName = actionName, artifacts = artifacts)
 
     case _ =>
       log.info("Received a bad format message...")

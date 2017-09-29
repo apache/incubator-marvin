@@ -21,8 +21,8 @@ import akka.util.Timeout
 import org.marvin.executor.actions.BatchAction.BatchReloadMessage
 import org.marvin.executor.actions.OnlineAction.OnlineReloadMessage
 import org.apache.hadoop.conf.Configuration
-import org.marvin.EngineMetadata
 import org.marvin.manager.ArtifactLoader.{BatchArtifactLoaderMessage, OnlineArtifactLoaderMessage}
+import org.marvin.model.EngineMetadata
 import org.marvin.util.HdfsUtil
 
 import scala.collection.mutable.Map
