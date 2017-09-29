@@ -193,8 +193,8 @@ object GenericHttpAPI extends HttpMarvinApp {
     val paramsFilePath = s"${ConfigurationContext.getStringConfigOrDefault("engineHome", ".")}/engine.params"
 
     GenericHttpAPI.system = api.setupSystem(engineFilePath, paramsFilePath)
-    val ipAddress = ConfigurationContext.getStringConfigOrDefault("ipAddress", "0.0.0.0")
-    val port = ConfigurationContext.getIntConfigOrDefault("port", 8080)
+    val ipAddress = ConfigurationContext.getStringConfigOrDefault("ipAddress", "localhost")
+    val port = ConfigurationContext.getIntConfigOrDefault("port", 8000)
 
     api.startServer(ipAddress, port, GenericHttpAPI.system)
   }
