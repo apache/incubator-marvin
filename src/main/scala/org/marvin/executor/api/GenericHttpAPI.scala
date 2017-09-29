@@ -56,6 +56,7 @@ object GenericHttpAPI extends HttpMarvinApp {
   var batchActor: ActorRef = _
   var artifactLoaderActor: ActorRef = _
   var onlineActionTimeout: Timeout = _
+  var healthCheckTimeout: Timeout = _
 
   var api: GenericHttpAPI = new GenericHttpAPIImpl()
 
@@ -215,7 +216,8 @@ trait GenericHttpAPI {
     GenericHttpAPI.batchActor = system.actorOf(Props(new BatchAction(metadata)), name = "batchActor")
     GenericHttpAPI.artifactLoaderActor = system.actorOf(Props(new ArtifactLoader(metadata)), name = "artifactLoaderActor")
 
-    GenericHttpAPI.onlineActionTimeout = Timeout(metadata.onlineActionTimeout seconds)
+    GenericHttpAPI.onlineActionTimeout = Timeout(metadata.onlineActionTimeout millisecond)
+    GenericHttpAPI.healthCheckTimeout = Timeout(metadata.healthCheckTimeout millisecond)
     system
   }
 
@@ -260,7 +262,7 @@ trait GenericHttpAPI {
   protected def onlineActionHealthCheck(actionName: String): Future[HealthStatus] = {
     val onlineHealthCheck = OnlineHealthCheckMessage(
       actionName = actionName, artifacts = getArtifactsToLoad(actionName).mkString(","))
-    implicit val futureTimeout = GenericHttpAPI.onlineActionTimeout
+    implicit val futureTimeout = GenericHttpAPI.healthCheckTimeout
     implicit val ec = GenericHttpAPI.system.dispatcher
     (GenericHttpAPI.onlineActor ? onlineHealthCheck).mapTo[Status] collect asHealthStatus
   }
@@ -268,7 +270,7 @@ trait GenericHttpAPI {
   protected def batchActionHealthCheck(actionName: String): Future[HealthStatus] = {
     val batchHealthCheck = BatchHealthCheckMessage(
       actionName = actionName, artifacts = getArtifactsToLoad(actionName).mkString(","))
-    implicit val futureTimeout = GenericHttpAPI.onlineActionTimeout
+    implicit val futureTimeout = GenericHttpAPI.healthCheckTimeout
     implicit val ec = GenericHttpAPI.system.dispatcher
     (GenericHttpAPI.batchActor ? batchHealthCheck).mapTo[Status] collect asHealthStatus
   }

@@ -397,6 +397,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
     val timeout = Timeout(2 seconds)
     GenericHttpAPI.system = system
     GenericHttpAPI.onlineActionTimeout = timeout
+    GenericHttpAPI.healthCheckTimeout = timeout
     probe
   }
 }
