@@ -26,9 +26,15 @@ java <OPTIONS> -jar path_to_jar_file.jar
 
 #### the available options are:
 
-- engineHome (path to the folder where the params and metadata file are located)
-- ipAddress (the IP address to bind the server)
-- port (the port to bind the server)
+- marvinConfig.engineHome (path to the folder where the params and metadata file are located)
+- marvinConfig.ipAddress (the IP address to bind the server)
+- marvinConfig.port (the port to bind the server)
+
+Example of direct invocation with options:
+
+```
+java -DmarvinConfig.engineHome=/path -DmarvinConfig.ipAddress=0.0.0.0 -DmarvinConfig.port=8080 -jar marvin_engine_executor.jar
+```
 
 ### using engine-executor from marvin-toolbox
 
