@@ -19,6 +19,7 @@ case class EngineMetadata(name:String, version:String, engineType:String,
                           actions:List[EngineActionMetadata], artifactsLocalPath:String,
                           artifactsRemotePath:String,
                           onlineActionTimeout:Int,
+                          healthCheckTimeout:Int,
                           reloadTimeout:Int,
                           hdfsHost:String){
   override def toString: String = name
