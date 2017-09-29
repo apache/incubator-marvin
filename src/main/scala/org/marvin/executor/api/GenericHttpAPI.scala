@@ -16,12 +16,10 @@ limitations under the License.
 package org.marvin.executor.api
 
 import java.io.FileNotFoundException
-import java.lang.Throwable
 
 import actions.HealthCheckResponse.Status
 import akka.actor.{ActorRef, ActorSystem, Props, Terminated}
-import akka.stream.ActorMaterializer
-import akka.http.scaladsl.server.{HttpApp, Route}
+import akka.http.scaladsl.server.{Route}
 import akka.pattern.ask
 import akka.util.Timeout
 import org.marvin.executor.actions.BatchAction.{BatchHealthCheckMessage, BatchMessage}
@@ -34,12 +32,10 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model._
 
 import scala.concurrent._
-import scala.io.{Source, StdIn}
+import scala.io.{Source}
 import scala.concurrent.duration._
 import org.marvin.executor.api.exception.EngineExceptionAndRejectionHandler._
 import spray.json.DefaultJsonProtocol._
-import akka.http.scaladsl.server._
-import akka.http.scaladsl.server.Directives._
 import org.marvin.executor.api.model.HealthStatus
 import org.marvin.model.{EngineMetadata, MarvinEExecutorException}
 
@@ -194,8 +190,8 @@ object GenericHttpAPI extends HttpMarvinApp {
     val paramsFilePath = s"${ConfigurationContext.getStringConfigOrDefault("engineHome", ".")}/engine.params"
 
     GenericHttpAPI.system = api.setupSystem(engineFilePath, paramsFilePath)
-    val ipAddress = ConfigurationContext.getStringConfigOrDefault("ipAddress", "0.0.0.0")
-    val port = ConfigurationContext.getIntConfigOrDefault("port", 8080)
+    val ipAddress = ConfigurationContext.getStringConfigOrDefault("ipAddress", "localhost")
+    val port = ConfigurationContext.getIntConfigOrDefault("port", 8000)
 
     api.startServer(ipAddress, port, GenericHttpAPI.system)
   }
@@ -208,7 +204,7 @@ trait GenericHttpAPI {
   protected def setupSystem(engineFilePath:String, paramsFilePath:String): ActorSystem = {
     val metadata = readJsonIfFileExists[EngineMetadata](engineFilePath)
     GenericHttpAPI.metadata = metadata
-    GenericHttpAPI.defaultParams = readJsonIfFileExists[Map[String, String]](paramsFilePath).mkString(",")
+    GenericHttpAPI.defaultParams = JsonUtil.toJson(readJsonIfFileExists[Map[String, String]](paramsFilePath))
 
     val system = ActorSystem("MarvinExecutorSystem")
 
