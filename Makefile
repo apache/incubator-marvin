@@ -23,10 +23,10 @@ help:
 	@echo "        Clean the build artifacts."
 
 package:
-		sbt assembly
+		sbt/sbt assembly
 
 test:
-		sbt test
+		sbt/sbt test
 
 clean:
-		sbt clean
+		sbt/sbt clean
