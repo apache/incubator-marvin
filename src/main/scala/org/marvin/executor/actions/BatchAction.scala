@@ -23,7 +23,7 @@ import org.marvin.manager.ArtifactSaver.SaverMessage
 import org.marvin.model.EngineMetadata
 
 object BatchAction {
-  case class BatchMessage(actionName:String, params:String)
+  case class BatchMessage(actionName:String, params:String, protocol:String)
   case class BatchReloadMessage(actionName: String, artifacts:String, protocol:String)
   case class BatchHealthCheckMessage(actionName: String, artifacts: String)
 }
@@ -38,12 +38,12 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
   }
 
   def receive = {
-    case BatchMessage(actionName, params) =>
+    case BatchMessage(actionName, params, protocol) =>
       log.info(s"Sending a message ${params} to $actionName")
       this.actionHandler.send_message(actionName=actionName, params=params)
 
       log.info(s"Sending a message to SaverMessage [${actionName}]")
-      artifactSaveActor ! SaverMessage(actionName=actionName)
+      artifactSaveActor ! SaverMessage(actionName=actionName, protocol=protocol)
 
     case BatchReloadMessage(actionName, artifacts, protocol) =>
       log.info(s"Sending the message to reload the $artifacts of $actionName using protocol $protocol")

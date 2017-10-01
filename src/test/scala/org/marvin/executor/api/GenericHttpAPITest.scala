@@ -137,7 +137,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/acquisitor", HttpEntity(`application/json`, s"""{"params": "testParams"}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "acquisitor", params = "testParams")
+      val expectedMessage = BatchMessage(actionName = "acquisitor", params = "testParams", protocol="1234")
       probe.expectMsg(expectedMessage)
 
       check{
@@ -153,7 +153,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/acquisitor", HttpEntity(`application/json`, s"""{}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "acquisitor", params = "default for test")
+      val expectedMessage = BatchMessage(actionName = "acquisitor", params = "default for test", protocol="1234")
       probe.expectMsg(expectedMessage)
 
       check{
@@ -171,7 +171,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/tpreparator", HttpEntity(`application/json`, s"""{"params": "testParams"}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "tpreparator", params = "testParams")
+      val expectedMessage = BatchMessage(actionName = "tpreparator", params = "testParams", protocol="1234")
       probe.expectMsg(expectedMessage)
 
       check{
@@ -187,7 +187,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/tpreparator", HttpEntity(`application/json`, s"""{}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "tpreparator", params = "default for test")
+      val expectedMessage = BatchMessage(actionName = "tpreparator", params = "default for test", protocol="1234")
       probe.expectMsg(expectedMessage)
 
       check{
@@ -231,7 +231,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/trainer", HttpEntity(`application/json`, s"""{"params": "testParams"}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "trainer", params = "testParams")
+      val expectedMessage = BatchMessage(actionName = "trainer", params = "testParams", protocol="1234")
       probe.expectMsg(expectedMessage)
 
       check {
@@ -247,7 +247,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/trainer", HttpEntity(`application/json`, s"""{}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "trainer", params = "default for test")
+      val expectedMessage = BatchMessage(actionName = "trainer", params = "default for test", protocol="1234")
       probe.expectMsg(expectedMessage)
 
       check {
@@ -290,7 +290,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/evaluator", HttpEntity(`application/json`, s"""{"params": "testParams"}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "evaluator", params = "testParams")
+      val expectedMessage = BatchMessage(actionName = "evaluator", params = "testParams", protocol = "1234")
       probe.expectMsg(expectedMessage)
 
       check {
@@ -306,7 +306,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/evaluator", HttpEntity(`application/json`, s"""{}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "evaluator", params = "default for test")
+      val expectedMessage = BatchMessage(actionName = "evaluator", params = "default for test", protocol = "1234")
       probe.expectMsg(expectedMessage)
 
       check {

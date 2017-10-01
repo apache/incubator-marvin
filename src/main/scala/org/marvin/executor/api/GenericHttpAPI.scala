@@ -242,7 +242,9 @@ trait GenericHttpAPI {
   }
 
   protected def batchRequest(actionName: String, params: String): String = {
-    val batchMessage = BatchMessage(actionName=actionName, params=params)
+    // Generate protocol
+    val protocol = "1234"
+    val batchMessage = BatchMessage(actionName=actionName, params=params, protocol=protocol)
     GenericHttpAPI.batchActor ! batchMessage
     "Working in progress!"
   }
