@@ -16,6 +16,7 @@ limitations under the License.
 package org.marvin.executor.api
 
 import java.io.FileNotFoundException
+import io.jvm.uuid.UUID
 
 import actions.HealthCheckResponse.Status
 import akka.actor.{ActorRef, ActorSystem, Props, Terminated}
@@ -206,7 +207,7 @@ trait GenericHttpAPI {
     GenericHttpAPI.metadata = metadata
     GenericHttpAPI.defaultParams = JsonUtil.toJson(readJsonIfFileExists[Map[String, String]](paramsFilePath))
 
-    val system = ActorSystem("MarvinExecutorSystem")
+    val system = ActorSystem(s"MarvinExecutorSystem")
 
     GenericHttpAPI.onlineActor = system.actorOf(Props(new OnlineAction(metadata)), name = "onlineActor")
     GenericHttpAPI.batchActor = system.actorOf(Props(new BatchAction(metadata)), name = "batchActor")
@@ -241,12 +242,15 @@ trait GenericHttpAPI {
     GenericHttpAPI.system.terminate()
   }
 
+  protected def generateProtocol(actionName:String): String ={
+    s"${actionName}_${UUID.randomString}"
+  }
+
   protected def batchRequest(actionName: String, params: String): String = {
-    // Generate protocol
-    val protocol = "1234"
+    val protocol = generateProtocol(actionName)
     val batchMessage = BatchMessage(actionName=actionName, params=params, protocol=protocol)
     GenericHttpAPI.batchActor ! batchMessage
-    "Working in progress!"
+    protocol
   }
 
   protected def onlineRequest(actionName: String, params: String, message: String): Future[String] = {

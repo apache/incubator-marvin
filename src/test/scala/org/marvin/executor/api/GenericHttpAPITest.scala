@@ -27,14 +27,11 @@ import scala.concurrent.duration._
 import ContentTypes._
 import akka.actor.{ActorSystem, Terminated}
 import akka.http.scaladsl.server.Route
-import com.typesafe.config.ConfigFactory
 import org.marvin.executor.actions.BatchAction.BatchMessage
 import org.marvin.manager.ArtifactLoader.{BatchArtifactLoaderMessage, OnlineArtifactLoaderMessage}
 import org.marvin.model.MarvinEExecutorException
-import org.marvin.util.ConfigurationContext
 
 import scala.concurrent.Future
-import scala.io.Source
 
 class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers with Inside with MockFactory {
 
