@@ -2,9 +2,10 @@
 	"name": "sample",
 	"version": "v0.0.1",
 	"engineType": "python",
-	"artifactsLocalPath": "/vagrant/projects/artifacts",
+	"artifactsLocalPath": "/home/taka/marvin/artifacts",
 	"artifactsRemotePath": "/tmp/marvin",
-	"onlineActionTimeout": 1,
+	"onlineActionTimeout": 1000,
+    "healthCheckTimeout": 2000,
 	"reloadTimeout": 120,
 	"hdfsHost": "hdfs://marvin-hadoop:8020",
 	"actions": [{

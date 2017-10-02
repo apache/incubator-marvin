@@ -26,6 +26,6 @@ from marvin_sample_engine.prediction import Predictor
 
 class TestPredictor:
     def test_execute(self, mocked_params):
-        ac = Predictor(params=mocked_params)
+        ac = Predictor(params=mocked_params, model=[1, 2])
         ac.execute(input_message="fake message")
         assert ac.params == mocked_params
