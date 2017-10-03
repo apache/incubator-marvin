@@ -53,6 +53,8 @@ class ArtifactSaver(engineMetadata: EngineMetadata) extends Actor with ActorLogg
         HdfsUtil.copyFromLocal(hdfsConf, uri("localUri"), uri("remoteUri"))
         log.info(s"File ${uri("remoteUri")} saved!")
       }
+
+      sender ! "Done"
     case _ =>
       log.info("Received a bad format message...")
   }

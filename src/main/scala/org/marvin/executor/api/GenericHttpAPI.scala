@@ -19,10 +19,10 @@ import java.io.FileNotFoundException
 
 import actions.HealthCheckResponse.Status
 import akka.actor.{ActorRef, ActorSystem, Props, Terminated}
-import akka.http.scaladsl.server.{Route}
+import akka.http.scaladsl.server.Route
 import akka.pattern.ask
 import akka.util.Timeout
-import org.marvin.executor.actions.BatchAction.{BatchHealthCheckMessage, BatchMessage}
+import org.marvin.executor.actions.BatchAction.{BatchHealthCheckMessage, BatchMessage, BatchPipelineMessage}
 import org.marvin.executor.actions.OnlineAction.{OnlineHealthCheckMessage, OnlineMessage}
 import org.marvin.executor.actions.{BatchAction, OnlineAction}
 import org.marvin.manager.ArtifactLoader
@@ -32,7 +32,7 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model._
 
 import scala.concurrent._
-import scala.io.{Source}
+import scala.io.Source
 import scala.concurrent.duration._
 import org.marvin.executor.api.exception.EngineExceptionAndRejectionHandler._
 import spray.json.DefaultJsonProtocol._
@@ -81,6 +81,14 @@ object GenericHttpAPI extends HttpMarvinApp {
               }
             }
           } ~
+            path("pipeline") {
+              entity(as[HttpEngineRequest]) { request =>
+                complete {
+                  val response_message = api.batchPipelineRequest(request.params.getOrElse(defaultParams))
+                  api.toHttpEngineResponse(response_message)
+                }
+              }
+            } ~
           path("acquisitor") {
             entity(as[HttpEngineRequest]) { request =>
               complete {
@@ -245,6 +253,14 @@ trait GenericHttpAPI {
     val batchMessage = BatchMessage(actionName=actionName, params=params)
     GenericHttpAPI.batchActor ! batchMessage
     "Working in progress!"
+  }
+
+  protected def batchPipelineRequest(params: String): String = {
+    val actions = List("acquisitor", "tpreparator", "trainer", "evaluator")
+    val protocol = "1234"
+    val batchPipelineMessage = BatchPipelineMessage(actions=actions, params=params, protocol=protocol)
+    GenericHttpAPI.batchActor ! batchPipelineMessage
+    protocol
   }
 
   protected def onlineRequest(actionName: String, params: String, message: String): Future[String] = {

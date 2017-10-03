@@ -15,6 +15,8 @@ limitations under the License.
   */
 package org.marvin.model
 
+import scala.collection.mutable.Map
+
 case class EngineMetadata(name:String, version:String, engineType:String,
                           actions:List[EngineActionMetadata], artifactsLocalPath:String,
                           artifactsRemotePath:String,
@@ -23,6 +25,10 @@ case class EngineMetadata(name:String, version:String, engineType:String,
                           reloadTimeout:Int,
                           hdfsHost:String){
   override def toString: String = name
+  val actionsMap = Map[String, EngineActionMetadata]()
+  for (action <- actions) {
+    actionsMap += ((action.name) -> action)
+  }
 }
 
 case class EngineActionMetadata(name:String, actionType:String, port:Int, host:String, artifactsToPersist:List[String], artifactsToLoad:List[String]){
