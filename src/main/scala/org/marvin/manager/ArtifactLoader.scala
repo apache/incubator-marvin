@@ -47,12 +47,6 @@ class ArtifactLoader(engineMetadata: EngineMetadata) extends Actor with ActorLog
 
   override def preStart() = {
     log.info(s"${this.getClass().getCanonicalName} actor initialized...")
-
-    actionsMap = Map[String, List[String]]()
-
-    for (action <- engineMetadata.actions) {
-      actionsMap += ((action.name) -> action.artifactsToLoad)
-    }
   }
 
   def copyArtifacts(artifacts: List[String], protocol:String) {
@@ -69,7 +63,7 @@ class ArtifactLoader(engineMetadata: EngineMetadata) extends Actor with ActorLog
     case OnlineArtifactLoaderMessage(actionName, protocol) =>
       log.info("Receive message and starting to working...")
 
-      val artifacts = actionsMap(actionName)
+      val artifacts = engineMetadata.actionsMap(actionName).artifactsToLoad
 
       copyArtifacts(artifacts, protocol)
 
@@ -86,7 +80,7 @@ class ArtifactLoader(engineMetadata: EngineMetadata) extends Actor with ActorLog
     case BatchArtifactLoaderMessage(actionName, protocol) =>
       log.info("Receive message and starting to working...")
 
-      val artifacts = actionsMap(actionName)
+      val artifacts = engineMetadata.actionsMap(actionName).artifactsToLoad
 
       copyArtifacts(artifacts, protocol)
 

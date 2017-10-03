@@ -15,15 +15,19 @@ limitations under the License.
   */
 package org.marvin.executor.actions
 
+import akka.Done
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.pattern.ask
 import akka.util.Timeout
+
 import scala.concurrent.duration._
 import org.marvin.executor.actions.ActionHandler.BatchType
 import org.marvin.executor.actions.BatchAction.{BatchHealthCheckMessage, BatchMessage, BatchPipelineMessage, BatchReloadMessage}
 import org.marvin.manager.ArtifactSaver
 import org.marvin.manager.ArtifactSaver.SaverMessage
 import org.marvin.model.EngineMetadata
+
+import scala.concurrent.{Await, Future}
 
 object BatchAction {
   case class BatchMessage(actionName:String, params:String, protocol:String)
@@ -35,6 +39,7 @@ object BatchAction {
 class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLogging {
   var actionHandler: ActionHandler = _
   val artifactSaveActor = context.actorOf(Props(new ArtifactSaver(engineMetadata)), name = "artifactSaveActor")
+  implicit val batchTimeout = Timeout(30 days)  //TODO how to measure???
 
   override def preStart() = {
     log.info(s"${this.getClass().getCanonicalName} actor initialized...")
@@ -43,15 +48,13 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
 
   def receive = {
     case BatchMessage(actionName, params, protocol) =>
-      implicit val generalTimeout = Timeout(3 days) //TODO how to measure???
-
       log.info(s"Sending a message ${params} to $actionName")
       this.actionHandler.send_message(actionName=actionName, params=params)
 
       log.info(s"Sending a message to SaverMessage [${actionName}]")
       artifactSaveActor ! SaverMessage(actionName=actionName, protocol=protocol)
 
-      sender ! "Done"
+      sender ! Done
 
     case BatchReloadMessage(actionName, artifacts, protocol) =>
       log.info(s"Sending the message to reload the $artifacts of $actionName using protocol $protocol")
@@ -62,8 +65,6 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
       sender ! this.actionHandler.healthCheck(actionName, artifacts)
 
     case BatchPipelineMessage(actions, params, protocol) =>
-      implicit val generalTimeout = Timeout(3 days) //TODO how to measure???
-
       //Call all batch actions in order to save and reload the next step
       for(actionName <- actions) {
         val artifacts = engineMetadata.actionsMap(actionName).artifactsToLoad.mkString(",")
@@ -75,7 +76,7 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
         self ? BatchMessage(actionName, params, protocol)
       }
 
-      sender ! "Done"
+      sender ! Done
 
     case _ =>
       log.info("Received a bad format message...")

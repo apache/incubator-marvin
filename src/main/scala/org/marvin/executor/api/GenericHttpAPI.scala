@@ -26,7 +26,6 @@ import org.marvin.executor.actions.BatchAction.{BatchHealthCheckMessage, BatchMe
 import org.marvin.executor.actions.OnlineAction.{OnlineHealthCheckMessage, OnlineMessage}
 import org.marvin.executor.actions.{BatchAction, OnlineAction}
 import org.marvin.manager.ArtifactLoader
-import org.marvin.manager.ArtifactLoader.{BatchArtifactLoaderMessage, OnlineArtifactLoaderMessage}
 import org.marvin.util.{ConfigurationContext, JsonUtil, ProtocolUtil}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model._
@@ -37,10 +36,16 @@ import scala.concurrent.duration._
 import org.marvin.executor.api.exception.EngineExceptionAndRejectionHandler._
 import spray.json.DefaultJsonProtocol._
 import org.marvin.executor.api.model.HealthStatus
+import org.marvin.manager.ArtifactLoader.{BatchArtifactLoaderMessage, OnlineArtifactLoaderMessage}
 import org.marvin.model.{EngineMetadata, MarvinEExecutorException}
 
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
+
+case class HttpEngineResponse(result: String)
+case class HttpEngineRequest(params: Option[String] = Option.empty, message: Option[String] = Option.empty)
+
+class GenericHttpAPIImpl() extends GenericHttpAPI
 
 object GenericHttpAPI extends HttpMarvinApp {
   var system: ActorSystem = _
@@ -205,8 +210,6 @@ object GenericHttpAPI extends HttpMarvinApp {
   }
 }
 
-class GenericHttpAPIImpl() extends GenericHttpAPI
-
 trait GenericHttpAPI {
   protected def setupSystem(engineFilePath:String, paramsFilePath:String): ActorSystem = {
     val metadata = readJsonIfFileExists[EngineMetadata](engineFilePath)
@@ -272,26 +275,21 @@ trait GenericHttpAPI {
   }
 
   protected def onlineActionHealthCheck(actionName: String): Future[HealthStatus] = {
-    val onlineHealthCheck = OnlineHealthCheckMessage(
-      actionName = actionName, artifacts = getArtifactsToLoad(actionName).mkString(","))
+    val onlineHealthCheck = OnlineHealthCheckMessage(actionName = actionName, artifacts=getArtifactsToLoad(actionName))
     implicit val futureTimeout = GenericHttpAPI.healthCheckTimeout
     implicit val ec = GenericHttpAPI.system.dispatcher
     (GenericHttpAPI.onlineActor ? onlineHealthCheck).mapTo[Status] collect asHealthStatus
   }
 
   protected def batchActionHealthCheck(actionName: String): Future[HealthStatus] = {
-    val batchHealthCheck = BatchHealthCheckMessage(
-      actionName = actionName, artifacts = getArtifactsToLoad(actionName).mkString(","))
+    val batchHealthCheck = BatchHealthCheckMessage(actionName = actionName, artifacts = getArtifactsToLoad(actionName))
     implicit val futureTimeout = GenericHttpAPI.healthCheckTimeout
     implicit val ec = GenericHttpAPI.system.dispatcher
     (GenericHttpAPI.batchActor ? batchHealthCheck).mapTo[Status] collect asHealthStatus
   }
 
-  private def getArtifactsToLoad(actionName: String): List[String] = {
-    GenericHttpAPI.metadata.actions.foreach{case action =>
-      if(action.name.equals(actionName)) return action.artifactsToLoad
-    }
-    throw new IllegalArgumentException(s"$actionName is not a valid action.")
+  private def getArtifactsToLoad(actionName: String): String = {
+    GenericHttpAPI.metadata.actionsMap(actionName).artifactsToLoad.mkString(",")
   }
 
   private def asHealthStatus: PartialFunction[Status, HealthStatus] = new PartialFunction[Status, HealthStatus] {
@@ -326,6 +324,3 @@ trait GenericHttpAPI {
   }
 
 }
-
-case class HttpEngineResponse(result: String)
-case class HttpEngineRequest(params: Option[String] = Option.empty, message: Option[String] = Option.empty)

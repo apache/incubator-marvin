@@ -33,19 +33,13 @@ class ArtifactSaver(engineMetadata: EngineMetadata) extends Actor with ActorLogg
 
   override def preStart() = {
     log.info(s"${this.getClass().getCanonicalName} actor initialized...")
-
-    actionsMap = Map[String, List[String]]()
-
-    for(action <- engineMetadata.actions){
-      actionsMap += ((action.name) -> action.artifactsToPersist)
-    }
   }
 
   def receive = {
     case SaverMessage(actionName, protocol) =>
       log.info("Receive message and starting to working...")
 
-      val artifacts = actionsMap(actionName)
+      val artifacts = engineMetadata.actionsMap(actionName).artifactsToPersist
 
       val uris = HdfsUtil.generateUris(artifacts, engineMetadata.artifactsLocalPath, engineMetadata.artifactsRemotePath, engineMetadata.name, engineMetadata.version, protocol)
       for(uri <- uris){
