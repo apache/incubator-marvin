@@ -55,8 +55,8 @@ class ArtifactLoader(engineMetadata: EngineMetadata) extends Actor with ActorLog
     }
   }
 
-  def copyArtifacts(artifacts: List[String]) {
-    val uris = HdfsUtil.generateUris(artifacts, engineMetadata.artifactsLocalPath, engineMetadata.artifactsRemotePath, engineMetadata.name, engineMetadata.version)
+  def copyArtifacts(artifacts: List[String], protocol:String) {
+    val uris = HdfsUtil.generateUris(artifacts, engineMetadata.artifactsLocalPath, engineMetadata.artifactsRemotePath, engineMetadata.name, engineMetadata.version, protocol)
 
     for (uri <- uris) {
       log.info(s"Copy file from ${uri("remoteUri")} to ${uri("localUri")}}")
@@ -71,7 +71,7 @@ class ArtifactLoader(engineMetadata: EngineMetadata) extends Actor with ActorLog
 
       val artifacts = actionsMap(actionName)
 
-      copyArtifacts(artifacts)
+      copyArtifacts(artifacts, protocol)
 
       val joined_artifacts = artifacts.mkString(",")
 
@@ -88,7 +88,7 @@ class ArtifactLoader(engineMetadata: EngineMetadata) extends Actor with ActorLog
 
       val artifacts = actionsMap(actionName)
 
-      copyArtifacts(artifacts)
+      copyArtifacts(artifacts, protocol)
 
       val joined_artifacts = artifacts.mkString(",")
 

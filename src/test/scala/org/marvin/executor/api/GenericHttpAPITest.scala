@@ -27,14 +27,12 @@ import scala.concurrent.duration._
 import ContentTypes._
 import akka.actor.{ActorSystem, Terminated}
 import akka.http.scaladsl.server.Route
-import com.typesafe.config.ConfigFactory
 import org.marvin.executor.actions.BatchAction.BatchMessage
 import org.marvin.manager.ArtifactLoader.{BatchArtifactLoaderMessage, OnlineArtifactLoaderMessage}
 import org.marvin.model.MarvinEExecutorException
-import org.marvin.util.ConfigurationContext
+import org.marvin.util.ProtocolUtil
 
 import scala.concurrent.Future
-import scala.io.Source
 
 class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers with Inside with MockFactory {
 
@@ -133,32 +131,34 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
     "interpret params and call BatchActor" in {
       val probe = setupProbe()
+      mockProtocolService()
       GenericHttpAPI.batchActor = probe.ref
 
       val result = Post("/acquisitor", HttpEntity(`application/json`, s"""{"params": "testParams"}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "acquisitor", params = "testParams")
+      val expectedMessage = BatchMessage(actionName = "acquisitor", params = "testParams", protocol="mockedProtocol")
       probe.expectMsg(expectedMessage)
 
       check{
         status shouldEqual StatusCodes.OK
-        responseAs[String] shouldEqual s"""{"result":"Working in progress!"}"""
+        responseAs[String] shouldEqual s"""{"result":"mockedProtocol"}"""
       }(result)
     }
 
     "use default params when no params is informed" in {
       val probe = setupProbe()
+      mockProtocolService()
       GenericHttpAPI.batchActor = probe.ref
       GenericHttpAPI.defaultParams = "default for test"
 
       val result = Post("/acquisitor", HttpEntity(`application/json`, s"""{}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "acquisitor", params = "default for test")
+      val expectedMessage = BatchMessage(actionName = "acquisitor", params = "default for test", protocol="mockedProtocol")
       probe.expectMsg(expectedMessage)
 
       check{
         status shouldEqual StatusCodes.OK
-        responseAs[String] shouldEqual s"""{"result":"Working in progress!"}"""
+        responseAs[String] shouldEqual s"""{"result":"mockedProtocol"}"""
       }(result)
     }
   }
@@ -167,32 +167,34 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
     "interpret params and call BatchActor" in {
       val probe = setupProbe()
+      mockProtocolService()
       GenericHttpAPI.batchActor = probe.ref
 
       val result = Post("/tpreparator", HttpEntity(`application/json`, s"""{"params": "testParams"}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "tpreparator", params = "testParams")
+      val expectedMessage = BatchMessage(actionName = "tpreparator", params = "testParams", protocol="mockedProtocol")
       probe.expectMsg(expectedMessage)
 
       check{
         status shouldEqual StatusCodes.OK
-        responseAs[String] shouldEqual s"""{"result":"Working in progress!"}"""
+        responseAs[String] shouldEqual s"""{"result":"mockedProtocol"}"""
       }(result)
     }
 
     "use default params when no params is informed" in {
       val probe = setupProbe()
+      mockProtocolService()
       GenericHttpAPI.batchActor = probe.ref
       GenericHttpAPI.defaultParams = "default for test"
 
       val result = Post("/tpreparator", HttpEntity(`application/json`, s"""{}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "tpreparator", params = "default for test")
+      val expectedMessage = BatchMessage(actionName = "tpreparator", params = "default for test", protocol="mockedProtocol")
       probe.expectMsg(expectedMessage)
 
       check{
         status shouldEqual StatusCodes.OK
-        responseAs[String] shouldEqual s"""{"result":"Working in progress!"}"""
+        responseAs[String] shouldEqual s"""{"result":"mockedProtocol"}"""
       }(result)
     }
   }
@@ -227,32 +229,34 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
     "interpret params and call BatchActor" in {
       val probe = setupProbe()
+      mockProtocolService()
       GenericHttpAPI.batchActor = probe.ref
 
       val result = Post("/trainer", HttpEntity(`application/json`, s"""{"params": "testParams"}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "trainer", params = "testParams")
+      val expectedMessage = BatchMessage(actionName = "trainer", params = "testParams", protocol="mockedProtocol")
       probe.expectMsg(expectedMessage)
 
       check {
         status shouldEqual StatusCodes.OK
-        responseAs[String] shouldEqual s"""{"result":"Working in progress!"}"""
+        responseAs[String] shouldEqual s"""{"result":"mockedProtocol"}"""
       }(result)
     }
 
     "use default params when no params is informed" in {
       val probe = setupProbe()
+      mockProtocolService()
       GenericHttpAPI.batchActor = probe.ref
       GenericHttpAPI.defaultParams = "default for test"
 
       val result = Post("/trainer", HttpEntity(`application/json`, s"""{}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "trainer", params = "default for test")
+      val expectedMessage = BatchMessage(actionName = "trainer", params = "default for test", protocol="mockedProtocol")
       probe.expectMsg(expectedMessage)
 
       check {
         status shouldEqual StatusCodes.OK
-        responseAs[String] shouldEqual s"""{"result":"Working in progress!"}"""
+        responseAs[String] shouldEqual s"""{"result":"mockedProtocol"}"""
       }(result)
     }
   }
@@ -286,32 +290,34 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
     "interpret params and call BatchActor" in {
       val probe = setupProbe()
+      mockProtocolService()
       GenericHttpAPI.batchActor = probe.ref
 
       val result = Post("/evaluator", HttpEntity(`application/json`, s"""{"params": "testParams"}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "evaluator", params = "testParams")
+      val expectedMessage = BatchMessage(actionName = "evaluator", params = "testParams", protocol = "mockedProtocol")
       probe.expectMsg(expectedMessage)
 
       check {
         status shouldEqual StatusCodes.OK
-        responseAs[String] shouldEqual s"""{"result":"Working in progress!"}"""
+        responseAs[String] shouldEqual s"""{"result":"mockedProtocol"}"""
       }(result)
     }
 
     "use default params when no params is informed" in {
       val probe = setupProbe()
+      mockProtocolService()
       GenericHttpAPI.batchActor = probe.ref
       GenericHttpAPI.defaultParams = "default for test"
 
       val result = Post("/evaluator", HttpEntity(`application/json`, s"""{}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "evaluator", params = "default for test")
+      val expectedMessage = BatchMessage(actionName = "evaluator", params = "default for test", protocol = "mockedProtocol")
       probe.expectMsg(expectedMessage)
 
       check {
         status shouldEqual StatusCodes.OK
-        responseAs[String] shouldEqual s"""{"result":"Working in progress!"}"""
+        responseAs[String] shouldEqual s"""{"result":"mockedProtocol"}"""
       }(result)
     }
   }
@@ -358,7 +364,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
   "setupSystem method" should {
 
     "throw a friendly exception when engine file does not exists" in {
-      val httpApi = new GenericHttpAPIOpen()
+      val httpApi = new GenericHttpAPIOpen(new ProtocolUtil())
 
       val existentFile = getClass.getResource("/test.json").getPath()
 
@@ -370,7 +376,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
     }
 
     "throw a friendly exception when params file does not exists" in {
-      val httpApi = new GenericHttpAPIOpen()
+      val httpApi = new GenericHttpAPIOpen(new ProtocolUtil())
 
       val existentFile = getClass.getResource("/test.json").getPath()
 
@@ -382,7 +388,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
     }
 
     "do not throw exception and setup the system when params files are valid" in {
-      val httpApi = new GenericHttpAPIOpen()
+      val httpApi = new GenericHttpAPIOpen(new ProtocolUtil())
 
       val validMetadataFile = getClass.getResource("/valid.metadata").getPath()
       val validParamsFile = getClass.getResource("/valid.params").getPath()
@@ -398,11 +404,19 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
     GenericHttpAPI.system = system
     GenericHttpAPI.onlineActionTimeout = timeout
     GenericHttpAPI.healthCheckTimeout = timeout
+
     probe
+  }
+
+  def mockProtocolService(): Unit = {
+    val protocolService = mock[ProtocolUtil]
+    (protocolService.generateProtocol _).expects(*).returning("mockedProtocol")
+    GenericHttpAPI.api = new GenericHttpAPIImpl()
+    GenericHttpAPI.protocolService = protocolService
   }
 }
 
-class GenericHttpAPIOpen extends GenericHttpAPI {
+class GenericHttpAPIOpen(var protocolService: ProtocolUtil) extends GenericHttpAPI {
   override def setupSystem(engineFilePath: String, paramsFilePath: String): ActorSystem = super.setupSystem(engineFilePath, paramsFilePath)
   override def startServer(ipAddress: String, port: Int, system: ActorSystem): Unit = super.startServer(ipAddress, port, system)
   override def terminate(): Future[Terminated] = super.terminate()

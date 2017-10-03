@@ -19,7 +19,7 @@ import java.io.FileNotFoundException
 
 import actions.HealthCheckResponse.Status
 import akka.actor.{ActorRef, ActorSystem, Props, Terminated}
-import akka.http.scaladsl.server.{Route}
+import akka.http.scaladsl.server.Route
 import akka.pattern.ask
 import akka.util.Timeout
 import org.marvin.executor.actions.BatchAction.{BatchHealthCheckMessage, BatchMessage}
@@ -27,12 +27,12 @@ import org.marvin.executor.actions.OnlineAction.{OnlineHealthCheckMessage, Onlin
 import org.marvin.executor.actions.{BatchAction, OnlineAction}
 import org.marvin.manager.ArtifactLoader
 import org.marvin.manager.ArtifactLoader.{BatchArtifactLoaderMessage, OnlineArtifactLoaderMessage}
-import org.marvin.util.{ConfigurationContext, JsonUtil}
+import org.marvin.util.{ConfigurationContext, JsonUtil, ProtocolUtil}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model._
 
 import scala.concurrent._
-import scala.io.{Source}
+import scala.io.Source
 import scala.concurrent.duration._
 import org.marvin.executor.api.exception.EngineExceptionAndRejectionHandler._
 import spray.json.DefaultJsonProtocol._
@@ -55,11 +55,11 @@ object GenericHttpAPI extends HttpMarvinApp {
   var healthCheckTimeout: Timeout = _
 
   var api: GenericHttpAPI = new GenericHttpAPIImpl()
+  var protocolService = new ProtocolUtil()
 
   implicit val httpEngineResponseFormat = jsonFormat1(HttpEngineResponse)
   implicit val httpEngineRequestFormat = jsonFormat2(HttpEngineRequest)
   implicit val healthStatusFormat = jsonFormat2(HealthStatus)
-
 
   override def routes: Route =
     handleRejections(marvinEngineRejectionHandler){
@@ -197,16 +197,15 @@ object GenericHttpAPI extends HttpMarvinApp {
   }
 }
 
-class GenericHttpAPIImpl extends GenericHttpAPI
+class GenericHttpAPIImpl() extends GenericHttpAPI
 
 trait GenericHttpAPI {
-
   protected def setupSystem(engineFilePath:String, paramsFilePath:String): ActorSystem = {
     val metadata = readJsonIfFileExists[EngineMetadata](engineFilePath)
     GenericHttpAPI.metadata = metadata
     GenericHttpAPI.defaultParams = JsonUtil.toJson(readJsonIfFileExists[Map[String, String]](paramsFilePath))
 
-    val system = ActorSystem("MarvinExecutorSystem")
+    val system = ActorSystem(s"MarvinExecutorSystem")
 
     GenericHttpAPI.onlineActor = system.actorOf(Props(new OnlineAction(metadata)), name = "onlineActor")
     GenericHttpAPI.batchActor = system.actorOf(Props(new BatchAction(metadata)), name = "batchActor")
@@ -242,9 +241,10 @@ trait GenericHttpAPI {
   }
 
   protected def batchRequest(actionName: String, params: String): String = {
-    val batchMessage = BatchMessage(actionName=actionName, params=params)
+    val protocol = GenericHttpAPI.protocolService.generateProtocol(actionName)
+    val batchMessage = BatchMessage(actionName=actionName, params=params, protocol=protocol)
     GenericHttpAPI.batchActor ! batchMessage
-    "Working in progress!"
+    protocol
   }
 
   protected def onlineRequest(actionName: String, params: String, message: String): Future[String] = {

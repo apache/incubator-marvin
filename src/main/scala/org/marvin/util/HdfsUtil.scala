@@ -21,12 +21,12 @@ object HdfsUtil {
     fs.close()
   }
 
-  def generateUris(artifacts:List[String], localRootPath:String, remoteRootPath:String, engineName:String, engineVersion:String):List[Map[String, String]]={
+  def generateUris(artifacts:List[String], localRootPath:String, remoteRootPath:String, engineName:String, engineVersion:String, protocol:String):List[Map[String, String]]={
     val urls = ListBuffer[Map[String, String]]()
     for(artifactName <- artifacts){
       urls +=  Map(
         "localUri" -> s"$localRootPath/$engineName/$artifactName",
-        "remoteUri" -> s"$remoteRootPath/$engineName/$engineVersion/$artifactName"
+        "remoteUri" -> s"$remoteRootPath/$engineName/$engineVersion/$artifactName/$protocol"
       )
     }
     return urls.toList
