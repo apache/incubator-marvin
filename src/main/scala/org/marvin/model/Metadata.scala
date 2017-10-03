@@ -25,9 +25,15 @@ case class EngineMetadata(name:String, version:String, engineType:String,
                           reloadTimeout:Int,
                           hdfsHost:String){
   override def toString: String = name
-  val actionsMap = Map[String, EngineActionMetadata]()
-  for (action <- actions) {
-    actionsMap += ((action.name) -> action)
+
+  val actionsMap:Map[String, EngineActionMetadata] = {
+    val map = Map[String, EngineActionMetadata]()
+    if (actions != null) {
+      for (action <- actions) {
+        map += ((action.name) -> action)
+      }
+    }
+    map
   }
 }
 

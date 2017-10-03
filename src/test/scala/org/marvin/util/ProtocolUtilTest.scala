@@ -15,17 +15,16 @@ limitations under the License.
   */
 package org.marvin.util
 
-import org.marvin.util.ProtocolUtil
 import org.scalatest.{Matchers, WordSpec}
 
 class ProtocolUtilTest extends WordSpec with Matchers {
 
-  val protocolService = new ProtocolUtil()
+  val protocolUtil = new ProtocolUtil()
 
   "generateProtocol" should {
 
     "generate a protocol with valid format" in {
-      val protocol = protocolService.generateProtocol("test")
+      val protocol = protocolUtil.generateProtocol("test")
       protocol should startWith("test_")
 
       val protocolWithoutPrefix = protocol.replace("test_", "")

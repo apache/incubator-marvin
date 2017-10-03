@@ -409,10 +409,10 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
   }
 
   def mockProtocolService(): Unit = {
-    val protocolService = mock[ProtocolUtil]
-    (protocolService.generateProtocol _).expects(*).returning("mockedProtocol")
+    val protocolUtil = mock[ProtocolUtil]
+    (protocolUtil.generateProtocol _).expects(*).returning("mockedProtocol")
     GenericHttpAPI.api = new GenericHttpAPIImpl()
-    GenericHttpAPI.protocolUtil = protocolService
+    GenericHttpAPI.protocolUtil = protocolUtil
   }
 }
 
