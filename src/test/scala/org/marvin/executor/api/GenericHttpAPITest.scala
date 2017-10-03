@@ -28,9 +28,9 @@ import ContentTypes._
 import akka.actor.{ActorSystem, Terminated}
 import akka.http.scaladsl.server.Route
 import org.marvin.executor.actions.BatchAction.BatchMessage
-import org.marvin.executor.api.service.ProtocolService
 import org.marvin.manager.ArtifactLoader.{BatchArtifactLoaderMessage, OnlineArtifactLoaderMessage}
 import org.marvin.model.MarvinEExecutorException
+import org.marvin.util.ProtocolUtil
 
 import scala.concurrent.Future
 
@@ -364,7 +364,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
   "setupSystem method" should {
 
     "throw a friendly exception when engine file does not exists" in {
-      val httpApi = new GenericHttpAPIOpen(new ProtocolService())
+      val httpApi = new GenericHttpAPIOpen(new ProtocolUtil())
 
       val existentFile = getClass.getResource("/test.json").getPath()
 
@@ -376,7 +376,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
     }
 
     "throw a friendly exception when params file does not exists" in {
-      val httpApi = new GenericHttpAPIOpen(new ProtocolService())
+      val httpApi = new GenericHttpAPIOpen(new ProtocolUtil())
 
       val existentFile = getClass.getResource("/test.json").getPath()
 
@@ -388,7 +388,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
     }
 
     "do not throw exception and setup the system when params files are valid" in {
-      val httpApi = new GenericHttpAPIOpen(new ProtocolService())
+      val httpApi = new GenericHttpAPIOpen(new ProtocolUtil())
 
       val validMetadataFile = getClass.getResource("/valid.metadata").getPath()
       val validParamsFile = getClass.getResource("/valid.params").getPath()
@@ -409,13 +409,14 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
   }
 
   def mockProtocolService(): Unit = {
-    val protocolService = mock[ProtocolService]
+    val protocolService = mock[ProtocolUtil]
     (protocolService.generateProtocol _).expects(*).returning("mockedProtocol")
-    GenericHttpAPI.api = new GenericHttpAPIImpl(protocolService)
+    GenericHttpAPI.api = new GenericHttpAPIImpl()
+    GenericHttpAPI.protocolService = protocolService
   }
 }
 
-class GenericHttpAPIOpen(var protocolService: ProtocolService) extends GenericHttpAPI {
+class GenericHttpAPIOpen(var protocolService: ProtocolUtil) extends GenericHttpAPI {
   override def setupSystem(engineFilePath: String, paramsFilePath: String): ActorSystem = super.setupSystem(engineFilePath, paramsFilePath)
   override def startServer(ipAddress: String, port: Int, system: ActorSystem): Unit = super.startServer(ipAddress, port, system)
   override def terminate(): Future[Terminated] = super.terminate()

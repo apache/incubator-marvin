@@ -13,13 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
   */
-package org.marvin.executor.api.service
+package org.marvin.util.service
 
+import org.marvin.util.ProtocolUtil
 import org.scalatest.{Matchers, WordSpec}
 
-class ProtocolServiceTest extends WordSpec with Matchers {
+class ProtocolUtilTest extends WordSpec with Matchers {
 
-  val protocolService = new ProtocolService()
+  val protocolService = new ProtocolUtil()
 
   "generateProtocol" should {
 
