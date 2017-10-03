@@ -4,8 +4,8 @@
 .testmondata
 .coverage
 .coverage.*
-coverage_report.xml
 coverage_report
+coverage.xml
 *.egg
 *.egg-info
 *.pyc
