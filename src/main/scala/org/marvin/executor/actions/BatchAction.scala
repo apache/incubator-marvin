@@ -26,7 +26,7 @@ import org.marvin.manager.ArtifactSaver.SaverMessage
 import org.marvin.model.EngineMetadata
 
 object BatchAction {
-  case class BatchMessage(actionName:String, params:String)
+  case class BatchMessage(actionName:String, params:String, protocol:String)
   case class BatchReloadMessage(actionName: String, artifacts:String, protocol:String)
   case class BatchHealthCheckMessage(actionName: String, artifacts: String)
   case class BatchPipelineMessage(actions:List[String], params:String, protocol:String)
@@ -42,14 +42,14 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
   }
 
   def receive = {
-    case BatchMessage(actionName, params) =>
+    case BatchMessage(actionName, params, protocol) =>
       implicit val generalTimeout = Timeout(3 days) //TODO how to measure???
 
       log.info(s"Sending a message ${params} to $actionName")
       this.actionHandler.send_message(actionName=actionName, params=params)
 
       log.info(s"Sending a message to SaverMessage [${actionName}]")
-      artifactSaveActor ? SaverMessage(actionName=actionName)
+      artifactSaveActor ! SaverMessage(actionName=actionName, protocol=protocol)
 
       sender ! "Done"
 
@@ -72,7 +72,7 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
           self ? BatchReloadMessage(actionName, artifacts, protocol)
         }
 
-        self ? BatchMessage(actionName, params)
+        self ? BatchMessage(actionName, params, protocol)
       }
 
       sender ! "Done"

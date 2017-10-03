@@ -22,7 +22,7 @@ import org.marvin.model.EngineMetadata
 import org.marvin.util.HdfsUtil
 
 object ArtifactSaver {
-  case class SaverMessage(actionName:String)
+  case class SaverMessage(actionName:String, protocol:String)
 }
 
 class ArtifactSaver(engineMetadata: EngineMetadata) extends Actor with ActorLogging {
@@ -42,12 +42,12 @@ class ArtifactSaver(engineMetadata: EngineMetadata) extends Actor with ActorLogg
   }
 
   def receive = {
-    case SaverMessage(actionName) =>
+    case SaverMessage(actionName, protocol) =>
       log.info("Receive message and starting to working...")
 
       val artifacts = actionsMap(actionName)
 
-      val uris = HdfsUtil.generateUris(artifacts, engineMetadata.artifactsLocalPath, engineMetadata.artifactsRemotePath, engineMetadata.name, engineMetadata.version)
+      val uris = HdfsUtil.generateUris(artifacts, engineMetadata.artifactsLocalPath, engineMetadata.artifactsRemotePath, engineMetadata.name, engineMetadata.version, protocol)
       for(uri <- uris){
         log.info(s"Sending file ${uri("localUri")} to ${uri("remoteUri")}")
         HdfsUtil.copyFromLocal(hdfsConf, uri("localUri"), uri("remoteUri"))
