@@ -16,11 +16,10 @@ limitations under the License.
 package org.marvin.executor.api
 
 import java.io.FileNotFoundException
-import io.jvm.uuid.UUID
 
 import actions.HealthCheckResponse.Status
 import akka.actor.{ActorRef, ActorSystem, Props, Terminated}
-import akka.http.scaladsl.server.{Route}
+import akka.http.scaladsl.server.Route
 import akka.pattern.ask
 import akka.util.Timeout
 import org.marvin.executor.actions.BatchAction.{BatchHealthCheckMessage, BatchMessage}
@@ -33,11 +32,12 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model._
 
 import scala.concurrent._
-import scala.io.{Source}
+import scala.io.Source
 import scala.concurrent.duration._
 import org.marvin.executor.api.exception.EngineExceptionAndRejectionHandler._
 import spray.json.DefaultJsonProtocol._
 import org.marvin.executor.api.model.HealthStatus
+import org.marvin.executor.api.service.ProtocolService
 import org.marvin.model.{EngineMetadata, MarvinEExecutorException}
 
 import scala.reflect.ClassTag
@@ -55,7 +55,7 @@ object GenericHttpAPI extends HttpMarvinApp {
   var onlineActionTimeout: Timeout = _
   var healthCheckTimeout: Timeout = _
 
-  var api: GenericHttpAPI = new GenericHttpAPIImpl()
+  var api: GenericHttpAPI = new GenericHttpAPIImpl(new ProtocolService())
 
   implicit val httpEngineResponseFormat = jsonFormat1(HttpEngineResponse)
   implicit val httpEngineRequestFormat = jsonFormat2(HttpEngineRequest)
@@ -198,9 +198,12 @@ object GenericHttpAPI extends HttpMarvinApp {
   }
 }
 
-class GenericHttpAPIImpl extends GenericHttpAPI
+class GenericHttpAPIImpl(var protocolService: ProtocolService) extends GenericHttpAPI
 
 trait GenericHttpAPI {
+
+  def protocolService: ProtocolService
+  def protocolService_=(protocolService: ProtocolService): Unit
 
   protected def setupSystem(engineFilePath:String, paramsFilePath:String): ActorSystem = {
     val metadata = readJsonIfFileExists[EngineMetadata](engineFilePath)
@@ -242,12 +245,8 @@ trait GenericHttpAPI {
     GenericHttpAPI.system.terminate()
   }
 
-  protected def generateProtocol(actionName:String): String ={
-    s"${actionName}_${UUID.randomString}"
-  }
-
   protected def batchRequest(actionName: String, params: String): String = {
-    val protocol = generateProtocol(actionName)
+    val protocol = protocolService.generateProtocol(actionName)
     val batchMessage = BatchMessage(actionName=actionName, params=params, protocol=protocol)
     GenericHttpAPI.batchActor ! batchMessage
     protocol
