@@ -17,13 +17,13 @@ package org.marvin.executor.actions
 
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.pattern.ask
+import akka.util.Timeout
+import scala.concurrent.duration._
 import org.marvin.executor.actions.ActionHandler.BatchType
 import org.marvin.executor.actions.BatchAction.{BatchHealthCheckMessage, BatchMessage, BatchPipelineMessage, BatchReloadMessage}
 import org.marvin.manager.ArtifactSaver
 import org.marvin.manager.ArtifactSaver.SaverMessage
 import org.marvin.model.EngineMetadata
-
-import scala.concurrent.Future
 
 object BatchAction {
   case class BatchMessage(actionName:String, params:String)
@@ -43,6 +43,8 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
 
   def receive = {
     case BatchMessage(actionName, params) =>
+      implicit val generalTimeout = Timeout(3 days) //TODO how to measure???
+
       log.info(s"Sending a message ${params} to $actionName")
       this.actionHandler.send_message(actionName=actionName, params=params)
 
@@ -60,6 +62,7 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
       sender ! this.actionHandler.healthCheck(actionName, artifacts)
 
     case BatchPipelineMessage(actions, params, protocol) =>
+      implicit val generalTimeout = Timeout(3 days) //TODO how to measure???
 
       //Call all batch actions in order to save and reload the next step
       for(actionName <- actions) {
