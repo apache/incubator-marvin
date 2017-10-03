@@ -259,7 +259,7 @@ trait GenericHttpAPI {
   }
 
   protected def batchPipelineRequest(params: String): String = {
-    val actions = List("acquisitor", "tpreparator", "trainer", "evaluator")
+    val actions = GenericHttpAPI.metadata.pipelineActions
     val protocol = GenericHttpAPI.protocolUtil.generateProtocol("pipeline")
     val batchPipelineMessage = BatchPipelineMessage(actions=actions, params=params, protocol=protocol)
     GenericHttpAPI.batchActor ! batchPipelineMessage

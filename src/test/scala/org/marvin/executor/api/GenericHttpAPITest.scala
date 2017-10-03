@@ -25,9 +25,10 @@ import akka.util.Timeout
 
 import scala.concurrent.duration._
 import ContentTypes._
+import akka.Done
 import akka.actor.{ActorSystem, Terminated}
 import akka.http.scaladsl.server.Route
-import org.marvin.executor.actions.BatchAction.BatchMessage
+import org.marvin.executor.actions.BatchAction.{BatchMessage, BatchPipelineMessage}
 import org.marvin.manager.ArtifactLoader.{BatchArtifactLoaderMessage, OnlineArtifactLoaderMessage}
 import org.marvin.model.MarvinEExecutorException
 import org.marvin.util.ProtocolUtil
@@ -344,6 +345,27 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
         status shouldEqual StatusCodes.BadRequest
         responseAs[String] shouldEqual s"""{"errorMessage":"Missing query parameter. [protocol]"}"""
       }
+    }
+  }
+
+  "/pipeline endpoint" should {
+
+    "interpret params and call BatchActor" in {
+      val probe = setupProbe()
+      mockProtocolService()
+      GenericHttpAPI.batchActor = probe.ref
+      GenericHttpAPI.artifactLoaderActor = probe.ref
+
+      val result = Post("/pipeline", HttpEntity(`application/json`, s"""{"params": "testParams"}""")) ~> route ~> runRoute
+
+      val actions = List("acquisitor", "tpreparator", "trainer", "evaluator")
+      probe.expectMsg(BatchPipelineMessage(actions = actions, params = "testParams", protocol = "mockedProtocol"))
+      probe.reply(Done)
+
+      check {
+        status shouldEqual StatusCodes.OK
+        responseAs[String] shouldEqual s"""{"result":"mockedProtocol"}"""
+      }(result)
     }
   }
 

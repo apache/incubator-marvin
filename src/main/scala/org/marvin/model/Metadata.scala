@@ -23,7 +23,8 @@ case class EngineMetadata(name:String, version:String, engineType:String,
                           onlineActionTimeout:Int,
                           healthCheckTimeout:Int,
                           reloadTimeout:Int,
-                          hdfsHost:String){
+                          hdfsHost:String,
+                          pipelineActions:List[String]){
   override def toString: String = name
 
   val actionsMap:Map[String, EngineActionMetadata] = {

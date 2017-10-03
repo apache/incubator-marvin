@@ -27,8 +27,6 @@ import org.marvin.manager.ArtifactSaver
 import org.marvin.manager.ArtifactSaver.SaverMessage
 import org.marvin.model.EngineMetadata
 
-import scala.concurrent.{Await, Future}
-
 object BatchAction {
   case class BatchMessage(actionName:String, params:String, protocol:String)
   case class BatchReloadMessage(actionName: String, artifacts:String, protocol:String)
@@ -61,21 +59,17 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
       sender ! this.actionHandler.reload(actionName, artifacts, protocol)
 
     case BatchHealthCheckMessage(actionName, artifacts) =>
-      log.debug(s"Sending message to batch health check. Following artifacts included: $artifacts.")
+      log.info(s"Sending message to batch health check. Following artifacts included: $artifacts.")
       sender ! this.actionHandler.healthCheck(actionName, artifacts)
 
     case BatchPipelineMessage(actions, params, protocol) =>
       //Call all batch actions in order to save and reload the next step
+      log.info(s"Executing Pipeline process with...")
       for(actionName <- actions) {
         val artifacts = engineMetadata.actionsMap(actionName).artifactsToLoad.mkString(",")
-
-        if (!artifacts.isEmpty) {
-          self ? BatchReloadMessage(actionName, artifacts, protocol)
-        }
-
+        if (!artifacts.isEmpty) self ? BatchReloadMessage(actionName, artifacts, protocol)
         self ? BatchMessage(actionName, params, protocol)
       }
-
       sender ! Done
 
     case _ =>
