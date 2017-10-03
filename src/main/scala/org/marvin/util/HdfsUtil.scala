@@ -26,7 +26,7 @@ object HdfsUtil {
     for(artifactName <- artifacts){
       urls +=  Map(
         "localUri" -> s"$localRootPath/$engineName/$artifactName",
-        "remoteUri" -> s"$remoteRootPath/$engineName/$engineVersion/$protocol/$artifactName"
+        "remoteUri" -> s"$remoteRootPath/$engineName/$engineVersion/$artifactName/$protocol"
       )
     }
     return urls.toList
