@@ -71,6 +71,8 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
         self ? BatchMessage(actionName, params, protocol)
       }
       sender ! Done
+    case Done =>
+      log.info("Work d  one with success!!")
 
     case _ =>
       log.info("Received a bad format message...")
