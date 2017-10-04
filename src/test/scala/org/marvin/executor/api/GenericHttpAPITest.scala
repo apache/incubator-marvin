@@ -28,9 +28,9 @@ import ContentTypes._
 import akka.Done
 import akka.actor.{ActorSystem, Terminated}
 import akka.http.scaladsl.server.Route
-import org.marvin.executor.actions.BatchAction.{BatchMessage, BatchPipelineMessage}
+import org.marvin.executor.actions.BatchAction.{BatchMessage, BatchPipelineMessage, BatchReloadMessage}
 import org.marvin.manager.ArtifactLoader.{BatchArtifactLoaderMessage, OnlineArtifactLoaderMessage}
-import org.marvin.model.MarvinEExecutorException
+import org.marvin.model.{EngineActionMetadata, EngineMetadata, MarvinEExecutorException}
 import org.marvin.util.ProtocolUtil
 
 import scala.concurrent.Future
@@ -348,27 +348,6 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
     }
   }
 
-  "/pipeline endpoint" should {
-
-    "interpret params and call BatchActor" in {
-      val probe = setupProbe()
-      mockProtocolService()
-      GenericHttpAPI.batchActor = probe.ref
-      GenericHttpAPI.artifactLoaderActor = probe.ref
-
-      val result = Post("/pipeline", HttpEntity(`application/json`, s"""{"params": "testParams"}""")) ~> route ~> runRoute
-
-      val actions = List("acquisitor", "tpreparator", "trainer", "evaluator")
-      probe.expectMsg(BatchPipelineMessage(actions = actions, params = "testParams", protocol = "mockedProtocol"))
-      probe.reply(Done)
-
-      check {
-        status shouldEqual StatusCodes.OK
-        responseAs[String] shouldEqual s"""{"result":"mockedProtocol"}"""
-      }(result)
-    }
-  }
-
   "main method" should {
 
     "load paths, ip and port from system configuration" in {
@@ -422,7 +401,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
   def setupProbe() : TestProbe = {
     val probe = TestProbe()
-    val timeout = Timeout(2 seconds)
+    val timeout = Timeout(3 seconds)
     GenericHttpAPI.system = system
     GenericHttpAPI.onlineActionTimeout = timeout
     GenericHttpAPI.healthCheckTimeout = timeout
