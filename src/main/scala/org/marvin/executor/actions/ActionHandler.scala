@@ -15,6 +15,8 @@ limitations under the License.
   */
 package org.marvin.executor.actions
 
+import java.util.concurrent.Executors
+
 import io.grpc.ManagedChannelBuilder
 import org.marvin.executor.actions.ActionHandler.{BatchType, OnlineType}
 import actions.BatchActionHandlerGrpc.BatchActionHandlerBlockingStub
@@ -24,6 +26,7 @@ import actions._
 import org.marvin.model.{EngineActionMetadata, EngineMetadata}
 
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext
 
 object ActionHandler {
   sealed abstract class ActionTypes(val name:String) {
@@ -67,7 +70,7 @@ class ActionHandler(metadata:EngineMetadata, actionType:ActionHandler.ActionType
         this.clients(actionName).asInstanceOf[BatchActionHandlerBlockingStub].RemoteExecute(request).message
 
       case _ =>
-        return "Action type is not supported!!!"
+        throw new UnsupportedOperationException(s"The action type ${this.actionType.toString} is not implemented.")
     }
   }
 
@@ -82,7 +85,7 @@ class ActionHandler(metadata:EngineMetadata, actionType:ActionHandler.ActionType
         this.clients(actionName).asInstanceOf[BatchActionHandlerBlockingStub].RemoteReload(request).message
 
       case _ =>
-        return "Action type is not supported!!!"
+        throw new UnsupportedOperationException(s"The action type ${this.actionType.toString} is not implemented.")
     }
   }
 

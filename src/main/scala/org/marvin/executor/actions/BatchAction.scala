@@ -15,6 +15,8 @@ limitations under the License.
   */
 package org.marvin.executor.actions
 
+import java.util.concurrent.Executors
+
 import akka.Done
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.pattern.ask
@@ -26,6 +28,8 @@ import org.marvin.executor.actions.BatchAction.{BatchHealthCheckMessage, BatchMe
 import org.marvin.manager.ArtifactSaver
 import org.marvin.manager.ArtifactSaver.SaverMessage
 import org.marvin.model.EngineMetadata
+
+import scala.concurrent.{ExecutionContext, Future}
 
 object BatchAction {
   case class BatchMessage(actionName:String, params:String, protocol:String)
@@ -46,36 +50,48 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
 
   def receive = {
     case BatchMessage(actionName, params, protocol) =>
-      log.info(s"Sending a message ${params} to $actionName")
-      this.actionHandler.send_message(actionName=actionName, params=params)
+      implicit val context = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
 
-      log.info(s"Sending a message to SaverMessage [${actionName}]")
-      artifactSaveActor ! SaverMessage(actionName=actionName, protocol=protocol)
-
-      sender ! Done
+      Future {
+        log.info(s"Sending a message ${params} to $actionName")
+        this.actionHandler.send_message(actionName=actionName, params=params)
+        log.info(s"Sending a message to SaverMessage [${actionName}]")
+        artifactSaveActor ! SaverMessage(actionName=actionName, protocol=protocol)
+      }.onComplete { result =>
+        sender ! result
+      }
 
     case BatchReloadMessage(actionName, artifacts, protocol) =>
-      log.info(s"Sending the message to reload the $artifacts of $actionName using protocol $protocol")
-      this.actionHandler.reload(actionName, artifacts, protocol)
+      implicit val context = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
 
-      sender ! Done
+      Future {
+        log.info(s"Sending the message to reload the $artifacts of $actionName using protocol $protocol")
+        this.actionHandler.reload(actionName, artifacts, protocol)
+      }.onComplete { result =>
+        log.info(s"$result")
+        sender ! Done
+      }
 
     case BatchHealthCheckMessage(actionName, artifacts) =>
       log.info(s"Sending message to batch health check. Following artifacts included: $artifacts.")
       sender ! this.actionHandler.healthCheck(actionName, artifacts)
 
     case BatchPipelineMessage(actions, params, protocol) =>
-      //Call all batch actions in order to save and reload the next step
-      log.info(s"Executing Pipeline process with...")
-      for(actionName <- actions) {
-        val artifacts = engineMetadata.actionsMap(actionName).artifactsToLoad.mkString(",")
-        
-        if (!artifacts.isEmpty) self ? BatchReloadMessage(actionName, artifacts, protocol)
-        
-        self ? BatchMessage(actionName, params, protocol)
-      }
+      implicit val context = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
 
-      sender ! Done
+      Future {
+        //Call all batch actions in order to save and reload the next step
+        log.info(s"Executing Pipeline process with...")
+        for(actionName <- actions) {
+          val artifacts = engineMetadata.actionsMap(actionName).artifactsToLoad.mkString(",")
+
+          if (!artifacts.isEmpty) self ? BatchReloadMessage(actionName, artifacts, protocol)
+
+          self ? BatchMessage(actionName, params, protocol)
+        }
+      }.onComplete { result =>
+        sender ! result
+      }
     
     case Done =>
       log.info("Work done with success!!")
