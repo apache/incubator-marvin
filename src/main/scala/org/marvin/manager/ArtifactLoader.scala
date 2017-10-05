@@ -95,6 +95,9 @@ class ArtifactLoader(engineMetadata: EngineMetadata) extends Actor with ActorLog
 
       sender ! Done
 
+    case Done =>
+      log.info("Work done with success!!")
+
     case _ =>
       log.info("Received a bad format message...")
   }
