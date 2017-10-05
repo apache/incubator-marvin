@@ -38,7 +38,7 @@ class OnlineAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggi
   def receive = {
     case OnlineMessage(actionName, message, params) =>
       log.info(s"Sending the message ${message} and params ${params} to $actionName")
-      sender ! this.actionHandler.send_message(actionName=actionName, params=params, message=message)
+      sender ! this.actionHandler.send_message(actionName = actionName, params = params, message = message)
 
     case OnlineReloadMessage(actionName, artifacts, protocol) =>
       log.info(s"Sending the message to reload the $artifacts of $actionName using protocol $protocol")
