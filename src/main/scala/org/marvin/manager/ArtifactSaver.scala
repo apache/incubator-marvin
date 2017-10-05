@@ -15,6 +15,7 @@ limitations under the License.
   */
 package org.marvin.manager
 
+import akka.Done
 import akka.actor.{Actor, ActorLogging}
 import org.apache.hadoop.conf.Configuration
 import org.marvin.manager.ArtifactSaver.SaverMessage
@@ -48,7 +49,8 @@ class ArtifactSaver(engineMetadata: EngineMetadata) extends Actor with ActorLogg
         log.info(s"File ${uri("remoteUri")} saved!")
       }
 
-      sender ! "Done"
+      sender ! Done
+    
     case _ =>
       log.info("Received a bad format message...")
   }

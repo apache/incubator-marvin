@@ -15,6 +15,7 @@ limitations under the License.
   */
 package org.marvin.executor.actions
 
+import akka.Done
 import akka.actor.{Actor, ActorLogging}
 import org.marvin.executor.actions.ActionHandler.OnlineType
 import org.marvin.executor.actions.OnlineAction.{OnlineHealthCheckMessage, OnlineMessage, OnlineReloadMessage}
@@ -41,10 +42,11 @@ class OnlineAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggi
 
     case OnlineReloadMessage(actionName, artifacts, protocol) =>
       log.info(s"Sending the message to reload the $artifacts of $actionName using protocol $protocol")
-      sender ! this.actionHandler.reload(actionName=actionName, artifacts=artifacts, protocol=protocol)
+      this.actionHandler.reload(actionName=actionName, artifacts=artifacts, protocol=protocol)
+      sender ! Done
 
     case OnlineHealthCheckMessage(actionName, artifacts) =>
-      log.debug("Sending online health check request.")
+      log.info("Sending online health check request.")
       sender ! this.actionHandler.healthCheck(actionName = actionName, artifacts = artifacts)
 
     case _ =>

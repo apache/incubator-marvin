@@ -15,6 +15,7 @@ limitations under the License.
   */
 package org.marvin.manager
 
+import akka.Done
 import akka.actor.{Actor, ActorLogging}
 import akka.pattern.ask
 import akka.util.Timeout
@@ -71,11 +72,11 @@ class ArtifactLoader(engineMetadata: EngineMetadata) extends Actor with ActorLog
 
       log.info(s"Reloading artifacts [${joined_artifacts}] in ${actionName}")
 
-      val reloadMessage = OnlineReloadMessage(actionName, joined_artifacts, protocol)
-      val futureResponse: Future[String] = (onlineActor ? reloadMessage).mapTo[String]
-      val response = Await.result(futureResponse, reloadTimeout.duration)
+      val response: Future[String] = (onlineActor ? OnlineReloadMessage(actionName, joined_artifacts, protocol)).mapTo[String]
 
       log.info(s"Artifacts [${joined_artifacts}] in $actionName [$response]!!")
+
+      sender ! Done
 
     case BatchArtifactLoaderMessage(actionName, protocol) =>
       log.info("Receive message and starting to working...")
@@ -88,11 +89,11 @@ class ArtifactLoader(engineMetadata: EngineMetadata) extends Actor with ActorLog
 
       log.info(s"Reloading artifacts [${joined_artifacts}] in ${actionName}")
 
-      val reloadMessage = BatchReloadMessage(actionName, joined_artifacts, protocol)
-      val futureResponse: Future[String] = (batchActor ? reloadMessage).mapTo[String]
-      val response = Await.result(futureResponse, reloadTimeout.duration)
+      val response: Future[String] = (batchActor ? BatchReloadMessage(actionName, joined_artifacts, protocol)).mapTo[String]
 
       log.info(s"Artifacts [${joined_artifacts}] in $actionName [$response]!!")
+
+      sender ! Done
 
     case _ =>
       log.info("Received a bad format message...")

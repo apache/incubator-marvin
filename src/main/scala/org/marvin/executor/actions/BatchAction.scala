@@ -56,7 +56,9 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
 
     case BatchReloadMessage(actionName, artifacts, protocol) =>
       log.info(s"Sending the message to reload the $artifacts of $actionName using protocol $protocol")
-      sender ! this.actionHandler.reload(actionName, artifacts, protocol)
+      this.actionHandler.reload(actionName, artifacts, protocol)
+
+      sender ! Done
 
     case BatchHealthCheckMessage(actionName, artifacts) =>
       log.info(s"Sending message to batch health check. Following artifacts included: $artifacts.")
@@ -67,12 +69,16 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
       log.info(s"Executing Pipeline process with...")
       for(actionName <- actions) {
         val artifacts = engineMetadata.actionsMap(actionName).artifactsToLoad.mkString(",")
+        
         if (!artifacts.isEmpty) self ? BatchReloadMessage(actionName, artifacts, protocol)
+        
         self ? BatchMessage(actionName, params, protocol)
       }
+
       sender ! Done
+    
     case Done =>
-      log.info("Work d  one with success!!")
+      log.info("Work done with success!!")
 
     case _ =>
       log.info("Received a bad format message...")
