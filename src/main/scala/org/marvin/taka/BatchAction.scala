@@ -8,7 +8,7 @@ import akka.pattern.pipe
 
 import scala.concurrent.duration._
 import org.marvin.model.{EngineActionMetadata, EngineMetadata}
-import org.marvin.taka.ActionHandler.{ExecuteBatch, HealthCheck, Reload}
+import org.marvin.taka.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
 import org.marvin.taka.ArtifactSaver.{SaveToLocal, SaveToRemote}
 import org.marvin.taka.BatchAction.{BatchExecute, BatchHealthCheck, BatchReload}
 

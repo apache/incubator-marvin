@@ -7,12 +7,10 @@ import akka.util.Timeout
 
 import scala.concurrent.duration._
 import org.marvin.model.EngineMetadata
-import org.marvin.taka.ActionHandler.ExecuteBatch
-import org.marvin.taka.BatchAction.{BatchExecute, BatchReload}
+import org.marvin.taka.EngineProxy.{ExecuteBatch, Reload}
 import org.marvin.taka.PipelineAction.PipelineExecute
 
-import scala.collection.mutable.ListBuffer
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
 
 object PipelineAction {
   case class PipelineExecute(protocol:String, params:String)
@@ -32,11 +30,10 @@ class PipelineAction(metadata: EngineMetadata) extends Actor with ActorLogging{
       implicit val futureTimeout = Timeout(200 seconds)
 
       log.info(s"Starting to process pipeline process with. Protocol: [$protocol] and Params: [$params].")
-      var batchActionHandler: ActorRef = context.actorOf(Props(new BatchActionProxy(metadata.actionsMap("acquisitor"))), name = "batchActionHandler")
-      Await.result((batchActionHandler ? ExecuteBatch(protocol, params)), futureTimeout.duration)
-      Await.result((batchActionHandler ? Reload(protocol, params)), futureTimeout.duration)
-
-
+      var batchActionProxy: ActorRef = context.actorOf(Props(new BatchActionProxy(metadata.actionsMap("acquisitor"))), name = "batchActionProxy")
+      Await.result((batchActionProxy ? ExecuteBatch(protocol, params)), futureTimeout.duration)
+      Await.result((batchActionProxy ? Reload(protocol)), futureTimeout.duration)
+      
     case Done =>
       log.info("Work Done!")
 
