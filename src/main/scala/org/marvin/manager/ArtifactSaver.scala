@@ -24,7 +24,7 @@ class ArtifactSaver(metadata: EngineMetadata) extends Actor with ActorLogging {
   def generatePaths(artifactName: String, protocol: String): Map[String, Path] = {
     Map(
       "localPath" -> new Path(s"${metadata.artifactsLocalPath}/${metadata.name}/$artifactName"),
-      "remotePath" -> new Path(s"${metadata.artifactsRemotePath}/${metadata.version}/$artifactName/$protocol")
+      "remotePath" -> new Path(s"${metadata.artifactsRemotePath}/${metadata.name}/${metadata.version}/$artifactName/$protocol")
     )
   }
 
