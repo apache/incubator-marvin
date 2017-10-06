@@ -27,7 +27,7 @@ import org.marvin.model.EngineMetadata
 import org.marvin.util.HdfsUtil
 
 import scala.collection.mutable.Map
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 import scala.concurrent.duration._
 
 object ArtifactLoader {
@@ -89,11 +89,7 @@ class ArtifactLoader(engineMetadata: EngineMetadata) extends Actor with ActorLog
 
       log.info(s"Reloading artifacts [${joined_artifacts}] in ${actionName}")
 
-      val response: Future[String] = (batchActor ? BatchReloadMessage(actionName, joined_artifacts, protocol)).mapTo[String]
-
-      log.info(s"Artifacts [${joined_artifacts}] in $actionName [$response]!!")
-
-      sender ! Done
+      (batchActor ? BatchReloadMessage(actionName, joined_artifacts, protocol))
 
     case Done =>
       log.info("Work done with success!!")

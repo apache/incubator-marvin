@@ -60,6 +60,7 @@ class ActionHandler(metadata:EngineMetadata, actionType:ActionHandler.ActionType
   }
 
   def send_message(actionName: String, params: String, message: String): String ={
+
     this.actionType match {
       case OnlineType =>
         val request = OnlineActionRequest(message=message, params=params)

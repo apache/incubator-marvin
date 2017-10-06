@@ -15,8 +15,11 @@ limitations under the License.
   */
 package org.marvin.executor.actions
 
+import java.util.concurrent.Executors
+
 import akka.Done
-import akka.actor.{Actor, ActorLogging, Props}
+import akka.actor.SupervisorStrategy.{Restart, Resume, Stop}
+import akka.actor.{Actor, ActorLogging, OneForOneStrategy, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 
@@ -26,6 +29,9 @@ import org.marvin.executor.actions.BatchAction.{BatchHealthCheckMessage, BatchMe
 import org.marvin.manager.ArtifactSaver
 import org.marvin.manager.ArtifactSaver.SaverMessage
 import org.marvin.model.EngineMetadata
+
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 object BatchAction {
   case class BatchMessage(actionName:String, params:String, protocol:String)
@@ -39,6 +45,12 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
   val artifactSaveActor = context.actorOf(Props(new ArtifactSaver(engineMetadata)), name = "artifactSaveActor")
   implicit val batchTimeout = Timeout(30 days)  //TODO how to measure???
 
+  override val supervisorStrategy =
+    OneForOneStrategy(maxNrOfRetries = 2, withinTimeRange = 1 minute) {
+      case _: Exception => Stop
+      case _: Error => Stop
+    }
+
   override def preStart() = {
     log.info(s"${this.getClass().getCanonicalName} actor initialized...")
     this.actionHandler = new ActionHandler(engineMetadata, BatchType)
@@ -46,18 +58,34 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
 
   def receive = {
     case BatchMessage(actionName, params, protocol) =>
-        log.info(s"Sending a message ${params} to $actionName")
-        this.actionHandler.send_message(actionName=actionName, params=params)
+      implicit val ec = ExecutionContext.fromExecutor(Executors.newCachedThreadPool())
+      log.info(s"Starting to process batch message to $actionName received with [$protocol]...")
 
-        log.info(s"Sending a message to SaverMessage [${actionName}]")
-        artifactSaveActor ! SaverMessage(actionName=actionName, protocol=protocol)
+      try{
+        log.info(s"Sending message to $actionName ")
+        val handlerResponse:String = this.actionHandler.send_message(actionName=actionName, params=params)
+        log.info(s"Message [$handlerResponse] return from handler!!")
 
-        sender ! Done
+        log.info(s"Sending message to save [${actionName}] artifacts")
+        (artifactSaveActor ? SaverMessage(actionName=actionName, protocol=protocol)).onComplete {
+
+          case Success(result) =>
+            log.info(s"Batch message to $actionName with protocol [$protocol] completed with [$result]!!")
+            context.parent ! result
+
+          case Failure(failure) =>
+            log.error(s"Batch message to $actionName with protocol [$protocol] completed with [$failure]!!")
+            context.parent ! Failure
+        }
+
+      }catch{
+        case e:Exception => e.printStackTrace()
+          context.parent ! Failure
+      }
 
     case BatchReloadMessage(actionName, artifacts, protocol) =>
       log.info(s"Sending the message to reload the $artifacts of $actionName using protocol $protocol")
       this.actionHandler.reload(actionName, artifacts, protocol)
-
       sender ! Done
 
     case BatchHealthCheckMessage(actionName, artifacts) =>
@@ -81,6 +109,6 @@ class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLoggin
       log.info("Work done with success!!")
 
     case _ =>
-      log.info("Received a bad format message...")
+      log.warning("Received a bad format message...")
   }
 }

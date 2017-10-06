@@ -18,14 +18,17 @@ package org.marvin.model
 import scala.collection.mutable.Map
 
 case class EngineMetadata(name:String, version:String, engineType:String,
-                          actions:List[EngineActionMetadata], artifactsLocalPath:String,
+                          actions:List[EngineActionMetadata],
                           artifactsRemotePath:String,
                           onlineActionTimeout:Int,
                           healthCheckTimeout:Int,
                           reloadTimeout:Int,
+                          batchActionTimeout:Int,
                           hdfsHost:String,
                           pipelineActions:List[String]){
   override def toString: String = name
+
+  val artifactsLocalPath:String = sys.env("MARVIN_DATA_PATH").mkString.concat( "/.artifacts")
 
   val actionsMap:Map[String, EngineActionMetadata] = {
     val map = Map[String, EngineActionMetadata]()
@@ -37,6 +40,13 @@ case class EngineMetadata(name:String, version:String, engineType:String,
     map
   }
 }
+
+sealed abstract class ActionTypes(val name:String) {
+  override def toString:String = name
+}
+
+case object BatchType extends ActionTypes(name="batch")
+case object OnlineType extends ActionTypes(name="online")
 
 case class EngineActionMetadata(name:String, actionType:String, port:Int, host:String, artifactsToPersist:List[String], artifactsToLoad:List[String]){
   override def toString: String = name
