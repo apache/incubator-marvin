@@ -2,11 +2,11 @@
 	"name": "sample",
 	"version": "v0.0.1",
 	"engineType": "python",
-	"artifactsLocalPath": "$MARVIN_HOME/artifacts",
 	"artifactsRemotePath": "/tmp/marvin",
 	"onlineActionTimeout": 1000,
     "healthCheckTimeout": 2000,
-	"reloadTimeout": 120,
+	"reloadTimeout": 12000,
+	"pipelineActions": ["acquisitor", "tpreparator", "trainer", "evaluator"],
 	"hdfsHost": "hdfs://marvin-hadoop:8020",
 	"actions": [{
 		"name": "acquisitor",
