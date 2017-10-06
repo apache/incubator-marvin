@@ -18,19 +18,16 @@ package org.marvin.executor.api
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCode, StatusCodes}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.testkit.TestProbe
-import org.marvin.executor.actions.OnlineAction.OnlineMessage
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Inside, Matchers, WordSpec}
 import akka.util.Timeout
 
 import scala.concurrent.duration._
 import ContentTypes._
-import akka.Done
 import akka.actor.{ActorSystem, Terminated}
-import akka.http.scaladsl.server.Route
-import org.marvin.executor.actions.BatchAction.{BatchMessage, BatchPipelineMessage, BatchReloadMessage}
-import org.marvin.manager.ArtifactLoader.{BatchArtifactLoaderMessage, OnlineArtifactLoaderMessage}
-import org.marvin.model.{EngineActionMetadata, EngineMetadata, MarvinEExecutorException}
+import org.marvin.executor.actions.BatchAction.BatchExecute
+import org.marvin.executor.actions.OnlineAction.{OnlineExecute}
+import org.marvin.model.MarvinEExecutorException
 import org.marvin.util.ProtocolUtil
 
 import scala.concurrent.Future
@@ -48,7 +45,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/predictor", HttpEntity(`application/json`, s"""{"params":"testParams","message":"testQuery"}""")) ~> route ~> runRoute
 
-      val expectedMessage = OnlineMessage(actionName="predictor", params="testParams", message="testQuery")
+      val expectedMessage = OnlineExecute(params="testParams", message="testQuery")
       probe.expectMsg(expectedMessage)
       probe.reply("fooReply")
 
@@ -73,7 +70,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/predictor", HttpEntity(`application/json`, s"""{"message":"testQuery"}""")) ~> route ~> runRoute
 
-      val expectedMessage = OnlineMessage(actionName="predictor", params="default for test", message="testQuery")
+      val expectedMessage = OnlineExecute(params="default for test", message="testQuery")
       probe.expectMsg(expectedMessage)
       probe.reply("noParams")
 
@@ -90,7 +87,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/predictor", HttpEntity(`application/json`, s"""{"params":"testParams","message":"testQuery"}""")) ~> route ~> runRoute
 
-      val expectedMessage = OnlineMessage(actionName="predictor", params="testParams", message="testQuery")
+      val expectedMessage = OnlineExecute(params="testParams", message="testQuery")
       probe.expectMsg(expectedMessage)
 
       check {
@@ -102,7 +99,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
   }
 
-  "/predictor/reload endpoint" should {
+/*  "/predictor/reload endpoint" should {
 
     "call ArtifactLoaderActor" in {
       val probe = setupProbe()
@@ -110,7 +107,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Put("/predictor/reload?protocol=1234") ~> route ~> runRoute
 
-      val expectedMessage = OnlineArtifactLoaderMessage(actionName = "predictor", protocol = "1234")
+      val expectedMessage = OnlineReload(actionName = "predictor", protocol = "1234")
       probe.expectMsg(expectedMessage)
 
       check{
@@ -127,7 +124,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
       }
     }
   }
-
+*/
   "/acquisitor endpoint" should {
 
     "interpret params and call BatchActor" in {
@@ -137,7 +134,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/acquisitor", HttpEntity(`application/json`, s"""{"params": "testParams"}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "acquisitor", params = "testParams", protocol="mockedProtocol")
+      val expectedMessage = BatchExecute(params = "testParams", protocol="mockedProtocol")
       probe.expectMsg(expectedMessage)
 
       check{
@@ -154,7 +151,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/acquisitor", HttpEntity(`application/json`, s"""{}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "acquisitor", params = "default for test", protocol="mockedProtocol")
+      val expectedMessage = BatchExecute(params = "default for test", protocol="mockedProtocol")
       probe.expectMsg(expectedMessage)
 
       check{
@@ -173,7 +170,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/tpreparator", HttpEntity(`application/json`, s"""{"params": "testParams"}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "tpreparator", params = "testParams", protocol="mockedProtocol")
+      val expectedMessage = BatchExecute(params = "testParams", protocol="mockedProtocol")
       probe.expectMsg(expectedMessage)
 
       check{
@@ -190,7 +187,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/tpreparator", HttpEntity(`application/json`, s"""{}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "tpreparator", params = "default for test", protocol="mockedProtocol")
+      val expectedMessage = BatchExecute(params = "default for test", protocol="mockedProtocol")
       probe.expectMsg(expectedMessage)
 
       check{
@@ -199,7 +196,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
       }(result)
     }
   }
-
+/*
   "/tpreparator/reload endpoint" should {
 
     "call ArtifactLoaderActor" in {
@@ -225,7 +222,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
       }
     }
   }
-
+*/
   "/trainer endpoint" should {
 
     "interpret params and call BatchActor" in {
@@ -235,7 +232,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/trainer", HttpEntity(`application/json`, s"""{"params": "testParams"}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "trainer", params = "testParams", protocol="mockedProtocol")
+      val expectedMessage = BatchExecute(params = "testParams", protocol="mockedProtocol")
       probe.expectMsg(expectedMessage)
 
       check {
@@ -252,7 +249,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/trainer", HttpEntity(`application/json`, s"""{}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "trainer", params = "default for test", protocol="mockedProtocol")
+      val expectedMessage = BatchExecute(params = "default for test", protocol="mockedProtocol")
       probe.expectMsg(expectedMessage)
 
       check {
@@ -262,6 +259,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
     }
   }
 
+  /*
   "/trainer/reload endpoint" should {
 
     "call ArtifactLoaderActor" in {
@@ -286,7 +284,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
       }
     }
   }
-
+*/
   "/evaluator endpoint" should {
 
     "interpret params and call BatchActor" in {
@@ -296,7 +294,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/evaluator", HttpEntity(`application/json`, s"""{"params": "testParams"}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "evaluator", params = "testParams", protocol = "mockedProtocol")
+      val expectedMessage = BatchExecute(params = "testParams", protocol = "mockedProtocol")
       probe.expectMsg(expectedMessage)
 
       check {
@@ -313,7 +311,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Post("/evaluator", HttpEntity(`application/json`, s"""{}""")) ~> route ~> runRoute
 
-      val expectedMessage = BatchMessage(actionName = "evaluator", params = "default for test", protocol = "mockedProtocol")
+      val expectedMessage = BatchExecute(params = "default for test", protocol = "mockedProtocol")
       probe.expectMsg(expectedMessage)
 
       check {
@@ -323,6 +321,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
     }
   }
 
+  /*
   "/evaluator/reload endpoint" should {
 
     "call ArtifactLoaderActor" in {
@@ -347,7 +346,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
       }
     }
   }
-
+*/
   "main method" should {
 
     "load paths, ip and port from system configuration" in {

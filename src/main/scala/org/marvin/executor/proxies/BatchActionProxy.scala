@@ -1,11 +1,11 @@
-package org.marvin.taka
+package org.marvin.executor.proxies
 
 import actions.BatchActionHandlerGrpc.BatchActionHandlerBlockingStub
 import actions.{BatchActionHandlerGrpc, BatchActionRequest, HealthCheckRequest, ReloadRequest}
 import akka.Done
 import io.grpc.ManagedChannelBuilder
+import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, Reload, HealthCheck}
 import org.marvin.model.EngineActionMetadata
-import org.marvin.taka.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
 
 class BatchActionProxy(metadata: EngineActionMetadata) extends EngineProxy (metadata)  {
   var engineClient:BatchActionHandlerBlockingStub = _

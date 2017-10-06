@@ -1,10 +1,10 @@
-package org.marvin.taka
+package org.marvin.executor.proxies
 
 import actions.OnlineActionHandlerGrpc.OnlineActionHandlerBlockingStub
 import actions._
 import io.grpc.ManagedChannelBuilder
 import org.marvin.model.EngineActionMetadata
-import org.marvin.taka.EngineProxy.{ExecuteOnline, HealthCheck, Reload}
+import org.marvin.executor.proxies.EngineProxy.{HealthCheck, Reload, ExecuteOnline}
 
 class OnlineActionProxy(metadata: EngineActionMetadata) extends EngineProxy (metadata)  {
   var engineClient:OnlineActionHandlerBlockingStub = _

@@ -1,7 +1,7 @@
-package org.marvin.taka
+package org.marvin.executor.proxies
 
 import akka.actor.{Actor, ActorLogging}
-import org.marvin.model.{EngineActionMetadata}
+import org.marvin.model.EngineActionMetadata
 
 object EngineProxy {
   case class ExecuteBatch(protocol:String, params:String)

@@ -17,15 +17,18 @@ package org.marvin.model
 
 import scala.collection.mutable.Map
 
-case class EngineMetadata(name:String, version:String, engineType:String,
+case class EngineMetadata(name:String,
+                          version:String,
+                          engineType:String,
                           actions:List[EngineActionMetadata],
                           artifactsRemotePath:String,
+                          pipelineActions: List[String],
                           onlineActionTimeout:Int,
                           healthCheckTimeout:Int,
                           reloadTimeout:Int,
                           batchActionTimeout:Int,
-                          hdfsHost:String,
-                          pipelineActions:List[String]){
+                          hdfsHost:String){
+  
   override def toString: String = name
 
   val artifactsLocalPath:String = sys.env("MARVIN_DATA_PATH").mkString.concat( "/.artifacts")

@@ -28,6 +28,7 @@ import akka.util.Timeout
 import org.marvin.util.{ConfigurationContext, JsonUtil, ProtocolUtil}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model._
+import org.marvin.executor.actions.{BatchAction, OnlineAction, PipelineAction}
 
 import scala.concurrent._
 import scala.io.Source
@@ -36,10 +37,10 @@ import org.marvin.executor.api.exception.EngineExceptionAndRejectionHandler._
 import spray.json.DefaultJsonProtocol._
 import org.marvin.executor.api.model.HealthStatus
 import org.marvin.model.{EngineMetadata, MarvinEExecutorException}
-import org.marvin.taka.{BatchAction, OnlineAction, PipelineAction}
-import org.marvin.taka.BatchAction.{BatchExecute, BatchHealthCheck, BatchReload}
-import org.marvin.taka.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
-import org.marvin.taka.PipelineAction.PipelineExecute
+import org.marvin.executor.actions.{OnlineAction, PipelineAction}
+import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchHealthCheck, BatchReload}
+import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
+import org.marvin.executor.actions.PipelineAction.PipelineExecute
 
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
