@@ -5,9 +5,9 @@ import actions.{BatchActionHandlerGrpc, BatchActionRequest, HealthCheckRequest, 
 import akka.Done
 import io.grpc.ManagedChannelBuilder
 import org.marvin.model.EngineActionMetadata
-import org.marvin.taka.ActionHandler.{ExecuteBatch, HealthCheck, Reload}
+import org.marvin.taka.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
 
-class BatchActionProxy(metadata: EngineActionMetadata) extends ActionHandler (metadata)  {
+class BatchActionProxy(metadata: EngineActionMetadata) extends EngineProxy (metadata)  {
   var engineClient:BatchActionHandlerBlockingStub = _
 
   override def preStart() = {

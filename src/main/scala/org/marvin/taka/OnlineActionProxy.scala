@@ -4,9 +4,9 @@ import actions.OnlineActionHandlerGrpc.OnlineActionHandlerBlockingStub
 import actions._
 import io.grpc.ManagedChannelBuilder
 import org.marvin.model.EngineActionMetadata
-import org.marvin.taka.ActionHandler.{ExecuteOnline, HealthCheck, Reload}
+import org.marvin.taka.EngineProxy.{ExecuteOnline, HealthCheck, Reload}
 
-class OnlineActionProxy(metadata: EngineActionMetadata) extends ActionHandler (metadata)  {
+class OnlineActionProxy(metadata: EngineActionMetadata) extends EngineProxy (metadata)  {
   var engineClient:OnlineActionHandlerBlockingStub = _
 
   override def preStart() = {
