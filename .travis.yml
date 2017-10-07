@@ -7,7 +7,7 @@ cache:
   - $HOME/.m2
 
 script:
-  make test
+  sbt/sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

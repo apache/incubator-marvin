@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/marvin-ai/marvin-engine-executor.svg)](https://travis-ci.org/marvin-ai/marvin--engine-executor) [![codecov](https://codecov.io/gh/marvin-ai/marvin-engine-executor/branch/master/graph/badge.svg)](https://codecov.io/gh/marvin-ai/marvin-engine-executor)
+
 # Marvin Engine Executor (Server)
 
 This is the server able to coordinate execution of the steps in a Marvin engine. The engine-executor
