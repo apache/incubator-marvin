@@ -1,0 +1,13 @@
+language: scala
+scala: 2.12.3
+
+cache:
+  directories:
+  - $HOME/.sbt
+  - $HOME/.m2
+
+script:
+  make test
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
