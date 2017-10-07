@@ -26,7 +26,7 @@ package:
 		sbt/sbt assembly
 
 test:
-		sbt/sbt test
+		sbt/sbt coverage test coverageReport
 
 clean:
 		sbt/sbt clean
