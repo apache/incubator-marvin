@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-.PHONY: help marvin update clean-pyc clean-build clean-reports clean-deps clean grpc
+.PHONY: help marvin update clean-pyc clean-build clean-reports clean-deps clean
 
 help:
 	@echo "    marvin"
@@ -29,15 +29,13 @@ help:
 	@echo "        Remove coverage reports."
 	@echo "    clean-deps"
 	@echo "        Remove marvin setup.py dependencies."
-	@echo "    grpc"
-	@echo "        Build grpc stubs."
 
 marvin:
-	pip install -e .
+	pip install -e . --process-dependency-links
 	marvin --help
 
 update:
-	pip install -e . -U 
+	pip install -e . -U --process-dependency-links
 
 clean-pyc:
 	find . -name '*.pyc' -exec rm -f {} +
@@ -59,7 +57,3 @@ clean-deps:
 	pip freeze | grep -v "^-e" | xargs pip uninstall -y
 
 clean: clean-build clean-pyc clean-reports clean-deps
-
-grpc:
-	python -m grpc_tools.protoc --proto_path=marvin_python_toolbox/engine_base/protos --python_out=marvin_python_toolbox/engine_base/stubs --grpc_python_out=marvin_python_toolbox/engine_base/stubs marvin_python_toolbox/engine_base/protos/actions.proto
-	ls -la marvin_python_toolbox/engine_base/stubs/*.py
