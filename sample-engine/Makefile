@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-.PHONY: help marvin update clean-pyc clean-build clean-reports clean-all
+.PHONY: help marvin update clean-pyc clean-build clean-reports clean-deps clean grpc
 
 help:
 	@echo "    marvin"
@@ -27,25 +27,39 @@ help:
 	@echo "        Remove build artifacts."
 	@echo "    clean-reports"
 	@echo "        Remove coverage reports."
+	@echo "    clean-deps"
+	@echo "        Remove marvin setup.py dependencies."
+	@echo "    grpc"
+	@echo "        Build grpc stubs."
 
 marvin:
-	pip install -e .  --process-dependency-links
+	pip install -e .
+	marvin --help
 
 update:
-	pip install -e .  --process-dependency-links -U
+	pip install -e . -U 
 
 clean-pyc:
-	find . -name '*.pyc' -exec rm --force {} +
-	find . -name '*.pyo' -exec rm --force {} +
-	find . -name '*~' -exec rm --force  {} +
+	find . -name '*.pyc' -exec rm -f {} +
+	find . -name '*.pyo' -exec rm -f {} +
+	find . -name '*~' -exec rm -f  {} +
 
 clean-build:
-	rm --force --recursive *.egg-info
-	rm --force --recursive .cache
+	rm -rf *.egg-info
+	rm -rf .cache
+	rm -rf .eggs
+	rm -rf dist
 
 clean-reports:
-	rm --force --recursive coverage_report/
-	rm --force coverage_report.xml
-	rm --force .coverage
+	rm -rf coverage_report/
+	rm -f coverage.xml
+	rm -f .coverage
 
-clean-all: clean-build clean-pyc clean-reports
+clean-deps:
+	pip freeze | grep -v "^-e" | xargs pip uninstall -y
+
+clean: clean-build clean-pyc clean-reports clean-deps
+
+grpc:
+	python -m grpc_tools.protoc --proto_path=marvin_python_toolbox/engine_base/protos --python_out=marvin_python_toolbox/engine_base/stubs --grpc_python_out=marvin_python_toolbox/engine_base/stubs marvin_python_toolbox/engine_base/protos/actions.proto
+	ls -la marvin_python_toolbox/engine_base/stubs/*.py
