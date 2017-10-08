@@ -1,5 +1,21 @@
+# Copyright [2017] [B2W Digital]
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 language: scala
+
 scala: 2.12.3
+
 jdk: oraclejdk8
 
 cache:
@@ -8,14 +24,29 @@ cache:
   - $HOME/.m2
 
 before_cache:
-  - find $HOME/.ivy2 -name \"ivydata-*.properties\" -delete
-  - find $HOME/.sbt -name \"*.lock\" -delete
+- find $HOME/.ivy2 -name \"ivydata-*.properties\" -delete
+- find $HOME/.sbt -name \"*.lock\" -delete
 
 before_script:
-  - unset SBT_OPTS
+- unset SBT_OPTS
 
-script:
-  sbt/sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport
+script: sbt/sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+- bash <(curl -s https://codecov.io/bash)
+
+before_deploy:
+- make package
+
+deploy:
+  provider: s3
+  access_key_id: $AWS_SECRET_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  bucket: marvin-engine-executor
+  local_dir: target/scala-2.12/
+  acl: public_read
+  skip_cleanup: true
+  region: us-east-1
+  on:
+    repo: marvin-ai/marvin-engine-executor
+    branch: disabled
