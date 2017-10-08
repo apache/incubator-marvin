@@ -16,20 +16,19 @@ limitations under the License.
 package org.marvin.executor.api
 
 import java.io.FileNotFoundException
+import java.util.concurrent.Executors
 
 import actions.HealthCheckResponse.Status
 import akka.actor.{ActorRef, ActorSystem, Props, Terminated}
+import akka.event.LoggingAdapter
+import akka.event.Logging
 import akka.http.scaladsl.server.Route
 import akka.pattern.ask
 import akka.util.Timeout
-import org.marvin.executor.actions.BatchAction.{BatchHealthCheckMessage, BatchMessage}
-import org.marvin.executor.actions.OnlineAction.{OnlineHealthCheckMessage, OnlineMessage}
-import org.marvin.executor.actions.{BatchAction, OnlineAction}
-import org.marvin.manager.ArtifactLoader
-import org.marvin.manager.ArtifactLoader.{BatchArtifactLoaderMessage, OnlineArtifactLoaderMessage}
 import org.marvin.util.{ConfigurationContext, JsonUtil, ProtocolUtil}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model._
+import org.marvin.executor.actions.{BatchAction, OnlineAction, PipelineAction}
 
 import scala.concurrent._
 import scala.io.Source
@@ -38,24 +37,42 @@ import org.marvin.executor.api.exception.EngineExceptionAndRejectionHandler._
 import spray.json.DefaultJsonProtocol._
 import org.marvin.executor.api.model.HealthStatus
 import org.marvin.model.{EngineMetadata, MarvinEExecutorException}
+import org.marvin.executor.actions.{OnlineAction, PipelineAction}
+import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchHealthCheck, BatchReload}
+import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
+import org.marvin.executor.actions.PipelineAction.PipelineExecute
 
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
+
+case class HttpEngineResponse(result: String)
+case class HttpEngineRequest(params: Option[String] = Option.empty, message: Option[String] = Option.empty)
+
+class GenericHttpAPIImpl() extends GenericHttpAPI
 
 object GenericHttpAPI extends HttpMarvinApp {
   var system: ActorSystem = _
 
   var defaultParams: String = _
   var metadata: EngineMetadata = _
-
-  var onlineActor: ActorRef = _
-  var batchActor: ActorRef = _
-  var artifactLoaderActor: ActorRef = _
-  var onlineActionTimeout: Timeout = _
-  var healthCheckTimeout: Timeout = _
+  var log: LoggingAdapter = _
 
   var api: GenericHttpAPI = new GenericHttpAPIImpl()
-  var protocolService = new ProtocolUtil()
+  var protocolUtil = new ProtocolUtil()
+
+  var actors:Map[String, ActorRef] = _
+  var predictorActor: ActorRef = _
+  var acquisitorActor: ActorRef = _
+  var tpreparatorActor: ActorRef = _
+  var trainerActor: ActorRef = _
+  var evaluatorActor: ActorRef = _
+  var pipelineActor: ActorRef = _
+
+  var onlineActionTimeout:Timeout = _
+  var healthCheckTimeout:Timeout = _
+  var batchActionTimeout:Timeout = _
+  var reloadTimeout:Timeout = _
+  var pipelineTimeout:Timeout = _
 
   implicit val httpEngineResponseFormat = jsonFormat1(HttpEngineResponse)
   implicit val httpEngineRequestFormat = jsonFormat2(HttpEngineRequest)
@@ -68,11 +85,7 @@ object GenericHttpAPI extends HttpMarvinApp {
           path("predictor") {
             entity(as[HttpEngineRequest]) { request =>
               require(!request.message.isEmpty, "The request payload must contain the attribute 'message'.")
-              val response_message = api.onlineRequest(
-                actionName = "predictor",
-                params = request.params.getOrElse(defaultParams),
-                message = request.message.get
-              )
+              val response_message = api.onlineExecute("predictor", request.params.getOrElse(defaultParams), request.message.get)
               onComplete(api.toHttpEngineResponseFuture(response_message)){ response =>
                 response match{
                   case Success(httpEngineResponse) => complete(httpEngineResponse)
@@ -84,7 +97,7 @@ object GenericHttpAPI extends HttpMarvinApp {
           path("acquisitor") {
             entity(as[HttpEngineRequest]) { request =>
               complete {
-                val response_message = api.batchRequest("acquisitor", request.params.getOrElse(defaultParams))
+                val response_message = api.batchExecute("acquisitor", request.params.getOrElse(defaultParams))
                 api.toHttpEngineResponse(response_message)
               }
             }
@@ -92,7 +105,7 @@ object GenericHttpAPI extends HttpMarvinApp {
           path("tpreparator") {
             entity(as[HttpEngineRequest]) { request =>
               complete {
-                val response_message = api.batchRequest("tpreparator", request.params.getOrElse(defaultParams))
+                val response_message = api.batchExecute("tpreparator", request.params.getOrElse(defaultParams))
                 api.toHttpEngineResponse(response_message)
               }
             }
@@ -100,7 +113,7 @@ object GenericHttpAPI extends HttpMarvinApp {
           path("trainer") {
             entity(as[HttpEngineRequest]) { request =>
               complete {
-                val response_message = api.batchRequest("trainer", request.params.getOrElse(defaultParams))
+                val response_message = api.batchExecute("trainer", request.params.getOrElse(defaultParams))
                 api.toHttpEngineResponse(response_message)
               }
             }
@@ -108,7 +121,15 @@ object GenericHttpAPI extends HttpMarvinApp {
           path("evaluator") {
             entity(as[HttpEngineRequest]) { request =>
               complete {
-                val response_message = api.batchRequest("evaluator", request.params.getOrElse(defaultParams))
+                val response_message = api.batchExecute("evaluator", request.params.getOrElse(defaultParams))
+                api.toHttpEngineResponse(response_message)
+              }
+            }
+          } ~
+          path("pipeline") {
+            entity(as[HttpEngineRequest]) { request =>
+              complete {
+                val response_message = api.pipeline(request.params.getOrElse(defaultParams))
                 api.toHttpEngineResponse(response_message)
               }
             }
@@ -118,7 +139,7 @@ object GenericHttpAPI extends HttpMarvinApp {
           path("predictor" / "reload") {
             parameters('protocol) { (protocol) =>
               complete {
-                val response_message = api.onlineReloadRequest(actionName = "predictor", protocol=protocol)
+                val response_message = api.reload("predictor", "online", protocol=protocol)
                 api.toHttpEngineResponse(response_message)
               }
             }
@@ -126,7 +147,7 @@ object GenericHttpAPI extends HttpMarvinApp {
           path("tpreparator" / "reload") {
             parameters('protocol) { (protocol) =>
               complete {
-                val response_message = api.batchReloadRequest(actionName = "tpreparator", protocol=protocol)
+                val response_message = api.reload("tpreparator", "batch", protocol=protocol)
                 api.toHttpEngineResponse(response_message)
               }
             }
@@ -134,7 +155,7 @@ object GenericHttpAPI extends HttpMarvinApp {
           path("trainer" / "reload") {
             parameters('protocol) { (protocol) =>
               complete {
-                val response_message = api.batchReloadRequest(actionName = "trainer", protocol=protocol)
+                val response_message = api.reload("trainer", "batch", protocol=protocol)
                 api.toHttpEngineResponse(response_message)
               }
             }
@@ -142,7 +163,7 @@ object GenericHttpAPI extends HttpMarvinApp {
           path("evaluator" / "reload") {
             parameters('protocol) { (protocol) =>
               complete {
-                val response_message = api.batchReloadRequest(actionName = "evaluator", protocol=protocol)
+                val response_message = api.reload("evaluator", "batch", protocol=protocol)
                 api.toHttpEngineResponse(response_message)
               }
             }
@@ -150,22 +171,27 @@ object GenericHttpAPI extends HttpMarvinApp {
         } ~
         get {
           path("predictor" / "health") {
-            onComplete(api.onlineActionHealthCheck("predictor")) { response =>
+            onComplete(api.check("predictor", "online")) { response =>
+              matchHealthTry(response)
+            }
+          } ~
+          path("acquisitor" / "health") {
+            onComplete(api.check("acquisitor", "batch")) { response =>
               matchHealthTry(response)
             }
           } ~
           path("tpreparator" / "health") {
-            onComplete(api.batchActionHealthCheck("tpreparator")) { response =>
+            onComplete(api.check("tpreparator", "batch")) { response =>
               matchHealthTry(response)
             }
           } ~
           path("trainer" / "health") {
-            onComplete(api.batchActionHealthCheck("trainer")) { response =>
+            onComplete(api.check("trainer", "batch")) { response =>
               matchHealthTry(response)
             }
           } ~
           path("evaluator" / "health") {
-            onComplete(api.batchActionHealthCheck("evaluator")) { response =>
+            onComplete(api.check("evaluator", "batch")) { response =>
               matchHealthTry(response)
             }
           }
@@ -197,22 +223,39 @@ object GenericHttpAPI extends HttpMarvinApp {
   }
 }
 
-class GenericHttpAPIImpl() extends GenericHttpAPI
-
 trait GenericHttpAPI {
   protected def setupSystem(engineFilePath:String, paramsFilePath:String): ActorSystem = {
     val metadata = readJsonIfFileExists[EngineMetadata](engineFilePath)
-    GenericHttpAPI.metadata = metadata
-    GenericHttpAPI.defaultParams = JsonUtil.toJson(readJsonIfFileExists[Map[String, String]](paramsFilePath))
-
     val system = ActorSystem(s"MarvinExecutorSystem")
 
-    GenericHttpAPI.onlineActor = system.actorOf(Props(new OnlineAction(metadata)), name = "onlineActor")
-    GenericHttpAPI.batchActor = system.actorOf(Props(new BatchAction(metadata)), name = "batchActor")
-    GenericHttpAPI.artifactLoaderActor = system.actorOf(Props(new ArtifactLoader(metadata)), name = "artifactLoaderActor")
+    GenericHttpAPI.metadata = metadata
+    GenericHttpAPI.defaultParams = JsonUtil.toJson(readJsonIfFileExists[Map[String, String]](paramsFilePath))
+    GenericHttpAPI.log = Logging.getLogger(system, this)
 
     GenericHttpAPI.onlineActionTimeout = Timeout(metadata.onlineActionTimeout millisecond)
     GenericHttpAPI.healthCheckTimeout = Timeout(metadata.healthCheckTimeout millisecond)
+    GenericHttpAPI.batchActionTimeout = Timeout(metadata.batchActionTimeout millisecond)
+    GenericHttpAPI.reloadTimeout = Timeout(metadata.reloadTimeout millisecond)
+
+    var totalPipelineTimeout = (metadata.reloadTimeout + metadata.batchActionTimeout) * metadata.pipelineActions.length * 1.20
+    GenericHttpAPI.pipelineTimeout = Timeout(totalPipelineTimeout milliseconds)
+
+    GenericHttpAPI.predictorActor = system.actorOf(Props(new OnlineAction("predictor", metadata)), name = "predictorActor")
+    GenericHttpAPI.acquisitorActor = system.actorOf(Props(new BatchAction("acquisitor", metadata)), name = "acquisitorActor")
+    GenericHttpAPI.tpreparatorActor = system.actorOf(Props(new BatchAction("tpreparator", metadata)), name = "tpreparatorActor")
+    GenericHttpAPI.trainerActor = system.actorOf(Props(new BatchAction("trainer", metadata)), name = "trainerActor")
+    GenericHttpAPI.evaluatorActor = system.actorOf(Props(new BatchAction("evaluator", metadata)), name = "evaluatorActor")
+    GenericHttpAPI.pipelineActor = system.actorOf(Props(new PipelineAction(metadata)), name = "pipelineActor")
+
+    GenericHttpAPI.actors = Map[String, ActorRef](
+      "predictor" -> GenericHttpAPI.predictorActor,
+      "acquisitor" -> GenericHttpAPI.acquisitorActor,
+      "tpreparator" -> GenericHttpAPI.tpreparatorActor,
+      "trainer" -> GenericHttpAPI.trainerActor,
+      "evaluator" -> GenericHttpAPI.evaluatorActor,
+      "pipeline" -> GenericHttpAPI.pipelineActor
+    )
+
     system
   }
 
@@ -240,42 +283,58 @@ trait GenericHttpAPI {
     GenericHttpAPI.system.terminate()
   }
 
-  protected def batchRequest(actionName: String, params: String): String = {
-    val protocol = GenericHttpAPI.protocolService.generateProtocol(actionName)
-    val batchMessage = BatchMessage(actionName=actionName, params=params, protocol=protocol)
-    GenericHttpAPI.batchActor ! batchMessage
+
+  def batchExecute(actionName: String, params: String): String = {
+    GenericHttpAPI.log.info(s"Request for $actionName] received.")
+    implicit val ec = ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
+    implicit val futureTimeout = GenericHttpAPI.batchActionTimeout
+    val protocol = GenericHttpAPI.protocolUtil.generateProtocol(actionName)
+    GenericHttpAPI.actors(actionName) ! BatchExecute(protocol, params)
     protocol
   }
 
-  protected def onlineRequest(actionName: String, params: String, message: String): Future[String] = {
-    val onlineMessage = OnlineMessage(actionName=actionName, params=params, message=message)
-    implicit val futureTimeout = GenericHttpAPI.onlineActionTimeout
-    implicit val ec = GenericHttpAPI.system.dispatcher
-    val futureResponse: Future[String] = (GenericHttpAPI.onlineActor ? onlineMessage).mapTo[String]
-    futureResponse
-  }
-
-  protected def onlineActionHealthCheck(actionName: String): Future[HealthStatus] = {
-    val onlineHealthCheck = OnlineHealthCheckMessage(
-      actionName = actionName, artifacts = getArtifactsToLoad(actionName).mkString(","))
+  def onlineExecute(actionName: String, params: String, message: String): Future[String] = {
+    GenericHttpAPI.log.info(s"Request for $actionName] received.")
+    implicit val ec = ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
     implicit val futureTimeout = GenericHttpAPI.healthCheckTimeout
-    implicit val ec = GenericHttpAPI.system.dispatcher
-    (GenericHttpAPI.onlineActor ? onlineHealthCheck).mapTo[Status] collect asHealthStatus
+    (GenericHttpAPI.actors(actionName) ? OnlineExecute(message, params)).mapTo[String]
   }
 
-  protected def batchActionHealthCheck(actionName: String): Future[HealthStatus] = {
-    val batchHealthCheck = BatchHealthCheckMessage(
-      actionName = actionName, artifacts = getArtifactsToLoad(actionName).mkString(","))
-    implicit val futureTimeout = GenericHttpAPI.healthCheckTimeout
-    implicit val ec = GenericHttpAPI.system.dispatcher
-    (GenericHttpAPI.batchActor ? batchHealthCheck).mapTo[Status] collect asHealthStatus
-  }
+  def reload(actionName: String, actionType:String, protocol: String): String = {
+    implicit val ec = ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
+    implicit val futureTimeout = GenericHttpAPI.reloadTimeout
 
-  private def getArtifactsToLoad(actionName: String): List[String] = {
-    GenericHttpAPI.metadata.actions.foreach{case action =>
-      if(action.name.equals(actionName)) return action.artifactsToLoad
+    actionType match {
+      case "online" =>
+        GenericHttpAPI.actors(actionName) ! OnlineReload(protocol)
+
+      case "batch" =>
+        GenericHttpAPI.actors(actionName) ! BatchReload(protocol)
     }
-    throw new IllegalArgumentException(s"$actionName is not a valid action.")
+
+    "Work in progress...Thank you folk!"
+  }
+
+  def check(actionName: String, actionType:String): Future[HealthStatus] = {
+    implicit val ec = ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
+    implicit val futureTimeout = GenericHttpAPI.healthCheckTimeout
+
+    actionType match {
+      case "online" =>
+        (GenericHttpAPI.actors(actionName) ? OnlineHealthCheck).mapTo[Status] collect asHealthStatus
+
+      case "batch" =>
+        (GenericHttpAPI.actors(actionName) ? BatchHealthCheck).mapTo[Status] collect asHealthStatus
+    }
+  }
+
+  def pipeline(params: String): String = {
+    GenericHttpAPI.log.info(s"Request pipeline process received.")
+    implicit val ec = ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
+    implicit val futureTimeout = GenericHttpAPI.pipelineTimeout
+    val protocol = GenericHttpAPI.protocolUtil.generateProtocol("pipeline")
+    GenericHttpAPI.actors("pipeline") ! PipelineExecute(protocol, params)
+    protocol
   }
 
   private def asHealthStatus: PartialFunction[Status, HealthStatus] = new PartialFunction[Status, HealthStatus] {
@@ -290,16 +349,6 @@ trait GenericHttpAPI {
     override def isDefinedAt(status: Status): Boolean = status != null
   }
 
-  protected def onlineReloadRequest(actionName: String, protocol: String): String = {
-    GenericHttpAPI.artifactLoaderActor ! OnlineArtifactLoaderMessage(actionName, protocol)
-    "Let's start!"
-  }
-
-  protected def batchReloadRequest(actionName: String, protocol: String): String = {
-    GenericHttpAPI.artifactLoaderActor ! BatchArtifactLoaderMessage(actionName, protocol)
-    "Let's start!"
-  }
-
   protected def toHttpEngineResponse(message:String): HttpEngineResponse = {
     HttpEngineResponse(result = message)
   }
@@ -310,6 +359,3 @@ trait GenericHttpAPI {
   }
 
 }
-
-case class HttpEngineResponse(result: String)
-case class HttpEngineRequest(params: Option[String] = Option.empty, message: Option[String] = Option.empty)

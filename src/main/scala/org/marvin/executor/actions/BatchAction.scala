@@ -1,59 +1,79 @@
-/**
-  * Copyright [2017] [B2W Digital]
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-  */
 package org.marvin.executor.actions
 
-import akka.actor.{Actor, ActorLogging, Props}
-import org.marvin.executor.actions.ActionHandler.BatchType
-import org.marvin.executor.actions.BatchAction.{BatchHealthCheckMessage, BatchMessage, BatchReloadMessage}
+import akka.Done
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.pattern.{ask, pipe}
+import akka.util.Timeout
+import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchHealthCheck, BatchReload}
+import org.marvin.executor.proxies.BatchActionProxy
 import org.marvin.manager.ArtifactSaver
-import org.marvin.manager.ArtifactSaver.SaverMessage
-import org.marvin.model.EngineMetadata
+import org.marvin.model.{EngineActionMetadata, EngineMetadata}
+import org.marvin.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
+import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
+
+import scala.collection.mutable.ListBuffer
+import scala.concurrent.Future
+import scala.concurrent.duration._
 
 object BatchAction {
-  case class BatchMessage(actionName:String, params:String, protocol:String)
-  case class BatchReloadMessage(actionName: String, artifacts:String, protocol:String)
-  case class BatchHealthCheckMessage(actionName: String, artifacts: String)
+  case class BatchExecute(protocol: String, params: String)
+  case class BatchReload(protocol:String)
+  case class BatchHealthCheck()
 }
 
-class BatchAction(engineMetadata: EngineMetadata) extends Actor with ActorLogging {
-  var actionHandler: ActionHandler = _
-  val artifactSaveActor = context.actorOf(Props(new ArtifactSaver(engineMetadata)), name = "artifactSaveActor")
+class BatchAction(actionName: String, metadata: EngineMetadata) extends Actor with ActorLogging{
+  var batchActionProxy: ActorRef = _
+  var artifactSaver: ActorRef = _
+  var engineActionMetadata: EngineActionMetadata = _
+  var artifactsToLoad: String = _
+  implicit val ec = context.dispatcher
 
   override def preStart() = {
-    log.info(s"${this.getClass().getCanonicalName} actor initialized...")
-    this.actionHandler = new ActionHandler(engineMetadata, BatchType)
+    engineActionMetadata = metadata.actionsMap(actionName)
+    artifactsToLoad = engineActionMetadata.artifactsToLoad.mkString(",")
+    batchActionProxy = context.actorOf(Props(new BatchActionProxy(engineActionMetadata)), name = "batchActionProxy")
+    artifactSaver = context.actorOf(Props(new ArtifactSaver(metadata)), name = "artifactSaver")
   }
 
-  def receive = {
-    case BatchMessage(actionName, params, protocol) =>
-      log.info(s"Sending a message ${params} to $actionName")
-      this.actionHandler.send_message(actionName=actionName, params=params)
+  override def receive  = {
+    case BatchExecute(protocol, params) =>
+      implicit val futureTimeout = Timeout(metadata.batchActionTimeout milliseconds)
 
-      log.info(s"Sending a message to SaverMessage [${actionName}]")
-      artifactSaveActor ! SaverMessage(actionName=actionName, protocol=protocol)
+      log.info(s"Starting to process execute to $actionName. Protocol: [$protocol] and params: [$params].")
 
-    case BatchReloadMessage(actionName, artifacts, protocol) =>
-      log.info(s"Sending the message to reload the $artifacts of $actionName using protocol $protocol")
-      sender ! this.actionHandler.reload(actionName, artifacts, protocol)
+      batchActionProxy ? ExecuteBatch(protocol, params)
 
-    case BatchHealthCheckMessage(actionName, artifacts) =>
-      log.debug(s"Sending message to batch health check. Following artifacts included: $artifacts.")
-      sender ! this.actionHandler.healthCheck(actionName, artifacts)
+      for(artifactName <- engineActionMetadata.artifactsToPersist){
+        artifactSaver ! SaveToRemote(artifactName, protocol)
+      }
+
+
+    case BatchReload(protocol) =>
+      implicit val futureTimeout = Timeout(metadata.reloadTimeout milliseconds)
+
+      log.info(s"Starting to process reload to $actionName. Protocol: [$protocol].")
+
+      val futures:ListBuffer[Future[Any]] = ListBuffer[Future[Any]]()
+      for(artifactName <- engineActionMetadata.artifactsToLoad) {
+        futures += (artifactSaver ? SaveToLocal(artifactName, protocol))
+      }
+
+      Future.sequence(futures).onComplete { response =>
+        batchActionProxy ! Reload(protocol)
+      }
+
+    case BatchHealthCheck =>
+      implicit val futureTimeout = Timeout(metadata.healthCheckTimeout milliseconds)
+      log.info(s"Starting to process health to $actionName.")
+
+      val originalSender = sender
+      ask(batchActionProxy, HealthCheck) pipeTo originalSender
+
+    case Done =>
+      log.info("Work Done!")
 
     case _ =>
-      log.info("Received a bad format message...")
+      log.warning(s"Not valid message !!")
+
   }
 }

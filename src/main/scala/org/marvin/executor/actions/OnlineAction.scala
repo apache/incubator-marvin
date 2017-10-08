@@ -1,53 +1,76 @@
-/**
-  * Copyright [2017] [B2W Digital]
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-  */
 package org.marvin.executor.actions
 
-import akka.actor.{Actor, ActorLogging}
-import org.marvin.executor.actions.ActionHandler.OnlineType
-import org.marvin.executor.actions.OnlineAction.{OnlineHealthCheckMessage, OnlineMessage, OnlineReloadMessage}
-import org.marvin.model.EngineMetadata
+import akka.Done
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.pattern.{ask, pipe}
+import akka.util.Timeout
+import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
+import org.marvin.manager.ArtifactSaver
+import org.marvin.model.{EngineActionMetadata, EngineMetadata}
+import org.marvin.manager.ArtifactSaver.SaveToLocal
+import org.marvin.executor.proxies.EngineProxy.{ExecuteOnline, HealthCheck, Reload}
+import org.marvin.executor.proxies.OnlineActionProxy
+
+import scala.collection.mutable.ListBuffer
+import scala.concurrent.Future
+import scala.concurrent.duration._
 
 object OnlineAction {
-  case class OnlineMessage(actionName:String, message:String, params:String)
-  case class OnlineReloadMessage(actionName: String, artifacts:String, protocol:String)
-  case class OnlineHealthCheckMessage(actionName: String, artifacts: String)
+  case class OnlineExecute(message: String, params: String)
+  case class OnlineReload(protocol:String)
+  case class OnlineHealthCheck()
 }
 
-class OnlineAction(engineMetadata: EngineMetadata) extends Actor with ActorLogging {
-  var actionHandler: ActionHandler = _
+class OnlineAction(actionName: String, metadata: EngineMetadata) extends Actor with ActorLogging{
+  var onlineActionProxy: ActorRef = _
+  var artifactSaver: ActorRef = _
+  var engineActionMetadata: EngineActionMetadata = _
+  var artifactsToLoad: String = _
+  implicit val ec = context.dispatcher
 
   override def preStart() = {
-    log.info(s"${this.getClass().getCanonicalName} actor initializing...")
-    this.actionHandler = new ActionHandler(engineMetadata, OnlineType)
+    engineActionMetadata = metadata.actionsMap(actionName)
+    artifactsToLoad = engineActionMetadata.artifactsToLoad.mkString(",")
+    onlineActionProxy = context.actorOf(Props(new OnlineActionProxy(engineActionMetadata)), name = "onlineActionProxy")
+    artifactSaver = context.actorOf(Props(new ArtifactSaver(metadata)), name = "artifactSaver")
   }
 
-  def receive = {
-    case OnlineMessage(actionName, message, params) =>
-      log.info(s"Sending the message ${message} and params ${params} to $actionName")
-      sender ! this.actionHandler.send_message(actionName=actionName, params=params, message=message)
+  override def receive  = {
+    case OnlineExecute(message, params) =>
+      implicit val futureTimeout = Timeout(metadata.onlineActionTimeout milliseconds)
 
-    case OnlineReloadMessage(actionName, artifacts, protocol) =>
-      log.info(s"Sending the message to reload the $artifacts of $actionName using protocol $protocol")
-      sender ! this.actionHandler.reload(actionName=actionName, artifacts=artifacts, protocol=protocol)
+      log.info(s"Starting to process execute to $actionName. Message: [$message] and params: [$params].")
 
-    case OnlineHealthCheckMessage(actionName, artifacts) =>
-      log.debug("Sending online health check request.")
-      sender ! this.actionHandler.healthCheck(actionName = actionName, artifacts = artifacts)
+      val originalSender = sender
+      ask(onlineActionProxy, ExecuteOnline(message, params)) pipeTo originalSender
+
+
+    case OnlineReload(protocol) =>
+      implicit val futureTimeout = Timeout(metadata.reloadTimeout milliseconds)
+
+      log.info(s"Starting to process reload to $actionName. Protocol: [$protocol].")
+
+      val futures:ListBuffer[Future[Any]] = ListBuffer[Future[Any]]()
+      for(artifactName <- engineActionMetadata.artifactsToLoad) {
+        futures += (artifactSaver ? SaveToLocal(artifactName, protocol))
+      }
+
+      Future.sequence(futures).onComplete { response =>
+        onlineActionProxy ! Reload(protocol)
+      }
+
+    case OnlineHealthCheck =>
+      implicit val futureTimeout = Timeout(metadata.healthCheckTimeout milliseconds)
+      log.info(s"Starting to process health to $actionName.")
+
+      val originalSender = sender
+      ask(onlineActionProxy, HealthCheck) pipeTo originalSender
+
+    case Done =>
+      log.info("Work Done!")
 
     case _ =>
-      log.info("Received a bad format message...")
+      log.warning(s"Not valid message !!")
+
   }
 }

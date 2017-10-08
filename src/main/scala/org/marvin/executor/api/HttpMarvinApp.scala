@@ -39,7 +39,9 @@ abstract class HttpMarvinApp extends HttpApp {
     }
     Future {
       blocking {
-        while(true) {} //the app will wait forever
+        while(true) {
+          Thread.sleep(10000)
+        } //the app will wait forever
       }
     }
     promise.future
