@@ -38,7 +38,7 @@
 		"port": 50054,
 		"host": "localhost",
 		"artifactsToPersist": ["metrics"],
-		"artifactsToLoad": ["dataset", "model"],
+		"artifactsToLoad": ["dataset"],
 		"pipeline": []
 	}, {
 		"name": "predictor",
@@ -46,7 +46,7 @@
 		"port": 50055,
 		"host": "localhost",
 		"artifactsToPersist": [],
-		"artifactsToLoad": ["model", "metrics"],
+		"artifactsToLoad": ["model"],
 		"pipeline": ["ppreparator"]
 	}]
 }
