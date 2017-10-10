@@ -1,10 +1,26 @@
+/*
+ * Copyright [2017] [B2W Digital]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package org.marvin.executor.actions
 
 import akka.Done
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
+import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload, OnlineReloadNoSave}
 import org.marvin.manager.ArtifactSaver
 import org.marvin.model.{EngineActionMetadata, EngineMetadata}
 import org.marvin.manager.ArtifactSaver.SaveToLocal
@@ -14,10 +30,12 @@ import org.marvin.executor.proxies.OnlineActionProxy
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
 import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
 object OnlineAction {
   case class OnlineExecute(message: String, params: String)
   case class OnlineReload(protocol:String)
+  case class OnlineReloadNoSave(protocol: String)
   case class OnlineHealthCheck()
 }
 
@@ -55,9 +73,22 @@ class OnlineAction(actionName: String, metadata: EngineMetadata) extends Actor w
         futures += (artifactSaver ? SaveToLocal(artifactName, protocol))
       }
 
-      Future.sequence(futures).onComplete { response =>
-        onlineActionProxy ! Reload(protocol)
+      Future.sequence(futures).onComplete {
+        case Success(response) =>
+          log.info(s"Reload to $actionName completed [$response] ! Protocol: [$protocol]")
+
+          onlineActionProxy forward Reload(protocol)
+
+        case Failure(failure) =>
+          failure.printStackTrace()
       }
+
+    case OnlineReloadNoSave(protocol) =>
+      implicit val futureTimeout = Timeout(metadata.reloadTimeout milliseconds)
+
+      log.info(s"Starting to process reload [no save] to $actionName. Protocol: [$protocol].")
+
+      onlineActionProxy forward Reload(protocol)
 
     case OnlineHealthCheck =>
       implicit val futureTimeout = Timeout(metadata.healthCheckTimeout milliseconds)

@@ -1,18 +1,19 @@
-/**
-  * Copyright [2017] [B2W Digital]
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-  */
+/*
+ * Copyright [2017] [B2W Digital]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package org.marvin.executor.api
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCode, StatusCodes}
@@ -41,7 +42,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
     "interpret the input message and respond with media type json" in {
 
       val probe = setupProbe()
-      GenericHttpAPI.predictorActor = probe.ref
+      GenericHttpAPI.predictorFSM = probe.ref
 
       val result = Post("/predictor", HttpEntity(`application/json`, s"""{"params":"testParams","message":"testQuery"}""")) ~> route ~> runRoute
 
@@ -65,7 +66,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
     "use default params when no params is informed" in {
       val probe = setupProbe()
-      GenericHttpAPI.predictorActor = probe.ref
+      GenericHttpAPI.predictorFSM = probe.ref
       GenericHttpAPI.defaultParams = "default for test"
 
       val result = Post("/predictor", HttpEntity(`application/json`, s"""{"message":"testQuery"}""")) ~> route ~> runRoute
@@ -82,7 +83,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
     "fail fast when the timeout is reached" in {
       val probe = setupProbe()
-      GenericHttpAPI.predictorActor = probe.ref
+      GenericHttpAPI.predictorFSM = probe.ref
       GenericHttpAPI.onlineActionTimeout = Timeout(50 millis)
 
       val result = Post("/predictor", HttpEntity(`application/json`, s"""{"params":"testParams","message":"testQuery"}""")) ~> route ~> runRoute
@@ -354,7 +355,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
       val apiMock = mock[GenericHttpAPIOpen]
       GenericHttpAPI.api = apiMock
 
-      (apiMock.setupSystem _).expects("a/fake/path/engine.metadata", "a/fake/path/engine.params").returning(null)
+      (apiMock.setupSystem _).expects("a/fake/path/engine.metadata", "a/fake/path/engine.params", "").returning(null)
       (apiMock.startServer _).expects("1.1.1.1", 9999, null).returning(1)
 
       GenericHttpAPI.main(null)
@@ -370,7 +371,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val caught =
         intercept[MarvinEExecutorException] {
-          httpApi.setupSystem("not_existent_engine_file", existentFile)
+          httpApi.setupSystem("not_existent_engine_file", existentFile, "")
         }
       caught.getMessage() shouldEqual "The file [not_existent_engine_file] does not exists. Check your engine configuration."
     }
@@ -382,7 +383,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val caught =
         intercept[MarvinEExecutorException] {
-          httpApi.setupSystem(existentFile, "not_existent_params_file")
+          httpApi.setupSystem(existentFile, "not_existent_params_file", "")
         }
       caught.getMessage() shouldEqual "The file [not_existent_params_file] does not exists. Check your engine configuration."
     }
@@ -393,7 +394,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
       val validMetadataFile = getClass.getResource("/valid.metadata").getPath()
       val validParamsFile = getClass.getResource("/valid.params").getPath()
 
-      val system = httpApi.setupSystem(validMetadataFile, validParamsFile)
+      val system = httpApi.setupSystem(validMetadataFile, validParamsFile, "")
       system shouldNot be(null)
     }
   }
@@ -417,7 +418,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 }
 
 class GenericHttpAPIOpen(var protocolService: ProtocolUtil) extends GenericHttpAPI {
-  override def setupSystem(engineFilePath: String, paramsFilePath: String): ActorSystem = super.setupSystem(engineFilePath, paramsFilePath)
+  override def setupSystem(engineFilePath: String, paramsFilePath: String, modelProtocol: String): ActorSystem = super.setupSystem(engineFilePath, paramsFilePath, modelProtocol)
   override def startServer(ipAddress: String, port: Int, system: ActorSystem): Unit = super.startServer(ipAddress, port, system)
   override def terminate(): Future[Terminated] = super.terminate()
 }
