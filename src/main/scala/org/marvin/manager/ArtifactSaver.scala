@@ -17,7 +17,6 @@
 package org.marvin.manager
 
 import java.io.{File, FileInputStream}
-
 import akka.Done
 import akka.actor.{Actor, ActorLogging}
 import org.apache.hadoop.conf.Configuration
