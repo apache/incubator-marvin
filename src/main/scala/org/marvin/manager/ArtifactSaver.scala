@@ -16,6 +16,7 @@
  */
 package org.marvin.manager
 
+import java.io.{File, FileInputStream}
 import akka.Done
 import akka.actor.{Actor, ActorLogging}
 import org.apache.hadoop.conf.Configuration
@@ -34,6 +35,16 @@ class ArtifactSaver(metadata: EngineMetadata) extends Actor with ActorLogging {
   override def preStart() = {
     log.info(s"${this.getClass().getCanonicalName} actor initialized...")
     conf = new Configuration()
+
+    if (sys.env.get("HADOOP_CONF_DIR") != None){
+      val confFiles:List[File] = getListOfFiles(sys.env.get("HADOOP_CONF_DIR").mkString)
+
+      for(file <- confFiles){
+        log.info(s"Loading ${file.getAbsolutePath} file to hdfs client configuration ..")
+        conf.addResource(new FileInputStream(file))
+      }
+    }
+
     conf.set("fs.defaultFS", metadata.hdfsHost)
   }
 
@@ -42,6 +53,14 @@ class ArtifactSaver(metadata: EngineMetadata) extends Actor with ActorLogging {
       "localPath" -> new Path(s"${metadata.artifactsLocalPath}/${metadata.name}/$artifactName"),
       "remotePath" -> new Path(s"${metadata.artifactsRemotePath}/${metadata.name}/${metadata.version}/$artifactName/$protocol")
     )
+  }
+
+  def getListOfFiles(path: String): List[File] = {
+    val dir = new File(path)
+    val extensions = List("xml")
+    dir.listFiles.filter(_.isFile).toList.filter { file =>
+      extensions.exists(file.getName.endsWith(_))
+    }
   }
 
   override def receive: Receive = {
