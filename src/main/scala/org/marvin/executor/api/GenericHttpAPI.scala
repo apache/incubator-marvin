@@ -307,7 +307,7 @@ trait GenericHttpAPI {
 
   def onlineExecute(actionName: String, params: String, message: String): Future[String] = {
     GenericHttpAPI.log.info(s"Request for $actionName] received.")
-    implicit val ec = ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
+    implicit val ec = GenericHttpAPI.system.dispatchers.lookup("marvin-online-dispatcher")
     implicit val futureTimeout = GenericHttpAPI.onlineActionTimeout
     (GenericHttpAPI.actors(actionName) ? OnlineExecute(message, params)).mapTo[String]
   }
