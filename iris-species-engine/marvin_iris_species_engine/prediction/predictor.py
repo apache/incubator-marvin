@@ -23,5 +23,7 @@ class Predictor(EngineBasePrediction):
         super(Predictor, self).__init__(**kwargs)
 
     def execute(self, input_message, **kwargs):
-        best_model = self.model[self.metrics['best_model'][0]]
-        return best_model.predict(input_message)[0]
+        return {
+            "svm_petals": self.model['svm_petals'].predict(input_message)[0],
+            "svm_sepals": self.model['svm_sepals'].predict(input_message)[0]
+        }
