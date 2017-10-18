@@ -204,14 +204,14 @@ object GenericHttpAPI extends HttpMarvinApp {
     }
 
   def matchHealthTry(response: Try[HealthStatus]) = response match {
-    case Success(healthStatus) => {
+    case Success(healthStatus) =>
       if(healthStatus.status.equals("OK"))
         complete(healthStatus)
       else
         complete(HttpResponse(StatusCodes.ServiceUnavailable,
           entity = HttpEntity(ContentTypes.`application/json`,
             healthStatusFormat.write(healthStatus).toString())))
-    }
+
     case Failure(e) => throw e
   }
 

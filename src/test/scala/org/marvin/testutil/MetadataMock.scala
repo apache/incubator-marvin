@@ -32,7 +32,7 @@ object MetadataMock {
       hdfsHost = "",
       healthCheckTimeout = 100,
       onlineActionTimeout = 100,
-      pipelineActions = null,
+      pipelineActions = List("acquisitor", "tpreparator"),
       reloadStateTimeout = Some(500),
       reloadTimeout = 100,
       version = "1"
