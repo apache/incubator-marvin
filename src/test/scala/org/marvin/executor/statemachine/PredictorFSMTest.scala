@@ -18,27 +18,23 @@ package org.marvin.executor.statemachine
 
 import actions.HealthCheckResponse.Status
 import actions.OnlineActionResponse
-import akka.actor.{ActorSystem, Props}
-import akka.testkit.{EventFilter, ImplicitSender, TestActorRef, TestFSMRef, TestKit, TestProbe}
+import akka.actor.ActorSystem
+import akka.testkit.{EventFilter, ImplicitSender, TestFSMRef, TestKit, TestProbe}
 import com.typesafe.config.ConfigFactory
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload, OnlineReloadNoSave}
-import org.marvin.executor.api.GenericHttpAPI
 import org.marvin.model.MarvinEExecutorException
 import org.marvin.testutil.MetadataMock
-import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec, WordSpecLike}
+import org.scalatest.{Matchers, WordSpecLike}
 
 class PredictorFSMTest extends TestKit(
   ActorSystem("EngineFSMTest", ConfigFactory.parseString("""akka.loggers = ["akka.testkit.TestEventListener"]""")))
-  with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll{
-
-  override def beforeAll(): Unit = {
-    super.beforeAll()
-  }
+  with ImplicitSender with WordSpecLike with Matchers {
 
   "engine finite state machine" should {
 
     "start with Unavailable" in {
-      val fsm = TestFSMRef[State, Data, PredictorFSM](new PredictorFSM(MetadataMock.simpleMockedMetadata()))
+      val probe = TestProbe()
+      val fsm = TestFSMRef[State, Data, PredictorFSM](new PredictorFSM(probe.ref, MetadataMock.simpleMockedMetadata()))
       fsm.stateName should be (Unavailable)
       fsm.stateData should be (NoModel)
     }
@@ -110,7 +106,7 @@ class PredictorFSMTest extends TestKit(
       val probe = TestProbe()
       val fsm = TestFSMRef[State, Data, PredictorFSM](new PredictorFSM(probe.ref, MetadataMock.simpleMockedMetadata()))
       fsm.setState(Ready)
-      fsm ! OnlineHealthCheck()
+      fsm ! OnlineHealthCheck
       probe.expectMsg(OnlineHealthCheck)
       probe.reply(Status.OK)
       expectMsg(Status.OK)
