@@ -48,7 +48,7 @@ class MetricsEvaluator(EngineBaseTraining):
                 indx += 1
 
     def execute(self, **kwargs):
-        validation_data = self.generate_samples(self.pw['IMAGES'],
+        validation_data = self.generate_samples(self.params['IMAGES'],
                                                 self.dataset['val'])
         y_true = []
         y_pred = []
