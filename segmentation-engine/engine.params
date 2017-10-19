@@ -1,0 +1,9 @@
+{
+	"PARAM_1" : "VALUE_OF_PARAM_1",
+	"TRAIN": "/vagrant/projects/VOCdevkit/VOC2012/ImageSets/Main/aeroplane_train.txt",
+	"VALID": "/vagrant/projects/VOCdevkit/VOC2012/ImageSets/Main/aeroplane_val.txt",
+	"IMAGES": "/vagrant/projects/VOCdevkit/VOC2012/JPEGImages/",
+	"EPOCHS": 1,
+	"STEPS": 2,
+	"VAL_STEPS": 2
+}
