@@ -7,11 +7,11 @@ try:
 except ImportError:
     import unittest.mock as mock
 
-from marvin_segmentation_engine.data_handler import AcquisitorAndCleaner
+from marvin_image_classification_engine.prediction import Predictor
 
 
-class TestAcquisitorAndCleaner:
+class TestPredictor:
     def test_execute(self, mocked_params):
-        ac = AcquisitorAndCleaner(params=mocked_params)
-        ac.execute()
+        ac = Predictor(params=mocked_params)
+        ac.execute(input_message="fake message")
         assert ac.params == mocked_params

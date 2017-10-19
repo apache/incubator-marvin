@@ -1,8 +1,8 @@
-# Segmentation v0.0.1
+# image_classification v0.0.1
 
 ## Overview
 
-Semantic segmentation
+Image Classification
 
 
 ## Requirements
@@ -25,7 +25,7 @@ _REPLACE: Add here the best way to install this engine
 First, create a new virtualenv
 
 ```
-mkvirtualenv marvin_segmentation_engine_env
+mkvirtualenv marvin_image_classification_engine_env
 ```
 
 Now install the development dependencies
@@ -88,6 +88,6 @@ git push origin master --follow-tags
 
 ### Logging
 
-The default log level is set to _WARNING_. You can change the log level at runtime setting another value to one of the following environment variable: `MARVIN_SEGMENTATION_ENGINE_LOG_LEVEL` or `LOG_LEVEL`. The available values are _CRITICAL_, _ERROR_, _WARNING_, _INFO_ and _DEBUG_.
+The default log level is set to _WARNING_. You can change the log level at runtime setting another value to one of the following environment variable: `MARVIN_IMAGE_CLASSIFICATION_ENGINE_LOG_LEVEL` or `LOG_LEVEL`. The available values are _CRITICAL_, _ERROR_, _WARNING_, _INFO_ and _DEBUG_.
 
 Be careful using `LOG_LEVEL`, it may affect another lib.

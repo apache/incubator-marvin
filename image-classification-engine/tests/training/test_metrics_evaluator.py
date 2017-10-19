@@ -7,7 +7,7 @@ try:
 except ImportError:
     import unittest.mock as mock
 
-from marvin_segmentation_engine.training import MetricsEvaluator
+from marvin_image_classification_engine.training import MetricsEvaluator
 
 
 class TestMetricsEvaluator:

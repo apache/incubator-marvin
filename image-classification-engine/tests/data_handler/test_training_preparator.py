@@ -7,7 +7,7 @@ try:
 except ImportError:
     import unittest.mock as mock
 
-from marvin_segmentation_engine.data_handler import TrainingPreparator
+from marvin_image_classification_engine.data_handler import TrainingPreparator
 
 
 class TestTrainingPreparator:

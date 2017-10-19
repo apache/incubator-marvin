@@ -8,7 +8,7 @@ from setuptools.command.test import test as TestCommand
 def _get_version():
     """Return the project version from VERSION file."""
 
-    with open(join(dirname(__file__), 'marvin_segmentation_engine/VERSION'), 'rb') as f:
+    with open(join(dirname(__file__), 'marvin_image_classification_engine/VERSION'), 'rb') as f:
         version = f.read().decode('ascii').strip()
     return version
 
@@ -43,14 +43,14 @@ class Tox(TestCommand):
 
 
 setup(
-    name='marvin_segmentation_engine',
+    name='marvin_image_classification_engine',
     version=_get_version(),
     url='',
-    description='Semantic segmentation',
+    description='Image Classification',
     long_description=open(join(dirname(__file__), 'README.md')).read(),
     author='Marvin AI Researcher',
     maintainer='B2W Labs Team',
-    maintainer_email='danilo.nunes@b2wdigital.com',
+    maintainer_email='@b2wdigital.com',
     packages=find_packages(exclude=('tests', 'tests.*')),
     include_package_data=True,
     zip_safe=False,

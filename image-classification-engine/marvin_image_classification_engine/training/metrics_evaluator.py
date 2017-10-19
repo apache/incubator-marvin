@@ -9,7 +9,6 @@ import os
 import numpy as np
 import cv2
 from sklearn import metrics as sk_metrics
-        
 from .._compatibility import six
 from .._logging import get_logger
 
@@ -49,7 +48,7 @@ class MetricsEvaluator(EngineBaseTraining):
                 indx += 1
 
     def execute(self, **kwargs):
-        validation_data = self.generate_samples(self.params['IMAGES'],
+        validation_data = self.generate_samples(self.pw['IMAGES'],
                                                 self.dataset['val'])
         y_true = []
         y_pred = []

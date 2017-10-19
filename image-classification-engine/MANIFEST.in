@@ -3,7 +3,7 @@ include INSTALL
 include LICENSE
 include MANIFEST.in
 include README.md
-include marvin_segmentation_engine/VERSION
+include marvin_image_classification_engine/VERSION
 recursive-include notebooks *
 prune notebooks/build
 recursive-include tests *

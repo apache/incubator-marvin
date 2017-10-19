@@ -33,7 +33,7 @@ class Logger(logging.getLoggerClass()):
 logging.setLoggerClass(Logger)
 
 
-def get_logger(name, namespace='marvin_segmentation_engine',
+def get_logger(name, namespace='marvin_image_classification_engine',
                log_level=DEFAULT_LOG_LEVEL, log_dir=DEFAULT_LOG_DIR):
     """Build a logger that outputs to a file and to the console,"""
 
