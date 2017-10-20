@@ -1,0 +1,12 @@
+{
+	"DATA": "http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar",
+	"TRAIN": "/home/vagrant/marvin/data/VOCdevkit/VOC2012/ImageSets/Main/aeroplane_train.txt",
+	"VALID": "/home/vagrant/marvin/data/VOCdevkit/VOC2012/ImageSets/Main/aeroplane_val.txt",
+	"IMAGES": "/home/vagrant/marvin/data//VOCdevkit/VOC2012/JPEGImages/",
+	"W": 150,
+	"H": 150,
+	"EPOCHS": 1,
+	"STEPS": 2,
+	"VAL_STEPS": 2,
+	"TEST_STEPS": 20
+}
