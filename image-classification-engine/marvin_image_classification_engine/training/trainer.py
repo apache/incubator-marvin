@@ -12,6 +12,7 @@ from keras.layers import Activation, Reshape, Dropout, Dense, Flatten
 from keras.layers import AtrousConvolution2D, Conv2D, MaxPooling2D, Conv2DTranspose, UpSampling2D
 from keras.models import Sequential
 from keras import callbacks, optimizers
+from ..model_serializer import ModelSerializer
 from .._compatibility import six
 from .._logging import get_logger
 
@@ -23,8 +24,7 @@ __all__ = ['Trainer']
 logger = get_logger('trainer')
 
 
-class Trainer(EngineBaseTraining):
-
+class Trainer(ModelSerializer, EngineBaseTraining):
     def __init__(self, **kwargs):
         super(Trainer, self).__init__(**kwargs)
 
@@ -54,26 +54,17 @@ class Trainer(EngineBaseTraining):
         return model
 
     def generate_samples(self, image_path, fnames, w=150, h=150):
-        indx = 0
         while True:
-            for fname in fnames['positive']:
+            for fname, label in fnames:
+                label = int(label)
+                if label == 0:
+                    continue
+
+                label = 0 if label == -1 else 1
                 image = cv2.imread(os.path.join(image_path, fname + '.jpg'))
                 image = cv2.resize(image, (w, h))
                 image = image[np.newaxis, :, :, (2, 1, 0)]
-                label = np.array([1])
-                yield (image, label)
-
-                if indx >= len(fnames['negative']):
-                    indx = 0
-
-                fname = fnames['negative'][indx]
-                image = cv2.imread(os.path.join(image_path, fname + '.jpg'))
-                image = cv2.resize(image, (w, h))
-                image = image[np.newaxis, :, :, (2, 1, 0)]
-                label = np.array([0])
-                yield (image, label)
-
-                indx += 1
+                yield (image, np.array([int(label)]))
 
     def execute(self, **kwargs):
         model = self.build_model(trainable=True)
@@ -82,9 +73,13 @@ class Trainer(EngineBaseTraining):
                       metrics=['accuracy'])
 
         training_data = self.generate_samples(self.params['IMAGES'],
-                                              self.dataset['train'])
+                                              self.dataset['train'],
+                                              w=self.params['W'],
+                                              h=self.params['H'])
         validation_data = self.generate_samples(self.params['IMAGES'],
-                                                self.dataset['val'])
+                                                self.dataset['val'],
+                                                w=self.params['W'],
+                                                h=self.params['H'])
 
         model.fit_generator(training_data,
                             steps_per_epoch=self.params['STEPS'],

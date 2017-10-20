@@ -5,7 +5,7 @@
 
 Use this module to add the project main code.
 """
-
+from ..model_serializer import ModelSerializer
 from .._compatibility import six
 from .._logging import get_logger
 
@@ -17,7 +17,7 @@ __all__ = ['Predictor']
 logger = get_logger('predictor')
 
 
-class Predictor(EngineBasePrediction):
+class Predictor(ModelSerializer, EngineBasePrediction):
 
     def __init__(self, **kwargs):
         super(Predictor, self).__init__(**kwargs)

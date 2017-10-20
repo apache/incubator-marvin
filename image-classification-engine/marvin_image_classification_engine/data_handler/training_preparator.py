@@ -23,5 +23,5 @@ class TrainingPreparator(EngineBaseDataHandler):
         super(TrainingPreparator, self).__init__(**kwargs)
 
     def execute(self, **kwargs):
-        train, val = self.initial_dataset
+    	train, val = self.initial_dataset
         self.dataset = {'train': train, 'val': val}
