@@ -11,3 +11,5 @@ coverage_report
 *.pyc
 tests/__pycache__
 .DS_Store
+.profiling
+.ipynb_checkpoints
