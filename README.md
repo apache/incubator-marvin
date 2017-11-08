@@ -2,23 +2,23 @@
 
 ## Overview
 
-Image Classification
+**Image Classification**
 
-
-## Requirements
-
-_REPLACE: Add here the list of requirements. For example:_
-
- - Python 2.7
- - Numpy 1.11.0 or higher
-
+It contains an example of how to perform image classification.
+The dataset is divided into two classes according to VOC2012 Images.
+- Airplane
+- Not Airplane
 
 ## Installation
 
-_REPLACE: Add here the best way to install this engine
-
+```
+marvin make
+```
 
 ## Development
+
+It runs deep learning through Keras and tensorflow as backend.
+Images are loaded using generator to save memory.
 
 ### Getting started
 
@@ -34,60 +34,12 @@ Now install the development dependencies
 make marvin
 ```
 
-You are now ready to code.
-
-
-### Adding new dependencies
-
-It\`s very important. All development dependencies should be added to `setup.py`.
-
-### Running tests
-
-This project uses *[py.test](http://pytest.org/)* as test runner and *[Tox](https://tox.readthedocs.io)* to manage virtualenvs.
-
-To run all tests use the following command
+and to run the whole pipeline
 
 ```
-marvin test
+marvin engine-dryrun
 ```
 
-To run specific test
+### Contact
 
-```
-marvin test tests/test_file.py::TestClass::test_method
-```
-
-
-### Writting documentation
-
-The project documentation is written using *[Jupyter](http://jupyter.readthedocs.io/)* notebooks. 
-You can start the notebook server from the command line by running the following command
-
-```
-marvin notebook
-```
-
-Use notebooks to demonstrate how to use the lib features. It can also be useful to show some use cases.
-
-
-### Bumping version
-
-```
-marvin pkg-bumpversion [patch|minor|major]
-git add . && git commit -m "Bump version"
-```
-
-
-### Tagging version
-
-```
-marvin pkg-createtag
-git push origin master --follow-tags
-```
-
-
-### Logging
-
-The default log level is set to _WARNING_. You can change the log level at runtime setting another value to one of the following environment variable: `MARVIN_IMAGE_CLASSIFICATION_ENGINE_LOG_LEVEL` or `LOG_LEVEL`. The available values are _CRITICAL_, _ERROR_, _WARNING_, _INFO_ and _DEBUG_.
-
-Be careful using `LOG_LEVEL`, it may affect another lib.
+danilo.nunes@b2wdigital.com
