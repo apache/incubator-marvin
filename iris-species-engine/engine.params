@@ -1,0 +1,5 @@
+{
+	"data_url" : "https://s3.amazonaws.com/marvin-engines-data/Iris.csv",
+	"test_size": 0.3,
+	"random_state": 0
+}

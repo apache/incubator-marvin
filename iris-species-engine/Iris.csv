@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Iris Species | Kaggle</title>
+    <meta charset="utf-8" />
+    <meta name="robots" content="index, follow"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">    <meta name="theme-color" content="#008ABC" />
+    <link rel="dns-prefetch" href="https://www.google-analytics.com" /><link rel="dns-prefetch" href="https://stats.g.doubleclick.net" /><link rel="dns-prefetch" href="https://js.intercomcdn.com" /><link rel="preload" href="https://az416426.vo.msecnd.net/scripts/a/ai.0.js" as=script /><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" as=script /><link rel="dns-prefetch" href="https://kaggle2.blob.core.windows.net" />
+    <link href="/content/v/d420a040e581/kaggle/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link rel="manifest" href="/static/json/manifest.json">
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic" rel='stylesheet' type='text/css'>
+                <link rel="stylesheet" type="text/css" href="/static/assets/vendor.css?v=35d31f6ac881"/>
+        <link rel="stylesheet" type="text/css" href="/static/assets/app.css?v=7965090d1027"/>
+        <script>
+            
+            (function () {
+                var originalError = window.onerror;
+
+                window.onerror = function (message, url, lineNumber, columnNumber, error) {
+                    var handled = originalError && originalError(message, url, lineNumber, columnNumber, error);
+                    var blockedByCors = message && message.toLowerCase().indexOf("script error") >= 0;
+                    return handled || blockedByCors;
+                };
+            })();
+        </script>
+    <script>
+        var appInsights=window.appInsights||function(config){
+        function i(config){t[config]=function(){var i=arguments;t.queue.push(function(){t[config].apply(t,i)})}}var t={config:config},u=document,e=window,o="script",s="AuthenticatedUserContext",h="start",c="stop",l="Track",a=l+"Event",v=l+"Page",y=u.createElement(o),r,f;y.src=config.url||"https://az416426.vo.msecnd.net/scripts/a/ai.0.js";u.getElementsByTagName(o)[0].parentNode.appendChild(y);try{t.cookie=u.cookie}catch(p){}for(t.queue=[],t.version="1.0",r=["Event","Exception","Metric","PageView","Trace","Dependency"];r.length;)i("track"+r.pop());return i("set"+s),i("clear"+s),i(h+a),i(c+a),i(h+v),i(c+v),i("flush"),config.disableExceptionTracking||(r="onerror",i("_"+r),f=e[r],e[r]=function(config,i,u,e,o){var s=f&&f(config,i,u,e,o);return s!==!0&&t["_"+r](config,i,u,e,o),s}),t
+        }({
+            instrumentationKey:"5b3d6014-f021-4304-8366-3cf961d5b90f",
+            disableAjaxTracking: true
+        });
+        window.appInsights=appInsights;
+        appInsights.trackPageView();
+    </script>
+    
+    
+    
+ 
+    
+    <script>
+    window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) }; ga.l = +new Date;
+    ga('create', 'UA-12629138-1', 'auto');
+    ga('set', 'displayFeaturesTask', null);
+    ga('send', 'pageview');
+    </script>
+    <script async src="https://www.google-analytics.com/analytics.js"></script>
+
+    
+<script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window,document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '136809193586742'); 
+    fbq('track', 'PageView');
+</script>
+<noscript>
+    <img height="1" width="1" src="https://www.facebook.com/tr?id=136809193586742&ev=PageView&noscript=1"/>
+</noscript>
+
+    
+
+    <script>
+          window.intercomSettings = {
+            app_id: "koj6gxx6"
+          };
+    </script>
+<script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/koj6gxx6';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})()</script>
+    
+    
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@kaggledatasets"/>
+    <meta name="og:url" content="https://www.kaggle.com/uciml/iris" />
+    <meta name="og:title" content="Iris Species" />
+    <meta name="og:description" content="Classify iris plants into three species in this classic dataset" />
+    <meta name="og:image" content="https://kaggle2.blob.core.windows.net/datasets-images/19/19/default-backgrounds/dataset-card.jpg" />
+
+
+    <script src="/static/assets/manifest.js?v=47a28ec84654"></script>
+<script src="/static/assets/vendor.js?v=b78f12d792ed"></script>
+</head>
+<body>
+    
+
+
+
+
+
+<div class="site-layout">
+        <div class="site-layout__header">
+            <div data-component-name="SiteHeaderContainer"></div><script>var Kaggle=window.Kaggle||{};Kaggle.State=Kaggle.State||[];Kaggle.State.push({});performance && performance.mark && performance.mark("SiteHeaderContainer.componentCouldBootstrap");</script>
+        </div>
+
+    <div class="site-layout__main-content">
+        
+
+<div data-component-name="DatasetContainer"></div><script>var Kaggle=window.Kaggle||{};Kaggle.State=Kaggle.State||[];Kaggle.State.push({"datasetId":19,"overview":"Classify iris plants into three species in this classic dataset","description":"The Iris dataset was used in R.A. Fisher\u0027s classic 1936 paper, [The Use of Multiple Measurements in Taxonomic Problems](http://rcs.chemometrics.ru/Tutorials/classification/Fisher.pdf), and can also be found on the [UCI Machine Learning Repository][1].\n\nIt includes three iris species with 50 samples each as well as some properties about each flower. One flower species is linearly separable from the other two, but the other two are not linearly separable from each other.\n\nThe columns in this dataset are:\n\n - Id\n - SepalLengthCm\n - SepalWidthCm\n - PetalLengthCm\n - PetalWidthCm\n - Species\n\n[![Sepal Width vs. Sepal Length](https://www.kaggle.io/svf/138327/e401fb2cc596451b1e4d025aaacda95f/sepalWidthvsLength.png)](https://www.kaggle.com/benhamner/d/uciml/iris/sepal-width-vs-length)\n\n\n  [1]: http://archive.ics.uci.edu/ml/","isRemoved":false,"isVersionRemoved":false,"isFeatured":true,"scheduledToBeFeatured":null,"privateGroupId":null,"datasetVersionId":420,"datasetVersionNumber":2,"lastVersionNumber":2,"datasetUrl":"/uciml/iris","datasetExternalUrl":"https://www.kaggle.com/uciml/iris","originalImageUrl":"","coverImageUrl":"https://kaggle2.blob.core.windows.net/datasets-images/19/19/default-backgrounds/dataset-cover.jpg","cardImageUrl":"https://kaggle2.blob.core.windows.net/datasets-images/19/19/default-backgrounds/dataset-card.jpg","thumbnailImageUrl":"https://kaggle2.blob.core.windows.net/datasets-images/19/19/default-backgrounds/dataset-thumbnail.jpg","license":"CC0: Public Domain \u003ca href=\u0022https://creativecommons.org/publicdomain/zero/1.0/\u0022 target=\u0022_blank\u0022\u003e\u003cspan class=\u0022fa fa-info-circle\u0022/\u003e\u003c/a\u003e","voteCount":396,"upVoteUrl":"/uciml/iris/vote","creatorUserId":1,"creatorDisplayName":"Kaggle Team","ownerTwitter":null,"lastUpdated":"2016-09-27T07:38:05.44Z","downloadUrl":"/uciml/iris/downloads/iris-species.zip","downloadSize":3718,"newNotebookUrl":"/Scripts/NewNotebook?datasetVersionId=420","newScriptUrl":"/Scripts/NewScript?datasetVersionId=420","hasAlreadyVotedUp":false,"isOldDatasetVersion":false,"numberOfViews":129465,"numberOfDownloads":17732,"numberOfScripts":0,"numberOfTopics":90,"privateGroupMemberCount":0,"canEdit":false,"canEditSlug":false,"canEditPublishStatus":false,"canEditFeatureStatus":false,"canEditPrivateGroup":false,"canEditDescription":false,"hideVersionStatuses":true,"cardImageLeft":null,"cardImageTop":null,"cardImageWidth":null,"cardImageHeight":null,"coverImageLeft":null,"coverImageTop":null,"coverImageWidth":null,"coverImageHeight":null,"datasetVersions":[{"id":420,"slug":"iris","name":"Iris Species","creationDate":"2016-09-27T07:38:05.44Z","versionNumber":2,"versionNotes":"Republishing files so they\u0027re formally in our system","thumbnailImageUrl":"https://kaggle2.blob.core.windows.net/datasets-images/19/19/default-backgrounds/dataset-thumbnail.jpg","datasetVersionUrl":"/uciml/iris/version/2","status":"ready","isRemoved":false},{"id":19,"slug":"iris","name":"Iris","creationDate":"2016-01-12T00:33:31Z","versionNumber":1,"versionNotes":"Initial release","thumbnailImageUrl":"https://kaggle2.blob.core.windows.net/datasets-images/19/19/default-backgrounds/dataset-thumbnail.jpg","datasetVersionUrl":"/uciml/iris/version/1","status":"ready","isRemoved":false}],"scripts":[{"name":"Python Data Visualizations","url":"/benhamner/python-data-visualizations","lastRunDate":"2017-08-29T15:54:22.1Z","totalVotes":574},{"name":"Decision Boundaries visualised via Python \u0026 Plotly","url":"/arthurtok/decision-boundaries-visualised-via-python-plotly","lastRunDate":"2017-10-08T11:35:15.687Z","totalVotes":142},{"name":"ML from Scratch with IRIS!!","url":"/ash316/ml-from-scratch-with-iris","lastRunDate":"2017-08-31T06:00:20.697Z","totalVotes":107}],"discussions":[{"title":"Decision Boundaries visualised via Python \u0026 Plotly","url":"/arthurtok/decision-boundaries-visualised-via-python-plotly/comments","lastPost":"2017-10-08T14:56:10.327Z","totalReplies":29},{"title":"Python Data Visualizations","url":"/benhamner/python-data-visualizations/comments","lastPost":"2017-10-04T07:23:55.27Z","totalReplies":94},{"title":"Simple Tensorflow NN","url":"/bakman329/simple-tensorflow-nn/comments","lastPost":"2017-09-23T11:46:47.647Z","totalReplies":1}],"contributors":[{"userId":993,"totalScriptVotes":583,"totalScripts":10,"totalForumMessages":4,"totalForumMessageVotes":2,"totalScore":599.0,"displayName":"Ben Hamner","performanceTier":"Staff","userUrl":"/benhamner","rank":"1st","userAvatarUrl":"https://kaggle2.blob.core.windows.net/avatars/thumbnails/993-fb.jpg"},{"userId":727797,"totalScriptVotes":142,"totalScripts":1,"totalForumMessages":9,"totalForumMessageVotes":6,"totalScore":158.0,"displayName":"Anisotropic","performanceTier":"Master","userUrl":"/arthurtok","rank":"2nd","userAvatarUrl":"https://kaggle2.blob.core.windows.net/avatars/thumbnails/727797-kg.jpg"},{"userId":740429,"totalScriptVotes":107,"totalScripts":1,"totalForumMessages":0,"totalForumMessageVotes":0,"totalScore":108.0,"displayName":"ashwin","performanceTier":"Expert","userUrl":"/ash316","rank":"3rd","userAvatarUrl":"https://kaggle2.blob.core.windows.net/avatars/thumbnails/740429-kg.jpg"}],"pageMessages":[],"feed":[{"activityType":"scriptRun","url":"/nautna/iris-knn-python-classification","userName":"nautna","userAvatarUrl":"https://kaggle2.blob.core.windows.net/avatars/thumbnails/634241-gp.jpg","date":"2017-10-08T20:32:32.78Z","userDisplayName":"Antuan","title":"Iris KNN Python Classification","versionNumber":2,"userUrl":"/nautna"},{"activityType":"scriptComment","url":"/arthurtok/decision-boundaries-visualised-via-python-plotly/comments","userName":"msaeedi","userAvatarUrl":"https://kaggle2.blob.core.windows.net/avatars/thumbnails/1280684-kg.jpg","date":"2017-10-08T14:56:10.327Z","userDisplayName":"msaeedi","title":"Decision Boundaries visualised via Python \u0026 Plotly","versionNumber":0,"userUrl":"/msaeedi"},{"activityType":"scriptRun","url":"/justindeed/iris-eda","userName":"justindeed","userAvatarUrl":"https://kaggle2.blob.core.windows.net/avatars/thumbnails/default-thumb.png","date":"2017-10-08T13:23:54.47Z","userDisplayName":"Justin Neumann","title":"Iris EDA","versionNumber":2,"userUrl":"/justindeed"},{"activityType":"scriptRun","url":"/arthurtok/decision-boundaries-visualised-via-python-plotly","userName":"arthurtok","userAvatarUrl":"https://kaggle2.blob.core.windows.net/avatars/thumbnails/727797-kg.jpg","date":"2017-10-08T11:35:12.46Z","userDisplayName":"Anisotropic","title":"Decision Boundaries visualised via Python \u0026 Plotly","versionNumber":63,"userUrl":"/arthurtok"},{"activityType":"scriptComment","url":"/arthurtok/decision-boundaries-visualised-via-python-plotly/comments","userName":"arthurtok","userAvatarUrl":"https://kaggle2.blob.core.windows.net/avatars/thumbnails/727797-kg.jpg","date":"2017-10-07T22:07:45.773Z","userDisplayName":"Anisotropic","title":"Decision Boundaries visualised via Python \u0026 Plotly","versionNumber":0,"userUrl":"/arthurtok"}],"privateGroups":[{"id":0,"name":"Publicly Accessible"}],"discussion":{"canDownvote":false,"dataUrl":"/forums/997/topics.json","id":997,"isRootLevel":false,"isSubscribed":false,"initialTopics":null,"paramValues":{"category":"all","kind":"all","page":1,"search":null,"group":"all","sortBy":"hot"}},"currentTab":"home","topicId":null,"isNewTopic":false,"newTopic":{"allowAttachments":false,"authorRanking":null,"authorTier":"novice","authorType":"topic","forumId":997,"parentName":"Iris Species","parentUrl":"/uciml/iris"},"canSeeCategories":true,"categories":{"categories":[{"id":7101,"name":"botany","fullPath":"natural and physical sciences \u003e biology \u003e botany","listingUrl":"/datasets?sortBy=relevance\u0026group=all\u0026search=tag%3A%27botany%27","description":null,"isInherited":false,"datasetCount":1,"competitionCount":0,"scriptCount":0,"totalCount":1},{"id":null,"name":"small","fullPath":null,"listingUrl":null,"description":"Dataset size: small (\u003c10MB)","isInherited":true,"datasetCount":0,"competitionCount":0,"scriptCount":0,"totalCount":0},{"id":null,"name":"featured","fullPath":null,"listingUrl":null,"description":"This dataset has been featured by the Kaggle team","isInherited":true,"datasetCount":0,"competitionCount":0,"scriptCount":0,"totalCount":0}],"type":"dataset"},"licenseGroups":[{"id":1,"name":"Creative Commons","licenses":[{"id":1,"description":"CC0: Public Domain \u003ca href=\u0022https://creativecommons.org/publicdomain/zero/1.0/\u0022 target=\u0022_blank\u0022\u003e\u003cspan class=\u0022fa fa-info-circle\u0022/\u003e\u003c/a\u003e","displaySequence":1},{"id":3,"description":"CC BY-NC-SA 4.0 \u003ca href=\u0022https://creativecommons.org/licenses/by-nc-sa/4.0/\u0022 target=\u0022_blank\u0022\u003e\u003cspan class=\u0022fa fa-info-circle\u0022/\u003e\u003c/a\u003e","displaySequence":2},{"id":8,"description":"CC BY-SA 4.0 \u003ca href=\u0022https://creativecommons.org/licenses/by-sa/4.0/\u0022 target=\u0022_blank\u0022\u003e\u003cspan class=\u0022fa fa-info-circle\u0022/\u003e\u003c/a\u003e","displaySequence":3},{"id":10,"description":"CC BY-SA 3.0 \u003ca href=\u0022https://creativecommons.org/licenses/by-sa/3.0/\u0022 target=\u0022_blank\u0022\u003e\u003cspan class=\u0022fa fa-info-circle\u0022/\u003e\u003c/a\u003e","displaySequence":4}],"displaySequence":1},{"id":2,"name":"GPL","licenses":[{"id":9,"description":"GPL 2 \u003ca href=\u0022http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html\u0022 target=\u0022_blank\u0022\u003e\u003cspan class=\u0022fa fa-info-circle\u0022/\u003e\u003c/a\u003e","displaySequence":1}],"displaySequence":2},{"id":3,"name":"Open Database","licenses":[{"id":5,"description":"Database: Open Database \u003ca href=\u0022http://opendatacommons.org/licenses/odbl/1.0/\u0022 target=\u0022_blank\u0022\u003e\u003cspan class=\u0022fa fa-info-circle\u0022/\u003e\u003c/a\u003e, Contents: Database Contents \u003ca href=\u0022http://opendatacommons.org/licenses/dbcl/1.0/\u0022 target=\u0022_blank\u0022\u003e\u003cspan class=\u0022fa fa-info-circle\u0022/\u003e\u003c/a\u003e","displaySequence":1},{"id":6,"description":"Database: Open Database \u003ca href=\u0022http://opendatacommons.org/licenses/odbl/1.0/\u0022 target=\u0022_blank\u0022\u003e\u003cspan class=\u0022fa fa-info-circle\u0022/\u003e\u003c/a\u003e, Contents: ? Original Authors","displaySequence":2}],"displaySequence":3},{"id":4,"name":"Special Cases","licenses":[{"id":7,"description":"World Bank Dataset Terms of Use \u003ca href=\u0022http://web.worldbank.org/WBSITE/EXTERNAL/0,,contentMDK:22547097~pagePK:50016803~piPK:50016805~theSitePK:13,00.html\u0022 target=\u0022_blank\u0022\u003e\u003cspan class=\u0022fa fa-info-circle\u0022/\u003e\u003c/a\u003e","displaySequence":1},{"id":2,"description":"Reddit API Terms \u003ca href=\u0022https://www.reddit.com/wiki/api\u0022 target=\u0022_blank\u0022\u003e\u003cspan class=\u0022fa fa-info-circle\u0022/\u003e\u003c/a\u003e","displaySequence":2}],"displaySequence":4},{"id":5,"name":"Other","licenses":[{"id":11,"description":"Data files ? Original Authors","displaySequence":1},{"id":12,"description":"Other (specified in description)","displaySequence":2},{"id":4,"description":"Unknown","displaySequence":3}],"displaySequence":5}],"owners":[{"id":0,"imageUrl":"/image-fetch/0","isOrganization":false,"name":null,"profileUrl":"/","slug":null,"maxFileSizeBytes":null},{"id":7,"imageUrl":"https://kaggle2.blob.core.windows.net/organizations/7/thumbnail.png","isOrganization":true,"name":"UCI Machine Learning","profileUrl":"/uciml","slug":"uciml","maxFileSizeBytes":524288000}],"maxCompressedFileBytesAllowed":524288000,"maxUncompressedFileBytesAllowed":524288000,"maxTopLevelFilesAllowed":20,"canSeeDatasetWorker":false,"title":"Iris Species","slug":"iris","licenseId":1,"data":{"id":420,"datasetId":19,"versionNumber":2,"zipBlobFileId":28441,"totalSize":15347,"name":null,"description":null,"type":"datasetVersion","children":[{"id":1383,"blobFileId":28439,"url":"/uciml/iris/downloads/database.sqlite","fileType":".sqlite","downloadUrl":"/uciml/iris/downloads/database.sqlite","relativePath":"../input/database.sqlite","creationDate":"2016-09-27T07:36:12Z","ownerSlug":"uciml","datasetSlug":"iris","datasetVersionNumber":2,"size":10240,"fullPath":null,"name":"database.sqlite","description":"SQLite database containing the same data as Iris.csv","type":"datasetVersionFile","children":[{"id":197,"datasetVersionFileId":1383,"ownerSlug":"uciml","datasetSlug":"iris","datasetVersionNumber":2,"columns":[{"name":"Id","description":null,"order":1,"originalType":"String","type":"numeric","isNullable":true,"isPrimaryKey":true,"info":null},{"name":"SepalLengthCm","description":null,"order":2,"originalType":"NUMERIC","type":"numeric","isNullable":true,"isPrimaryKey":false,"info":null},{"name":"SepalWidthCm","description":null,"order":3,"originalType":"NUMERIC","type":"numeric","isNullable":true,"isPrimaryKey":false,"info":null},{"name":"PetalLengthCm","description":null,"order":4,"originalType":"NUMERIC","type":"numeric","isNullable":true,"isPrimaryKey":false,"info":null},{"name":"PetalWidthCm","description":null,"order":5,"originalType":"NUMERIC","type":"numeric","isNullable":true,"isPrimaryKey":false,"info":null},{"name":"Species","description":null,"order":6,"originalType":"TEXT","type":"string","isNullable":true,"isPrimaryKey":false,"info":null}],"totalRows":150,"name":"Iris","description":null,"type":"sqliteTable","children":[],"info":{"metrics":null},"settings":{"csvSettings":null}}],"info":{"metrics":null},"settings":{"csvSettings":null}},{"id":1384,"blobFileId":28440,"url":"/uciml/iris/downloads/Iris.csv","fileType":".csv","downloadUrl":"/uciml/iris/downloads/Iris.csv","relativePath":"../input/Iris.csv","creationDate":"2016-09-27T07:36:12Z","ownerSlug":"uciml","datasetSlug":"iris","datasetVersionNumber":2,"size":5107,"fullPath":null,"name":"Iris.csv","description":"Table of Iris plant properties. Each row corresponds to a different plant","type":"datasetVersionFile","children":[{"columns":[{"name":"Id","description":"Unique ID","order":0,"originalType":"Numeric","type":"numeric","isNullable":false,"isPrimaryKey":false,"info":null},{"name":"SepalLengthCm","description":"Length of the sepal (in cm)","order":1,"originalType":"Numeric","type":"numeric","isNullable":false,"isPrimaryKey":false,"info":null},{"name":"SepalWidthCm","description":"Width of the sepal (in cm)","order":2,"originalType":"Numeric","type":"numeric","isNullable":false,"isPrimaryKey":false,"info":null},{"name":"PetalLengthCm","description":"Length of the petal (in cm)","order":3,"originalType":"Numeric","type":"numeric","isNullable":false,"isPrimaryKey":false,"info":null},{"name":"PetalWidthCm","description":"Width of the petal (in cm)","order":4,"originalType":"Numeric","type":"numeric","isNullable":false,"isPrimaryKey":false,"info":null},{"name":"Species","description":"Species name","order":5,"originalType":"String","type":"string","isNullable":false,"isPrimaryKey":false,"info":null}],"totalRows":null,"name":null,"description":null,"type":"genericTable","children":[],"info":{"metrics":null},"settings":{"csvSettings":null}}],"info":{"metrics":null},"settings":{"csvSettings":null}}],"info":{"metrics":null},"settings":{"csvSettings":null}},"isPublished":true,"owner":{"id":7,"imageUrl":"https://kaggle2.blob.core.windows.net/organizations/7/thumbnail.png","isOrganization":true,"name":"UCI Machine Learning","profileUrl":"/uciml","slug":"uciml","maxFileSizeBytes":524288000}});performance && performance.mark && performance.mark("DatasetContainer.componentCouldBootstrap");</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        "HTML-CSS": {
+            preferredFont: "TeX",
+            availableFonts: ["STIX", "TeX"],
+            linebreaks: {
+                automatic: true
+            },
+            EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+        },
+        tex2jax: {
+            inlineMath: [["\\(", "\\)"], ["\\\\(", "\\\\)"]],
+            displayMath: [["$$", "$$"], ["\\[", "\\]"]],
+            processEscapes: true,
+            ignoreClass: "tex2jax_ignore|dno"
+        },
+        TeX: {
+            noUndefined: {
+                attributes: {
+                    mathcolor: "red",
+                    mathbackground: "#FFEEEE",
+                    mathsize: "90%"
+                }
+            }
+        },
+        Macros: {
+            href: "{}"
+        },
+        skipStartupTypeset: true,
+        messageStyle: "none"
+    });
+</script>
+
+<script type="text/javascript" async crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+    </div>
+
+        <div class="site-layout__footer">
+            <footer class="site-footer">
+    <div class="site-footer__content">
+        <div class="site-footer__copyright">
+            <span>&copy; 2017 Kaggle Inc</span>
+        </div>
+        <nav class="site-footer__nav">
+            <a href="/team">Our Team</a>
+            <a href="/terms">Terms</a>
+            <a href="/privacy">Privacy</a>
+            <a href="/contact">Contact/Support</a>
+        </nav>
+        <nav class="site-footer__social">
+            <div data-component-name="SocialIcons"></div><script>var Kaggle=window.Kaggle||{};Kaggle.State=Kaggle.State||[];Kaggle.State.push();performance && performance.mark && performance.mark("SocialIcons.componentCouldBootstrap");</script>
+        </nav>
+    </div>
+</footer>
+
+        </div>
+</div>
+
+
+
+<script type="text/javascript">
+    var Kaggle = Kaggle || {};
+
+    Kaggle.Current = {
+        hasJupyterNotebookEditor: true,
+        hasEnvironmentVariables: false,
+        hasInteractiveScripts: false,
+        hasStandaloneKernelProxy: false,
+        antiForgeryToken: 'Obw67wkB043DiOLq0mYT1qjzTPsArZz6T4pWV82O6wClixdM01wvvVusKut_JTNrozOMhjLee0sqj-EpTWWreZotKdE1',
+        isAnonymous: true,
+        isFullScreen: false,
+        
+        
+        
+        
+        
+        
+        
+        
+    }
+        Kaggle.Current.log = function(){};
+        Kaggle.Current.warn = function(){};
+</script>
+
+
+
+
+
+<script type="text/javascript">
+    var Kaggle = Kaggle || {};
+    Kaggle.PageMessages = [{"id":null,"type":"info","message":null,"dangerousHtmlMessage":"Please \u003ca href=\u0022/account/login?returnUrl=%2Fuciml%2Firis\u0022\u003elogin\u003c/a\u003e to download this dataset.","isPersistent":true,"faIcon":null}];
+</script>
+
+
+<script src="/content/v/5dbea6ee9ce1/shared/js/kaggle.prism.min.js"></script>
+
+
+
+
+
+<script type="text/javascript">
+/* <![CDATA[ */
+goog_snippet_vars = function() {
+    var w = window;
+    w.google_conversion_id = 955616553;
+    w.google_conversion_label = "-SL0CM3tqXMQqZrWxwM";
+    w.google_conversion_value = 0.00;
+    w.google_conversion_currency = "USD";
+    w.google_remarketing_only = false;
+    w.google_conversion_language = "en";
+    w.google_conversion_format = "3";
+    w.google_conversion_color = "ffffff";
+}
+// DO NOT CHANGE THE CODE BELOW.
+goog_report_conversion = function(url) {
+    goog_snippet_vars();
+    window.google_conversion_format = "3";
+    var opt = new Object();
+    opt.onload_callback = function() {
+        if (typeof(url) != 'undefined') {
+            window.location = url;
+        }
+    }
+    var conv_handler = window['google_trackConversion'];
+    if (typeof(conv_handler) == 'function') {
+        conv_handler(opt);
+    }
+}
+/* ]]> */
+</script>
+<script type="text/javascript"
+src="//www.googleadservices.com/pagead/conversion_async.js">
+</script>
+
+
+
+
+
+    <script src="/static/assets/app.js?v=d4a50ca55074"></script>
+    
+        <script>
+            (function() {
+                if ('serviceWorker' in navigator) {
+                    
+                    navigator.serviceWorker.register("/static/assets/service-worker.js").then(function(reg) {
+                        
+                        reg.onupdatefound = function() {
+                            
+                            var installingWorker = reg.installing;
+                            installingWorker.onstatechange = function() {
+                                switch (installingWorker.state) {
+                                case 'installed':
+                                    if (navigator.serviceWorker.controller) {
+                                        
+                                        console.log('New or updated content is available.');
+                                    } else {
+                                        
+                                        console.log('Content is now available offline!');
+                                    }
+                                    break;
+                                case 'redundant':
+                                    console.error('The installing service worker became redundant.');
+                                    break;
+                                }
+                            };
+                        };
+                    }).catch(function(e) {
+                      console.error('Error during service worker registration:', e);
+                    });
+                }
+            })();
+        </script>
+</body>
+</html>
