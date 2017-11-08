@@ -33,14 +33,7 @@ class MetricsEvaluator(ModelSerializer, EngineBaseTraining):
         for indx, (fname, label) in enumerate(self.dataset['val']):
             if indx == self.params["TEST_STEPS"]:
                 break
-
-            label = int(label)
-            if label == -1:
-                continue
-            label = 0 if label == -1 else 1
-            image = cv2.imread(os.path.join(self.params['IMAGES'],
-                                            fname + '.jpg'))
-            image = cv2.resize(image, (self.params['W'], self.params['H']))
+            image = cv2.imread(fname)
             image = image[np.newaxis, :, :, (2, 1, 0)]
             predicted = self.model.predict(image)
             y_true.append(label)
@@ -48,6 +41,6 @@ class MetricsEvaluator(ModelSerializer, EngineBaseTraining):
 
         metrics = {}
         metrics['accuracy'] = sk_metrics.accuracy_score(y_true, y_pred)
-        print(metrics)
+        logger.info(metrics)
         self.metrics = metrics
 
