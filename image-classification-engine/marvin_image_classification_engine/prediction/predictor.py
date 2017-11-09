@@ -23,4 +23,4 @@ class Predictor(ModelSerializer, EngineBasePrediction):
         super(Predictor, self).__init__(**kwargs)
 
     def execute(self, input_message, **kwargs):
-        return {"Contains airplane": self.model.predict(input_message)}
+        return {"Contains airplane": self.model.predict(input_message).squeeze().tolist()}

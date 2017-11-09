@@ -53,33 +53,22 @@ class Trainer(ModelSerializer, EngineBaseTraining):
         print(model.summary())
         return model
 
-    def generate_samples(self, image_path, fnames, w=150, h=150):
+    def generate_samples(self, fnames):
         while True:
             for fname, label in fnames:
-                label = int(label)
-                if label == 0:
-                    continue
-
-                label = 0 if label == -1 else 1
-                image = cv2.imread(os.path.join(image_path, fname + '.jpg'))
-                image = cv2.resize(image, (w, h))
+                image = cv2.imread(fname)
                 image = image[np.newaxis, :, :, (2, 1, 0)]
                 yield (image, np.array([int(label)]))
+
 
     def execute(self, **kwargs):
         model = self.build_model(trainable=True)
         model.compile(loss='binary_crossentropy',
-                      optimizer=optimizers.SGD(lr=0.001, momentum=0.9),
+                      optimizer=optimizers.SGD(lr=self.params['LEARNING_RATE'], momentum=self.params['MOMENTUM']),
                       metrics=['accuracy'])
 
-        training_data = self.generate_samples(self.params['IMAGES'],
-                                              self.dataset['train'],
-                                              w=self.params['W'],
-                                              h=self.params['H'])
-        validation_data = self.generate_samples(self.params['IMAGES'],
-                                                self.dataset['val'],
-                                                w=self.params['W'],
-                                                h=self.params['H'])
+        training_data = self.generate_samples(self.dataset['train'])
+        validation_data = self.generate_samples(self.dataset['val'])
 
         model.fit_generator(training_data,
                             steps_per_epoch=self.params['STEPS'],

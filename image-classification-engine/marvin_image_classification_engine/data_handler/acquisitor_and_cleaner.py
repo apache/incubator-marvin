@@ -41,6 +41,6 @@ class AcquisitorAndCleaner(EngineBaseDataHandler):
             print("Extracting...")
             os.system('tar xvf {} --directory {}'.format(data, MarvinData.data_path))
             print("Done.")
-        train = self.read_samples(self.params['TRAIN'])
-        val = self.read_samples(self.params['VALID'])
+        train = self.read_samples(os.path.join(MarvinData.data_path, self.params['TRAIN']))
+        val = self.read_samples(os.path.join(MarvinData.data_path, self.params['VALID']))
         self.initial_dataset = ((train, val))

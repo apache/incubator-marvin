@@ -73,6 +73,10 @@ setup(
         'pandas==0.20.3',
         'matplotlib==2.0.2',
         'marvin-python-toolbox==0',
+        'opencv-python==3.3.0.10',
+        'Keras==2.0.8',
+        'tensorflow==1.3.0',
+        'h5py==2.7.1',
     ],
     dependency_links=['git+https://github.com/marvin-ai/marvin-python-toolbox.git/@master#egg=marvin_python_toolbox-0'],
     tests_require=[
