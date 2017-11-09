@@ -8,6 +8,7 @@ Use this module to add the project main code.
 
 from .._compatibility import six
 from .._logging import get_logger
+from ..data_handler.training_preparator import TrainingPreparator
 
 from marvin_python_toolbox.engine_base import EngineBasePrediction
 
@@ -23,4 +24,5 @@ class PredictionPreparator(EngineBasePrediction):
         super(PredictionPreparator, self).__init__(**kwargs)
 
     def execute(self, input_message, **kwargs):
-        pass
+        features = [TrainingPreparator.sent2features(input_message["sentence1"])]
+        return features

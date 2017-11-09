@@ -34,3 +34,8 @@ class Trainer(EngineBaseTraining):
                                 )
         crf.fit(self.dataset['train'][0], self.dataset['train'][1])
         self.model = crf
+
+        logger.info("Model trained to recognize the following entities: ")
+        labels = list(self.model.classes_)
+        labels.remove('O')  # O is used to tag no entity
+        logger.info(labels)

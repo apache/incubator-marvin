@@ -22,7 +22,8 @@ class TrainingPreparator(EngineBaseDataHandler):
     def __init__(self, **kwargs):
         super(TrainingPreparator, self).__init__(**kwargs)
 
-    def word2features(self, sent, i):
+    @classmethod
+    def word2features(cls, sent, i):
         word = sent[i][0]
         postag = sent[i][1]
         
@@ -65,22 +66,24 @@ class TrainingPreparator(EngineBaseDataHandler):
                     
         return features
 
+    @classmethod
+    def sent2features(cls, sent):
+        return [cls.word2features(sent, i) for i in range(len(sent))]
 
-    def sent2features(self, sent):
-        return [self.word2features(sent, i) for i in range(len(sent))]
-
-    def sent2labels(self, sent):
+    @classmethod
+    def sent2labels(cls, sent):
         return [label for token, postag, label in sent]
 
-    def sent2tokens(self, sent):
+    @classmethod
+    def sent2tokens(cls, sent):
         return [token for token, postag, label in sent]
 
     def execute(self, **kwargs):
-        X_train = [self.sent2features(s) for s in self.initial_dataset['train_sents']]
-        y_train = [self.sent2labels(s) for s in self.initial_dataset['train_sents']]
+        X_train = [TrainingPreparator.sent2features(s) for s in self.initial_dataset['train_sents']]
+        y_train = [TrainingPreparator.sent2labels(s) for s in self.initial_dataset['train_sents']]
 
-        X_test = [self.sent2features(s) for s in self.initial_dataset['test_sents']]
-        y_test = [self.sent2labels(s) for s in self.initial_dataset['test_sents']]
+        X_test = [TrainingPreparator.sent2features(s) for s in self.initial_dataset['test_sents']]
+        y_test = [TrainingPreparator.sent2labels(s) for s in self.initial_dataset['test_sents']]
 
         self.dataset = {"train": [X_train, y_train],
                         "test": [X_test, y_test]}
