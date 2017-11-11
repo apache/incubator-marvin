@@ -1,0 +1,7 @@
+{
+	"algorithm" : "lbfgs",
+	"c1" : 0.10789964607864502, 
+	"c2" : 0.082422264927260847, 
+	"max_iterations" : 100, 
+	"all_possible_transitions" : true
+}
