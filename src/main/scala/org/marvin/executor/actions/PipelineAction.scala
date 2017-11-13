@@ -60,7 +60,7 @@ class PipelineAction(metadata: EngineMetadata) extends Actor with ActorLogging{
 
         val futures:ListBuffer[Future[Done]] = ListBuffer[Future[Done]]()
 
-        for(artifactName <- engineActionMetadata.artifactsToLoad) {
+        for(artifactName <- engineActionMetadata.artifactsToPersist) {
           futures += (artifactSaver ? SaveToRemote(artifactName, protocol)).mapTo[Done]
         }
 
