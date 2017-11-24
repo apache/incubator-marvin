@@ -42,7 +42,7 @@ class PipelineAction(metadata: EngineMetadata) extends Actor with ActorLogging{
   var artifactSaver: ActorRef = _
 
   override def preStart() = {
-    artifactSaver = context.actorOf(Props(new ArtifactSaver(metadata)), name = "artifactSaver")
+    artifactSaver = context.actorOf(ArtifactSaver.build(metadata), name = "artifactSaver")
   }
 
   override def receive  = {

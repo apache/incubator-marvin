@@ -21,7 +21,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload, OnlineReloadNoSave}
-import org.marvin.manager.ArtifactSaver
+import org.marvin.manager.{ArtifactHdfsSaver, ArtifactSaver}
 import org.marvin.model.{EngineActionMetadata, EngineMetadata}
 import org.marvin.manager.ArtifactSaver.SaveToLocal
 import org.marvin.executor.proxies.EngineProxy.{ExecuteOnline, HealthCheck, Reload}
@@ -39,7 +39,7 @@ object OnlineAction {
   case class OnlineHealthCheck()
 }
 
-class OnlineAction(actionName: String, metadata: EngineMetadata) extends Actor with ActorLogging{
+class OnlineAction(actionName: String, metadata: EngineMetadata) extends Actor with ActorLogging {
   var onlineActionProxy: ActorRef = _
   var artifactSaver: ActorRef = _
   var engineActionMetadata: EngineActionMetadata = _
@@ -50,7 +50,7 @@ class OnlineAction(actionName: String, metadata: EngineMetadata) extends Actor w
     engineActionMetadata = metadata.actionsMap(actionName)
     artifactsToLoad = engineActionMetadata.artifactsToLoad.mkString(",")
     onlineActionProxy = context.actorOf(Props(new OnlineActionProxy(engineActionMetadata)), name = "onlineActionProxy")
-    artifactSaver = context.actorOf(Props(new ArtifactSaver(metadata)), name = "artifactSaver")
+    artifactSaver = context.actorOf(ArtifactSaver.build(metadata), name = "artifactSaver")
   }
 
   override def receive  = {

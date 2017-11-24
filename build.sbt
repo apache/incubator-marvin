@@ -38,14 +38,15 @@ libraryDependencies ++= Seq (
 )
 
 libraryDependencies += "org.apache.hadoop" % "hadoop-client" % "2.7.4"
-
 libraryDependencies += "io.spray" %%  "spray-json" % "1.3.3"
 libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.0"
 libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.0"
 libraryDependencies += "io.jvm.uuid" %% "scala-uuid" % "0.2.3"
+libraryDependencies += "com.amazonaws" % "aws-java-sdk-s3" % "1.11.232"
 
 dependencyOverrides ++= Set(
   "io.netty" %% "netty" % "3.7.0",
+  "io.netty" %% "netty-handler-proxy" % "4.1.12",
   "com.google.guava" %% "guava" % "19.0"
 )
 

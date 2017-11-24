@@ -27,6 +27,8 @@ object MetadataMock {
         new EngineActionMetadata(name="predictor", actionType="online", port=777, host="localhost", artifactsToPersist=List(), artifactsToLoad=List("model"))
       ),
       artifactsRemotePath = "",
+      artifactManagerType = "HDFS",
+      s3BucketName = "marvin-artifact-bucket",
       batchActionTimeout = 100,
       engineType = "python",
       hdfsHost = "",
