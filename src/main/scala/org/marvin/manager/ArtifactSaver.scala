@@ -25,6 +25,7 @@ object ArtifactSaver {
 
   def build(metadata: EngineMetadata): Props = {
     metadata.artifactManagerType.toUpperCase match {
+      case "FS" => return Props(new ArtifactFSSaver(metadata))
       case "HDFS" => return Props(new ArtifactHdfsSaver(metadata))
       case "S3" => return Props(new ArtifactS3Saver(metadata))
       case _ => throw new MarvinEExecutorException(s"Can not recognize ArtifactManagerType from EngineMetadata")
