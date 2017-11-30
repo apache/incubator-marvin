@@ -17,11 +17,31 @@
 package org.marvin.util
 
 import io.jvm.uuid.UUID
+import org.marvin.model.EngineMetadata
+
+import scala.collection.immutable.HashMap
 
 class ProtocolUtil {
 
   def generateProtocol(actionName:String): String ={
     s"${actionName}_${UUID.randomString}"
+  }
+
+  def splitProtocol(protocol: String, metadata: EngineMetadata): HashMap[String, String] = {
+    var splitedProtocols = new HashMap[String, String]()
+
+    for (_p <- protocol.split(",")){
+      val _action = _p.substring(0, _p.indexOf("_"))
+
+      if (_action != "pipeline") {
+        for (_artifact <- metadata.actionsMap(_action).artifactsToPersist) splitedProtocols += (_artifact -> _p)
+      }
+      else{
+        for (_paction <- metadata.pipelineActions) for (_artifact <- metadata.actionsMap(_paction).artifactsToPersist) splitedProtocols += (_artifact -> _p)
+      }
+    }
+
+    splitedProtocols
   }
 
 }

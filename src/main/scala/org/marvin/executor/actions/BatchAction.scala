@@ -26,6 +26,7 @@ import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, HealthCheck, Reloa
 import org.marvin.manager.ArtifactSaver
 import org.marvin.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
 import org.marvin.model.{EngineActionMetadata, EngineMetadata}
+import org.marvin.util.ProtocolUtil
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
@@ -44,6 +45,7 @@ class BatchAction(actionName: String, metadata: EngineMetadata) extends Actor wi
   var engineActionMetadata: EngineActionMetadata = _
   var artifactsToLoad: String = _
   implicit val ec = context.dispatcher
+  var protocolUtil = new ProtocolUtil()
 
   override def preStart() = {
     engineActionMetadata = metadata.actionsMap(actionName)
@@ -75,9 +77,11 @@ class BatchAction(actionName: String, metadata: EngineMetadata) extends Actor wi
 
       log.info(s"Starting to process reload to $actionName. Protocol: [$protocol].")
 
+      val splitedProtocols = protocolUtil.splitProtocol(protocol, metadata)
+
       val futures:ListBuffer[Future[Any]] = ListBuffer[Future[Any]]()
       for(artifactName <- engineActionMetadata.artifactsToLoad) {
-        futures += (artifactSaver ? SaveToLocal(artifactName, protocol))
+          futures += (artifactSaver ? SaveToLocal(artifactName, splitedProtocols(artifactName)))
       }
 
       Future.sequence(futures).onComplete {
