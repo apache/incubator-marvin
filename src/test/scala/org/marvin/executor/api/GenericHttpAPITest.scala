@@ -32,6 +32,7 @@ import akka.http.scaladsl.server.Route
 import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchHealthCheck, BatchReload}
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
 import org.marvin.executor.actions.PipelineAction.PipelineExecute
+import org.marvin.executor.statemachine.Reload
 import org.marvin.model.MarvinEExecutorException
 import org.marvin.testutil.MetadataMock
 import org.marvin.util.ProtocolUtil
@@ -300,7 +301,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val result = Put(s"/predictor/reload?protocol=$protocol") ~> route ~> runRoute
 
-      val expectedMessage = OnlineReload(protocol)
+      val expectedMessage = Reload(protocol)
       testActors("predictor").expectMsg(expectedMessage)
 
       check{

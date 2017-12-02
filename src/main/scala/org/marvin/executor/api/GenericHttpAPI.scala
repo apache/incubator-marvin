@@ -39,7 +39,7 @@ import spray.json.DefaultJsonProtocol._
 import org.marvin.executor.api.model.HealthStatus
 import org.marvin.model.{EngineMetadata, MarvinEExecutorException}
 import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchHealthCheck, BatchReload}
-import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
+import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck}
 import org.marvin.executor.actions.PipelineAction.PipelineExecute
 import org.marvin.executor.statemachine.{PredictorFSM, Reload, ReloadNoSave}
 
@@ -318,7 +318,7 @@ trait GenericHttpAPI {
 
     actionType match {
       case "online" =>
-        GenericHttpAPI.actors(actionName) ! OnlineReload(protocol)
+        GenericHttpAPI.actors(actionName) ! Reload(protocol)
 
       case "batch" =>
         GenericHttpAPI.actors(actionName) ! BatchReload(protocol)
