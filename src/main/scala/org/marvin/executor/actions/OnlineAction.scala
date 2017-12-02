@@ -21,11 +21,12 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload, OnlineReloadNoSave}
-import org.marvin.manager.{ArtifactHdfsSaver, ArtifactSaver}
+import org.marvin.manager.ArtifactSaver
 import org.marvin.model.{EngineActionMetadata, EngineMetadata}
 import org.marvin.manager.ArtifactSaver.SaveToLocal
 import org.marvin.executor.proxies.EngineProxy.{ExecuteOnline, HealthCheck, Reload}
 import org.marvin.executor.proxies.OnlineActionProxy
+import org.marvin.util.ProtocolUtil
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
@@ -45,6 +46,7 @@ class OnlineAction(actionName: String, metadata: EngineMetadata) extends Actor w
   var engineActionMetadata: EngineActionMetadata = _
   var artifactsToLoad: String = _
   implicit val ec = context.dispatcher
+  var protocolUtil = new ProtocolUtil()
 
   override def preStart() = {
     engineActionMetadata = metadata.actionsMap(actionName)
@@ -68,9 +70,11 @@ class OnlineAction(actionName: String, metadata: EngineMetadata) extends Actor w
 
       log.info(s"Starting to process reload to $actionName. Protocol: [$protocol].")
 
+      val splitedProtocols = protocolUtil.splitProtocol(protocol, metadata)
+
       val futures:ListBuffer[Future[Any]] = ListBuffer[Future[Any]]()
       for(artifactName <- engineActionMetadata.artifactsToLoad) {
-        futures += (artifactSaver ? SaveToLocal(artifactName, protocol))
+        futures += (artifactSaver ? SaveToLocal(artifactName, splitedProtocols(artifactName)))
       }
 
       Future.sequence(futures).onComplete {
