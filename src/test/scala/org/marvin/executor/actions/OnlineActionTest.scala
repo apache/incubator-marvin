@@ -17,9 +17,14 @@
 package org.marvin.executor.actions
 
 import akka.Done
-import akka.actor.{ActorSystem, Props}
-import akka.testkit.{EventFilter, ImplicitSender, TestKit}
+import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.testkit.{EventFilter, ImplicitSender, TestKit, TestProbe}
 import com.typesafe.config.ConfigFactory
+import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
+import org.marvin.executor.proxies.EngineProxy.{ExecuteOnline, HealthCheck, Reload}
+import org.marvin.executor.statemachine.Reloaded
+import org.marvin.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
+import org.marvin.model.EngineMetadata
 import org.marvin.testutil.MetadataMock
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
@@ -34,11 +39,101 @@ class OnlineActionTest extends TestKit(
   "online action actor" must {
 
     "send Done message" in {
-      val onlineAction = system.actorOf(Props(new OnlineAction("predictor", MetadataMock.simpleMockedMetadata())))
+
+      val mockedProxy = TestProbe()
+      val mockedSaver = TestProbe()
+      val metadata = MetadataMock.simpleMockedMetadata()
+
+      val onlineAction = system.actorOf(Props(new MockedOnlineAction("predictor", metadata, mockedProxy.ref, mockedSaver.ref)))
+
       onlineAction ! Done
       expectNoMsg()
       EventFilter.info("Work Done!")
     }
 
+    "send OnlineExecute message" in {
+
+      val mockedProxy = TestProbe()
+      val mockedSaver = TestProbe()
+      val metadata = MetadataMock.simpleMockedMetadata()
+
+      val onlineAction = system.actorOf(Props(new MockedOnlineAction("predictor", metadata, mockedProxy.ref, mockedSaver.ref)))
+
+      val protocol = "fake_protocol"
+      val params = "fakeParams"
+
+      onlineAction ! OnlineExecute(protocol, params)
+
+      mockedProxy.expectMsg(ExecuteOnline(protocol, params))
+      mockedProxy.reply("response")
+
+      expectMsg("response")
+    }
+
+    "send OnlineReload message with single protocol" in {
+
+      val mockedProxy = TestProbe()
+      val mockedSaver = TestProbe()
+      val metadata = MetadataMock.simpleMockedMetadata()
+
+      val onlineAction = system.actorOf(Props(new MockedOnlineAction("predictor", metadata, mockedProxy.ref, mockedSaver.ref)))
+
+      val protocol = "trainer_12345protocol"
+
+      onlineAction ! OnlineReload(protocol)
+
+      mockedSaver.expectMsg(SaveToLocal("model", protocol))
+      mockedSaver.reply(Done)
+
+      mockedProxy.expectMsg(Reload(protocol))
+      mockedProxy.reply(Reloaded(protocol))
+    }
+
+    "send OnlineHealthCheck message with OK" in {
+
+      val mockedProxy = TestProbe()
+      val mockedSaver = TestProbe()
+      val metadata = MetadataMock.simpleMockedMetadata()
+
+      val onlineAction = system.actorOf(Props(new MockedOnlineAction("predictor", metadata, mockedProxy.ref, mockedSaver.ref)))
+
+      onlineAction ! OnlineHealthCheck
+
+      mockedProxy.expectMsg(HealthCheck)
+      mockedProxy.reply("OK")
+
+      expectMsg("OK")
+    }
+
+    "send OnlineHealthCheck message with NOK" in {
+
+      val mockedProxy = TestProbe()
+      val mockedSaver = TestProbe()
+      val metadata = MetadataMock.simpleMockedMetadata()
+
+      val onlineAction = system.actorOf(Props(new MockedOnlineAction("predictor", metadata, mockedProxy.ref, mockedSaver.ref)))
+
+      onlineAction ! OnlineHealthCheck
+
+      mockedProxy.expectMsg(HealthCheck)
+      mockedProxy.reply("NOK")
+
+      expectMsg("NOK")
+    }
+
+  }
+
+  class MockedOnlineAction (actionName: String,
+                           metadata: EngineMetadata,
+                           _onlineActionProxy: ActorRef,
+                           _artifactSaver: ActorRef
+                          ) extends OnlineAction (actionName, metadata){
+
+    override def preStart() = {
+      engineActionMetadata = metadata.actionsMap(actionName)
+      artifactsToLoad = engineActionMetadata.artifactsToLoad.mkString(",")
+      onlineActionProxy = _onlineActionProxy
+      artifactSaver = _artifactSaver
+    }
   }
 }
