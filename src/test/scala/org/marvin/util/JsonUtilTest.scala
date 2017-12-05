@@ -17,13 +17,8 @@
 package org.marvin.util
 
 import java.io.File
-
 import org.everit.json.schema.ValidationException
 import org.marvin.model.EngineMetadata
-import java.io.File
-import org.everit.json.schema.ValidationException
-import org.json.JSONObject
-import org.marvin.model.{EngineMetadata, MarvinEExecutorException}
 import org.scalatest.{Matchers, WordSpec}
 import scala.io.Source
 
