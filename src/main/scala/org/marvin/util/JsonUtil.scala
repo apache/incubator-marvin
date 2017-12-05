@@ -70,7 +70,6 @@ object JsonUtil {
     } catch {
       case e: ValidationException =>
         e.printStackTrace()
-        e.getCausingExceptions.stream().forEach(println)
         throw e
     }
   }
