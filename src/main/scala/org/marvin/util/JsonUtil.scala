@@ -18,6 +18,7 @@ package org.marvin.util
 
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import grizzled.slf4j.Logging
 import org.everit.json.schema.ValidationException
 import org.everit.json.schema.loader.SchemaLoader
 import org.json.{JSONObject, JSONTokener}
@@ -25,7 +26,7 @@ import spray.json._
 
 import scala.reflect.{ClassTag, _}
 
-object JsonUtil {
+object JsonUtil extends Logging {
   val jacksonMapper = new ObjectMapper()
   jacksonMapper.registerModule(DefaultScalaModule)
   jacksonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -59,7 +60,7 @@ object JsonUtil {
     try{
       jsonSchema = new JSONObject(new JSONTokener(getClass.getResourceAsStream(schemaName)))
     } catch {
-      case e: NullPointerException => println(s"File ${schemaName} not found, check your schema file")
+      case e: NullPointerException => info(s"File ${schemaName} not found, check your schema file")
         throw e
     }
 
