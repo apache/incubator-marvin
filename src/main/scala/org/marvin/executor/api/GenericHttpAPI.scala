@@ -29,6 +29,7 @@ import akka.util.Timeout
 import org.marvin.util.{ConfigurationContext, JsonUtil, ProtocolUtil}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model._
+import org.everit.json.schema.ValidationException
 import org.marvin.executor.actions.{BatchAction, PipelineAction}
 
 import scala.concurrent._
@@ -230,7 +231,7 @@ object GenericHttpAPI extends HttpMarvinApp {
 
 trait GenericHttpAPI {
   protected def setupSystem(engineFilePath:String, paramsFilePath:String, modelProtocol:String): ActorSystem = {
-    val metadata = readJsonIfFileExists[EngineMetadata](engineFilePath)
+    val metadata = readJsonIfFileExists[EngineMetadata](engineFilePath, true)
     val system = ActorSystem(s"MarvinExecutorSystem")
 
     GenericHttpAPI.metadata = metadata
@@ -271,13 +272,15 @@ trait GenericHttpAPI {
     system
   }
 
-  private def readJsonIfFileExists[T: ClassTag](filePath: String): T = {
-    Try(JsonUtil.fromJson[T](Source.fromFile(filePath).mkString)) match {
+  private def readJsonIfFileExists[T: ClassTag](filePath: String, validate: Boolean = false): T = {
+    Try(JsonUtil.fromJson[T](Source.fromFile(filePath).mkString, validate)) match {
       case Success(json) => json
       case Failure(ex) => {
         ex match {
           case ex: FileNotFoundException => throw new MarvinEExecutorException(s"The file [$filePath] does not exists." +
             s" Check your engine configuration.", ex)
+          case ex: ValidationException => throw new MarvinEExecutorException(s"Invalid engine metadata file."  +
+            s" Check your engine metadata file.", ex)
           case _ => throw ex
         }
       }
