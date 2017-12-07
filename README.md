@@ -6,7 +6,7 @@ This is the component responsable for coordinate execution of the steps (actions
 is able to communicate with engines through gRPC protocol. More details about the contract can be found 
 on the protobuf file.
 
-The latest stable build can be downloaded from [here](https://s3.amazonaws.com/marvin-engine-executor/marvin-engine-executor-assembly-0.0.1.jar): 
+The latest stable build can be downloaded from [here](https://s3.amazonaws.com/marvin-engine-executor/marvin-engine-executor-assembly-0.0.1.jar). 
 
 ### install requirements
 
