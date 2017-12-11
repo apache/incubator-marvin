@@ -60,41 +60,7 @@
       "type": "string"
     },
     "actions": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "Engine action name",
-            "type": "string"
-          },
-          "actionType": {
-            "description": "Engine action type",
-            "type": "string"
-          },
-          "port": {
-            "description": "Engine action port",
-            "type": "integer"
-          },
-          "host": {
-            "description": "host name",
-            "type": "string"
-          },
-          "artifactsToPersist": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "artifactsToLoad": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": ["name", "actionType", "port", "host"]
-      }
+      "$ref": "file:src/main/resources/EngineActionSchema.json"
     }
   },
   "required": ["name", "version", "engineType", "artifactsRemotePath", "artifactManagerType", "onlineActionTimeout", "healthCheckTimeout", "reloadTimeout", "batchActionTimeout", "pipelineActions", "actions"]

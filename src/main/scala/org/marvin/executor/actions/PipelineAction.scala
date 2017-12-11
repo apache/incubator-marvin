@@ -66,7 +66,7 @@ class PipelineAction(metadata: EngineMetadata) extends Actor with ActorLogging{
 
         if (!futures.isEmpty) Future.sequence(futures).onComplete{
           case Success(response) =>
-            log.info(s"All artifacts from [$actionName] where saved with successful!! [$response]")
+            log.info(s"All artifacts from [$actionName] were saved with success!! [$response]")
           case Failure(failure) =>
             failure.printStackTrace()
         }

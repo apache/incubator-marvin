@@ -12,7 +12,6 @@
     "actions": [{
         "name": "acquisitor",
         "actionType": "batch",
-        "port": 50051,
         "host": "localhost",
         "artifactsToPersist": ["initialdataset"],
         "artifactsToLoad": [],
