@@ -48,4 +48,16 @@ class JsonUtilTest extends WordSpec with Matchers {
     }
   }
 
+  "Schema files in main resource and test resource" should {
+    "synchronize" in {
+      val testSchema = Source.fromResource("EngineMetadataSchema.json").getLines().filterNot(line => line.trim.startsWith("\"$ref\":")).toList
+      val mainSchema = Source.fromFile("src/main/resources/EngineMetadataSchema.json").getLines().filterNot(line => line.trim.startsWith("\"$ref\":")).toList
+      assert { testSchema === mainSchema }
+
+      val testActionSchema = Source.fromResource("EngineActionSchema.json").getLines().toList
+      val mainActionSchema = Source.fromFile("src/main/resources/EngineActionSchema.json").getLines().toList
+      assert { testActionSchema === mainActionSchema }
+    }
+  }
+
 }
