@@ -60,7 +60,7 @@
       "type": "string"
     },
     "actions": {
-      "$ref": "/EngineActionSchema.json"
+      "$ref": "file:src/test/resources/EngineActionSchema.json"
     }
   },
   "required": ["name", "version", "engineType", "artifactsRemotePath", "artifactManagerType", "onlineActionTimeout", "healthCheckTimeout", "reloadTimeout", "batchActionTimeout", "pipelineActions", "actions"]
