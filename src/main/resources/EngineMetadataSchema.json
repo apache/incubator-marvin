@@ -58,9 +58,6 @@
     "hdfsHost": {
       "description": "HDFS host",
       "type": "string"
-    },
-    "actions": {
-      "$ref": "/EngineActionSchema.json"
     }
   },
   "required": ["name", "version", "engineType", "artifactsRemotePath", "artifactManagerType", "onlineActionTimeout", "healthCheckTimeout", "reloadTimeout", "batchActionTimeout", "pipelineActions", "actions"]

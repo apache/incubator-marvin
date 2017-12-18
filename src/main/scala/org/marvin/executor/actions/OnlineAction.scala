@@ -17,7 +17,7 @@
 package org.marvin.executor.actions
 
 import akka.Done
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, Props, Status}
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload, OnlineReloadNoSave}
@@ -77,14 +77,13 @@ class OnlineAction(actionName: String, metadata: EngineMetadata) extends Actor w
         futures += (artifactSaver ? SaveToLocal(artifactName, splitedProtocols(artifactName)))
       }
 
-      Future.sequence(futures).onComplete {
-        case Success(response) =>
-          log.info(s"Reload to $actionName completed [$response] ! Protocol: [$protocol]")
-
-          onlineActionProxy forward Reload(protocol)
-
-        case Failure(failure) =>
-          failure.printStackTrace()
+      val origSender = sender()
+      Future.sequence(futures).onComplete{
+        case Success(_) => onlineActionProxy.ask(Reload(protocol)) pipeTo origSender
+        case Failure(e) => {
+          log.error(s"Failure to reload artifacts using protocol $protocol.")
+          origSender ! Status.Failure(e)
+        }
       }
 
     case OnlineReloadNoSave(protocol) =>

@@ -28,6 +28,8 @@ import org.marvin.model.EngineMetadata
 import org.marvin.testutil.MetadataMock
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
+import scala.concurrent.duration._
+
 class OnlineActionTest extends TestKit(
   ActorSystem("OnlineActionTest", ConfigFactory.parseString("""akka.loggers = ["akka.testkit.TestEventListener"]""")))
   with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
@@ -85,6 +87,8 @@ class OnlineActionTest extends TestKit(
       mockedSaver.expectMsg(SaveToLocal("model", protocol))
       mockedSaver.reply(Done)
 
+      //wait for one message to be returned for at least 3 seconds
+      receiveOne(3 seconds)
       mockedProxy.expectMsg(Reload(protocol))
       mockedProxy.reply(Reloaded(protocol))
     }

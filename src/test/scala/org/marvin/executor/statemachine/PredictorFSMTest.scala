@@ -71,7 +71,7 @@ class PredictorFSMTest extends TestKit(
       returnedMessage.cause shouldBe a[MarvinEExecutorException]
     }
 
-    "go to Reloaded when Reloading and receive Reloaded" in {
+    "go to Ready when Reloading and receive Reloaded" in {
       val probe = TestProbe()
       val fsm = TestFSMRef[State, Data, PredictorFSM](new PredictorFSM(probe.ref, MetadataMock.simpleMockedMetadata()))
       fsm.setState(Reloading)
