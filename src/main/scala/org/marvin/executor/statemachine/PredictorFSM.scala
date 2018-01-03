@@ -16,17 +16,16 @@
  */
 package org.marvin.executor.statemachine
 
-import akka.actor.{ActorRef, FSM, Props}
-import scala.concurrent.duration._
+import akka.actor.{ActorRef, FSM, OneForOneStrategy, Props, SupervisorStrategy}
 
+import scala.concurrent.duration._
 import org.marvin.executor.actions.OnlineAction
-import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload, OnlineReloadNoSave}
+import org.marvin.executor.actions.OnlineAction._
+import org.marvin.executor.proxies.{FailedToReload, Reloaded}
 import org.marvin.model.{EngineMetadata, MarvinEExecutorException}
 
 //receive events
 final case class Reload(protocol: String = "")
-final case class ReloadNoSave(protocol: String = "")
-final case class Reloaded(protocol: String)
 
 //states
 sealed trait State
@@ -42,20 +41,15 @@ final case class Model(protocol: String) extends Data
 class PredictorFSM(var predictorActor: ActorRef, metadata: EngineMetadata) extends FSM[State, Data]{
   def this(metadata: EngineMetadata) = this(null, metadata)
 
-  var reloadStateTimeout: FiniteDuration = _
+  var reloadStateTimeout: FiniteDuration = metadata.reloadStateTimeout.getOrElse(180000) milliseconds
 
   override def preStart() {
     if (predictorActor == null) predictorActor = context.system.actorOf(Props(new OnlineAction("predictor", metadata)), name = "predictorActor")
-    reloadStateTimeout = metadata.reloadStateTimeout.getOrElse(180000) milliseconds
   }
 
   startWith(Unavailable, NoModel)
 
   when(Unavailable) {
-    case Event(ReloadNoSave(protocol), _) => {
-      predictorActor ! OnlineReloadNoSave(protocol = protocol)
-      goto(Reloading) using ToReload(protocol)
-    }
     case Event(Reload(protocol), _) => {
       predictorActor ! OnlineReload(protocol = protocol)
       goto(Reloading) using ToReload(protocol)
@@ -71,6 +65,10 @@ class PredictorFSM(var predictorActor: ActorRef, metadata: EngineMetadata) exten
   when(Reloading, stateTimeout = reloadStateTimeout) {
     case Event(Reloaded(protocol), _) => {
       goto(Ready) using Model(protocol)
+    }
+    case Event(FailedToReload(protocol), _) => {
+      log.error(s"Failed to reload with protocol {$protocol}")
+      goto(Unavailable)
     }
     case Event(StateTimeout, _) => {
       log.warning("Reloading state timed out.")
@@ -91,10 +89,6 @@ class PredictorFSM(var predictorActor: ActorRef, metadata: EngineMetadata) exten
     }
     case Event(Reload(protocol), _) => {
       predictorActor ! OnlineReload(protocol = protocol)
-      goto(Reloading) using ToReload(protocol)
-    }
-    case Event(ReloadNoSave(protocol), _) => {
-      predictorActor ! OnlineReloadNoSave(protocol = protocol)
       goto(Reloading) using ToReload(protocol)
     }
     case Event(OnlineHealthCheck, _) => {

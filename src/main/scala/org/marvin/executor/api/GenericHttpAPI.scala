@@ -42,7 +42,7 @@ import org.marvin.model.{EngineMetadata, MarvinEExecutorException}
 import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchHealthCheck, BatchReload}
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck}
 import org.marvin.executor.actions.PipelineAction.PipelineExecute
-import org.marvin.executor.statemachine.{PredictorFSM, Reload, ReloadNoSave}
+import org.marvin.executor.statemachine.{PredictorFSM, Reload}
 
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
@@ -255,7 +255,7 @@ trait GenericHttpAPI {
 
     if(!metadata.actionsMap.get("predictor").isEmpty){
       modelProtocol match {
-        case "" => GenericHttpAPI.predictorFSM ! ReloadNoSave(modelProtocol)
+        case "" => GenericHttpAPI.predictorFSM ! Reload("")
         case _ => GenericHttpAPI.predictorFSM ! Reload(modelProtocol)
       }
     }

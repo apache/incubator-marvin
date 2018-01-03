@@ -21,7 +21,8 @@ import actions.OnlineActionResponse
 import akka.actor.ActorSystem
 import akka.testkit.{EventFilter, ImplicitSender, TestFSMRef, TestKit, TestProbe}
 import com.typesafe.config.ConfigFactory
-import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload, OnlineReloadNoSave}
+import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
+import org.marvin.executor.proxies.Reloaded
 import org.marvin.model.MarvinEExecutorException
 import org.marvin.testutil.MetadataMock
 import org.scalatest.{Matchers, WordSpecLike}
@@ -50,15 +51,14 @@ class PredictorFSMTest extends TestKit(
       fsm.stateData should be (ToReload(testProtocol))
     }
 
-    "go to Reloading when Unavailable and receive ReloadNoSave" in {
+    "go to Reloading when Unavailable and receive Reload with no protocol" in {
       val probe = TestProbe()
       val fsm = TestFSMRef[State, Data, PredictorFSM](new PredictorFSM(probe.ref, MetadataMock.simpleMockedMetadata()))
 
-      val testProtocol = "protocol1234"
-      fsm ! ReloadNoSave(testProtocol)
-      probe.expectMsg(OnlineReloadNoSave(testProtocol))
+      fsm ! Reload()
+      probe.expectMsg(OnlineReload(""))
       fsm.stateName should be (Reloading)
-      fsm.stateData should be (ToReload(testProtocol))
+      fsm.stateData should be (ToReload(""))
     }
 
     "stay unavailable and send a failure when unavailable and receive unknown message" in {
@@ -80,13 +80,13 @@ class PredictorFSMTest extends TestKit(
       fsm.stateData should be (Model("protocol123"))
     }
 
-    "receive failure and stay Reloading when Reloading" in {
+    "receive failure and go to Unavailable when Reloading" in {
       val probe = TestProbe()
       val fsm = TestFSMRef[State, Data, PredictorFSM](new PredictorFSM(probe.ref, MetadataMock.simpleMockedMetadata()))
       fsm.setState(Reloading)
       fsm ! OnlineExecute("test", "test")
       probe.expectNoMsg
-      fsm.stateName should be (Reloading)
+      fsm.stateName should be (Unavailable)
       val returnedMessage = expectMsgType[akka.actor.Status.Failure]
       returnedMessage.cause shouldBe a[MarvinEExecutorException]
     }
@@ -124,15 +124,15 @@ class PredictorFSMTest extends TestKit(
       fsm.stateData should be (ToReload(protocol))
     }
 
-    "go to Reloading when Ready and receive ReloadNoSave" in {
+    "go to Reloading when Ready and receive Reload with no protocol" in {
       val probe = TestProbe()
       val fsm = TestFSMRef[State, Data, PredictorFSM](new PredictorFSM(probe.ref, MetadataMock.simpleMockedMetadata()))
       fsm.setState(Ready)
-      val protocol = "protocol99"
-      fsm ! ReloadNoSave(protocol)
-      probe.expectMsg(OnlineReloadNoSave(protocol))
+      val protocol = null
+      fsm ! Reload(protocol)
+      probe.expectMsg(OnlineReload(null))
       fsm.stateName should be (Reloading)
-      fsm.stateData should be (ToReload(protocol))
+      fsm.stateData should be (ToReload(null))
     }
 
     "stay in the same state and log a warning when unknown event is sent" in {
