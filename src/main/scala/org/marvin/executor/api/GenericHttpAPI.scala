@@ -20,7 +20,8 @@ import java.io.FileNotFoundException
 import java.util.concurrent.Executors
 
 import actions.HealthCheckResponse.Status
-import akka.actor.{ActorRef, ActorSystem, Props, Terminated}
+import akka.Done
+import akka.actor.{ActorPath, ActorRef, ActorSystem, Address, Props, Terminated}
 import akka.event.LoggingAdapter
 import akka.event.Logging
 import akka.http.scaladsl.server.Route
@@ -29,8 +30,10 @@ import akka.util.Timeout
 import org.marvin.util.{ConfigurationContext, JsonUtil, ProtocolUtil}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model._
+import com.typesafe.config.ConfigFactory
 import org.everit.json.schema.ValidationException
 import org.marvin.executor.actions.{BatchAction, PipelineAction}
+import com.typesafe.config.Config
 
 import scala.concurrent._
 import scala.io.Source
@@ -42,8 +45,11 @@ import org.marvin.model.{EngineMetadata, MarvinEExecutorException}
 import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchHealthCheck, BatchReload}
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck}
 import org.marvin.executor.actions.PipelineAction.PipelineExecute
+import org.marvin.executor.api.GenericHttpAPI.{actors, complete, healthStatusFormat, metadata, system}
+import org.marvin.executor.manager.{ExecutorClusterListener, ExecutorManager}
 import org.marvin.executor.statemachine.{PredictorFSM, Reload}
 
+import scala.collection.immutable
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
@@ -54,13 +60,14 @@ class GenericHttpAPIImpl() extends GenericHttpAPI
 
 object GenericHttpAPI extends HttpMarvinApp {
   var system: ActorSystem = _
+  var customConf: Config = _
 
   var defaultParams: String = _
   var metadata: EngineMetadata = _
   var log: LoggingAdapter = _
 
   var api: GenericHttpAPI = new GenericHttpAPIImpl()
-  var protocolUtil = new ProtocolUtil()
+  var protocolUtil: ProtocolUtil = _
 
   var actors:Map[String, ActorRef] = _
   var predictorFSM: ActorRef = _
@@ -69,6 +76,7 @@ object GenericHttpAPI extends HttpMarvinApp {
   var trainerActor: ActorRef = _
   var evaluatorActor: ActorRef = _
   var pipelineActor: ActorRef = _
+  var executorManager: ActorRef = _
 
   var onlineActionTimeout:Timeout = _
   var healthCheckTimeout:Timeout = _
@@ -80,8 +88,7 @@ object GenericHttpAPI extends HttpMarvinApp {
   implicit val httpEngineRequestFormat = jsonFormat2(HttpEngineRequest)
   implicit val healthStatusFormat = jsonFormat2(HealthStatus)
 
-  override def routes: Route =
-    handleRejections(marvinEngineRejectionHandler){
+  override def routes: Route = handleRejections(marvinEngineRejectionHandler){
       handleExceptions(marvinEngineExceptionHandler){
         post {
           path("predictor") {
@@ -177,64 +184,87 @@ object GenericHttpAPI extends HttpMarvinApp {
         get {
           path("predictor" / "health") {
             onComplete(api.check("predictor", "online")) { response =>
-              matchHealthTry(response)
+              api.matchHealthTry(response)
             }
           } ~
           path("acquisitor" / "health") {
             onComplete(api.check("acquisitor", "batch")) { response =>
-              matchHealthTry(response)
+              api.matchHealthTry(response)
             }
           } ~
           path("tpreparator" / "health") {
             onComplete(api.check("tpreparator", "batch")) { response =>
-              matchHealthTry(response)
+              api.matchHealthTry(response)
             }
           } ~
           path("trainer" / "health") {
             onComplete(api.check("trainer", "batch")) { response =>
-              matchHealthTry(response)
+              api.matchHealthTry(response)
             }
           } ~
           path("evaluator" / "health") {
             onComplete(api.check("evaluator", "batch")) { response =>
-              matchHealthTry(response)
+              api.matchHealthTry(response)
             }
           }
         }
       }
     }
 
-  def matchHealthTry(response: Try[HealthStatus]) = response match {
-    case Success(healthStatus) =>
-      if(healthStatus.status.equals("OK"))
-        complete(healthStatus)
-      else
-        complete(HttpResponse(StatusCodes.ServiceUnavailable,
-          entity = HttpEntity(ContentTypes.`application/json`,
-            healthStatusFormat.write(healthStatus).toString())))
-
-    case Failure(e) => throw e
-  }
-
   def main(args: Array[String]): Unit = {
     val engineFilePath = s"${ConfigurationContext.getStringConfigOrDefault("engineHome", ".")}/engine.metadata"
     val paramsFilePath = s"${ConfigurationContext.getStringConfigOrDefault("engineHome", ".")}/engine.params"
 
-    val modelProtocolToLoad = ConfigurationContext.getStringConfigOrDefault("modelProtocol", "")
-    GenericHttpAPI.system = api.setupSystem(engineFilePath, paramsFilePath, modelProtocolToLoad)
     val ipAddress = ConfigurationContext.getStringConfigOrDefault("ipAddress", "localhost")
     val port = ConfigurationContext.getIntConfigOrDefault("port", 8000)
 
-    api.startServer(ipAddress, port, GenericHttpAPI.system)
+    val modelProtocolToLoad = ConfigurationContext.getStringConfigOrDefault("modelProtocol", "")
+
+    val enableManagement = ConfigurationContext.getBooleanConfigOrDefault("enableAdmin", false)
+
+    system = api.setupSystem(engineFilePath, paramsFilePath, modelProtocolToLoad, enableManagement)
+    api.startServer(ipAddress, port, system)
   }
 }
 
 trait GenericHttpAPI {
-  protected def setupSystem(engineFilePath:String, paramsFilePath:String, modelProtocol:String): ActorSystem = {
+  protected def setupSystem(engineFilePath:String, paramsFilePath:String, modelProtocol:String, enableManagement:Boolean): ActorSystem = {
     val metadata = readJsonIfFileExists[EngineMetadata](engineFilePath, true)
-    val system = ActorSystem(s"MarvinExecutorSystem")
+
+    //start cluster administration actor
+
+    if (enableManagement) {
+      ConfigFactory.parseString("akka.actor.provider=remote").withFallback(ConfigFactory.load())
+      ConfigFactory.parseString("akka.remote.artery.enabled=on").withFallback(ConfigFactory.load())
+      ConfigFactory.parseString("akka.remote.artery.canonical.hostname=\"127.0.0.1\"").withFallback(ConfigFactory.load())
+      ConfigFactory.parseString("akka.remote.artery.canonical.port=50100").withFallback(ConfigFactory.load())
+
+      //val nodeSeeds = immutable.Seq(new Address("akka.tcp", GenericHttpAPI.system.name, "127.0.0.1", 50100))
+      //GenericHttpAPI.executorManager = GenericHttpAPI.system.actorOf(Props(new ExecutorClusterListener(nodeSeeds)), name = "clusterListener")
+
+      GenericHttpAPI.customConf = ConfigFactory.parseString(
+        """
+        akka{
+          actor {
+            provider = remote
+          }
+
+          remote.artery {
+            enabled = on
+            canonical.hostname = "127.0.0.1"
+            canonical.port = 50100
+          }
+        }
+      """
+      ).withFallback(ConfigFactory.load())
+    }else{
+      GenericHttpAPI.customConf = ConfigFactory.load()
+    }
+
+    val system = ActorSystem(metadata.name, GenericHttpAPI.customConf)
 
     GenericHttpAPI.metadata = metadata
+    GenericHttpAPI.protocolUtil = new ProtocolUtil()
     GenericHttpAPI.defaultParams = JsonUtil.toJson(readJsonIfFileExists[Map[String, String]](paramsFilePath))
     GenericHttpAPI.log = Logging.getLogger(system, this)
 
@@ -253,13 +283,6 @@ trait GenericHttpAPI {
     GenericHttpAPI.pipelineActor = system.actorOf(Props(new PipelineAction(metadata)), name = "pipelineActor")
     GenericHttpAPI.predictorFSM = system.actorOf(Props(new PredictorFSM(metadata)), name = "predictorFSM")
 
-    if(!metadata.actionsMap.get("predictor").isEmpty){
-      modelProtocol match {
-        case "" => GenericHttpAPI.predictorFSM ! Reload("")
-        case _ => GenericHttpAPI.predictorFSM ! Reload(modelProtocol)
-      }
-    }
-
     GenericHttpAPI.actors = Map[String, ActorRef](
       "predictor" -> GenericHttpAPI.predictorFSM,
       "acquisitor" -> GenericHttpAPI.acquisitorActor,
@@ -268,6 +291,18 @@ trait GenericHttpAPI {
       "evaluator" -> GenericHttpAPI.evaluatorActor,
       "pipeline" -> GenericHttpAPI.pipelineActor
     )
+
+    if (enableManagement){
+      val managedActorPaths = Map[String, ActorPath](
+        "predictor" -> actors("predictor").path,
+        "pipeline" -> actors("pipeline").path
+      )
+
+      GenericHttpAPI.executorManager = system.actorOf(Props(new ExecutorManager(metadata, managedActorPaths)), name="executorManager")
+    }
+
+    //send model protocol to be reloaded by predictor service
+    GenericHttpAPI.predictorFSM ! Reload(modelProtocol)
 
     system
   }
@@ -297,7 +332,6 @@ trait GenericHttpAPI {
   protected def terminate(): Future[Terminated] = {
     GenericHttpAPI.system.terminate()
   }
-
 
   def batchExecute(actionName: String, params: String): String = {
     GenericHttpAPI.log.info(s"Request for $actionName] received.")
@@ -371,6 +405,18 @@ trait GenericHttpAPI {
   protected def toHttpEngineResponseFuture(message:Future[String]): Future[HttpEngineResponse] = {
     implicit val ec: ExecutionContext = GenericHttpAPI.system.dispatcher
     message collect { case response => HttpEngineResponse(result = response)}
+  }
+
+  def matchHealthTry(response: Try[HealthStatus]) = response match {
+    case Success(healthStatus) =>
+      if(healthStatus.status.equals("OK"))
+        complete(healthStatus)
+      else
+        complete(HttpResponse(StatusCodes.ServiceUnavailable,
+          entity = HttpEntity(ContentTypes.`application/json`,
+            healthStatusFormat.write(healthStatus).toString())))
+
+    case Failure(e) => throw e
   }
 
 }

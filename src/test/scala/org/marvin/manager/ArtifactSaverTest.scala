@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.manager
+package org.marvin.manager
 
 import org.marvin.manager.ArtifactSaver
 import org.marvin.model.EngineMetadata

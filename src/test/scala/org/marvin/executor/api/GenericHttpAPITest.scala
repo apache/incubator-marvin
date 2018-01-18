@@ -586,7 +586,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
       val apiMock = mock[GenericHttpAPIOpen]
       GenericHttpAPI.api = apiMock
 
-      (apiMock.setupSystem _).expects("a/fake/path/engine.metadata", "a/fake/path/engine.params", "").returning(null)
+      (apiMock.setupSystem _).expects("a/fake/path/engine.metadata", "a/fake/path/engine.params", "", false).returning(null)
       (apiMock.startServer _).expects("1.1.1.1", 9999, null).returning(1)
 
       GenericHttpAPI.main(null)
@@ -602,7 +602,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val caught =
         intercept[MarvinEExecutorException] {
-          httpApi.setupSystem("not_existent_engine_file", existentFile, "")
+          httpApi.setupSystem("not_existent_engine_file", existentFile, "", false)
         }
       caught.getMessage() shouldEqual "The file [not_existent_engine_file] does not exists. Check your engine configuration."
     }
@@ -614,7 +614,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val caught =
         intercept[MarvinEExecutorException] {
-          httpApi.setupSystem(existentFile, "not_existent_params_file", "")
+          httpApi.setupSystem(existentFile, "not_existent_params_file", "", false)
         }
       caught.getMessage() shouldEqual "The file [not_existent_params_file] does not exists. Check your engine configuration."
     }
@@ -625,7 +625,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
       val validMetadataFile = getClass.getResource("/valid.metadata").getPath()
       val validParamsFile = getClass.getResource("/valid.params").getPath()
 
-      val system = httpApi.setupSystem(validMetadataFile, validParamsFile, "")
+      val system = httpApi.setupSystem(validMetadataFile, validParamsFile, "", false)
       system shouldNot be(null)
     }
   }
@@ -672,7 +672,7 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 }
 
 class GenericHttpAPIOpen(var protocolService: ProtocolUtil) extends GenericHttpAPI {
-  override def setupSystem(engineFilePath: String, paramsFilePath: String, modelProtocol: String): ActorSystem = super.setupSystem(engineFilePath, paramsFilePath, modelProtocol)
+  override def setupSystem(engineFilePath: String, paramsFilePath: String, modelProtocol: String, enableManagement:Boolean): ActorSystem = super.setupSystem(engineFilePath, paramsFilePath, modelProtocol, enableManagement)
   override def startServer(ipAddress: String, port: Int, system: ActorSystem): Unit = super.startServer(ipAddress, port, system)
   override def terminate(): Future[Terminated] = super.terminate()
 }
