@@ -108,6 +108,70 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
     }
   }
 
+  "/feedback endpoint" should {
+
+    "interpret the input message and respond with media type json" in {
+
+      val message = "testQuery"
+      val params = "testParams"
+      val response = "fooReply"
+
+      val result = Post("/feedback", HttpEntity(`application/json`, s"""{"params":"$params","message":"$message"}""")) ~> route ~> runRoute
+
+      val expectedMessage = OnlineExecute(message, params)
+      testActors("feedback").expectMsg(expectedMessage)
+      testActors("feedback").reply(response)
+
+      check {
+        status shouldEqual StatusCode.int2StatusCode(200)
+        contentType shouldEqual ContentTypes.`application/json`
+        responseAs[String] shouldEqual s"""{"result":"$response"}"""
+      }(result)
+    }
+
+    "gracefully fail when message is not informed" in {
+      Post("/predictor", HttpEntity(`application/json`, s"""{"params":"testParams"}""")) ~> route ~> check {
+        status shouldEqual StatusCodes.BadRequest
+        responseAs[String] shouldEqual s"""{"errorMessage":"requirement failed: The request payload must contain the attribute 'message'."}"""
+      }
+    }
+
+    "use default params when no params is informed" in {
+
+      val message = "testQuery"
+      val response = "noParams"
+
+      val result = Post("/feedback", HttpEntity(`application/json`, s"""{"message":"$message"}""")) ~> route ~> runRoute
+
+      val expectedMessage = OnlineExecute(message, GenericHttpAPI.defaultParams)
+      testActors("feedback").expectMsg(expectedMessage)
+      testActors("feedback").reply(response)
+
+      check{
+        status shouldEqual StatusCodes.OK
+        responseAs[String] shouldEqual s"""{"result":"$response"}"""
+      }(result)
+    }
+
+    "fail fast when the timeout is reached" in {
+
+      val message = "testQuery"
+
+      GenericHttpAPI.onlineActionTimeout = Timeout(50 millis)
+
+      val result = Post("/feedback", HttpEntity(`application/json`, s"""{"message":"$message"}""")) ~> route ~> runRoute
+
+      val expectedMessage = OnlineExecute(message, GenericHttpAPI.defaultParams)
+      testActors("feedback").expectMsg(expectedMessage)
+
+      check {
+        status shouldEqual StatusCodes.InternalServerError
+        responseAs[String] shouldEqual """{"errorMessage":"The engine was not able to provide a response within the specified timeout."}"""
+      }(result)
+
+    }
+  }
+
   "/acquisitor endpoint" should {
 
     "interpret params and call BatchActor" in {
@@ -649,7 +713,8 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
       "tpreparator" -> TestProbe(),
       "trainer" -> TestProbe(),
       "evaluator" -> TestProbe(),
-      "pipeline" -> TestProbe()
+      "pipeline" -> TestProbe(),
+      "feedback" -> TestProbe()
     )
 
     GenericHttpAPI.actors = Map[String, ActorRef](
@@ -658,7 +723,8 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
       "tpreparator" -> testActors("tpreparator").ref,
       "trainer" -> testActors("trainer").ref,
       "evaluator" -> testActors("evaluator").ref,
-      "pipeline" -> testActors("pipeline").ref
+      "pipeline" -> testActors("pipeline").ref,
+      "feedback" -> testActors("feedback").ref
     )
 
     testActors

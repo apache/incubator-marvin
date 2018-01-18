@@ -29,9 +29,8 @@ import akka.util.Timeout
 import org.marvin.util.{ConfigurationContext, JsonUtil, ProtocolUtil}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model._
+import org.marvin.executor.actions.{BatchAction, OnlineAction, PipelineAction}
 import com.github.fge.jsonschema.core.exceptions.ProcessingException
-import org.marvin.executor.actions.{BatchAction, PipelineAction}
-
 import scala.concurrent._
 import scala.io.Source
 import scala.concurrent.duration._
@@ -69,6 +68,7 @@ object GenericHttpAPI extends HttpMarvinApp {
   var trainerActor: ActorRef = _
   var evaluatorActor: ActorRef = _
   var pipelineActor: ActorRef = _
+  var feedbackActor: ActorRef = _
 
   var onlineActionTimeout:Timeout = _
   var healthCheckTimeout:Timeout = _
@@ -138,6 +138,21 @@ object GenericHttpAPI extends HttpMarvinApp {
                 api.toHttpEngineResponse(response_message)
               }
             }
+          } ~
+          path("feedback") {
+            entity(as[HttpEngineRequest]) { request =>
+              require(!request.message.isEmpty, "The request payload must contain the attribute 'message'.")
+              val response_message = api.onlineExecute("feedback", request.params.getOrElse(defaultParams), request.message.get)
+              onComplete(api.toHttpEngineResponseFuture(response_message)){ response =>
+                response match{
+                  case Success(httpEngineResponse) => complete(httpEngineResponse)
+                  case Failure(e) => {
+                    log.info("RECEIVE FAILURE!!! "+e.getMessage + e.getClass)
+                    throw e
+                  }
+                }
+              }
+            }
           }
         } ~
         put {
@@ -172,6 +187,14 @@ object GenericHttpAPI extends HttpMarvinApp {
                 api.toHttpEngineResponse(response_message)
               }
             }
+          } ~
+          path("feedback" / "reload") {
+            parameters('protocol) { (protocol) =>
+              complete {
+                val response_message = api.reload("feedback", "online", protocol=protocol)
+                api.toHttpEngineResponse(response_message)
+              }
+            }
           }
         } ~
         get {
@@ -197,6 +220,11 @@ object GenericHttpAPI extends HttpMarvinApp {
           } ~
           path("evaluator" / "health") {
             onComplete(api.check("evaluator", "batch")) { response =>
+              matchHealthTry(response)
+            }
+          } ~
+          path("feedback" / "health") {
+            onComplete(api.check("feedback", "online")) { response =>
               matchHealthTry(response)
             }
           }
@@ -252,6 +280,7 @@ trait GenericHttpAPI {
     GenericHttpAPI.evaluatorActor = system.actorOf(Props(new BatchAction("evaluator", metadata)), name = "evaluatorActor")
     GenericHttpAPI.pipelineActor = system.actorOf(Props(new PipelineAction(metadata)), name = "pipelineActor")
     GenericHttpAPI.predictorFSM = system.actorOf(Props(new PredictorFSM(metadata)), name = "predictorFSM")
+    GenericHttpAPI.feedbackActor = system.actorOf(Props(new OnlineAction("feedback", metadata)), name = "feedbackActor")
 
     if(!metadata.actionsMap.get("predictor").isEmpty){
       modelProtocol match {
@@ -266,7 +295,8 @@ trait GenericHttpAPI {
       "tpreparator" -> GenericHttpAPI.tpreparatorActor,
       "trainer" -> GenericHttpAPI.trainerActor,
       "evaluator" -> GenericHttpAPI.evaluatorActor,
-      "pipeline" -> GenericHttpAPI.pipelineActor
+      "pipeline" -> GenericHttpAPI.pipelineActor,
+      "feedback" -> GenericHttpAPI.feedbackActor
     )
 
     system
