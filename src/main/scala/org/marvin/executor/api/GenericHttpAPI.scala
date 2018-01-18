@@ -29,7 +29,7 @@ import akka.util.Timeout
 import org.marvin.util.{ConfigurationContext, JsonUtil, ProtocolUtil}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model._
-import org.everit.json.schema.ValidationException
+import com.github.fge.jsonschema.core.exceptions.ProcessingException
 import org.marvin.executor.actions.{BatchAction, PipelineAction}
 
 import scala.concurrent._
@@ -279,7 +279,7 @@ trait GenericHttpAPI {
         ex match {
           case ex: FileNotFoundException => throw new MarvinEExecutorException(s"The file [$filePath] does not exists." +
             s" Check your engine configuration.", ex)
-          case ex: ValidationException => throw new MarvinEExecutorException(s"Invalid engine metadata file."  +
+          case ex: ProcessingException => throw new MarvinEExecutorException(s"Invalid engine metadata file."  +
             s" Check your engine metadata file.", ex)
           case _ => throw ex
         }

@@ -17,9 +17,11 @@
 package org.marvin.util
 
 import java.io.File
-import org.everit.json.schema.ValidationException
+
+import com.github.fge.jsonschema.core.exceptions.ProcessingException
 import org.marvin.model.EngineMetadata
 import org.scalatest.{Matchers, WordSpec}
+
 import scala.io.Source
 
 
@@ -30,12 +32,15 @@ class JsonUtilTest extends WordSpec with Matchers {
       val testFilePath = new File(getClass.getClassLoader.getResource("metadataToValidate.json").getPath)
       assert { JsonUtil.validateJson[EngineMetadata](Source.fromFile(testFilePath).mkString) == () }
     }
-  }
-
-  "A Metadata validation" should {
-    "throw Exception if metadataToValidate is invalid" in {
-      assertThrows[ValidationException] {
+    "throw Exception if metadataToValidateWithError is invalid" in {
+      assertThrows[ProcessingException] {
         val errorTestFilePath = new File(getClass.getClassLoader.getResource("metadataToValidateWithError.json").getPath)
+        JsonUtil.validateJson[EngineMetadata](Source.fromFile(errorTestFilePath).mkString)
+      }
+    }
+    "throw Exception if metadataToValidateWithRefError is invalid" in {
+      assertThrows[ProcessingException] {
+        val errorTestFilePath = new File(getClass.getClassLoader.getResource("metadataToValidateWithRefError.json").getPath)
         JsonUtil.validateJson[EngineMetadata](Source.fromFile(errorTestFilePath).mkString)
       }
     }
