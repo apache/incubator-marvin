@@ -16,14 +16,16 @@
  */
 package org.marvin.util
 
-import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
+import com.fasterxml.jackson.databind.{DeserializationFeature, JsonNode, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import com.github.fge.jsonschema.core.report.ProcessingMessage
+import com.github.fge.jsonschema.main.JsonSchemaFactory
 import grizzled.slf4j.Logging
-import org.everit.json.schema.ValidationException
-import org.everit.json.schema.loader.SchemaLoader
-import org.json.{JSONObject, JSONTokener}
+import com.github.fge.jsonschema.core.exceptions.ProcessingException
+import org.json4s.jackson.JsonMethods.{asJsonNode, parse}
 import spray.json._
 
+import scala.io.Source
 import scala.reflect.{ClassTag, _}
 
 object JsonUtil extends Logging {
@@ -52,27 +54,29 @@ object JsonUtil extends Logging {
 
   def validateJson[T: ClassTag](jsonString: String) = {
     val className = classTag[T].runtimeClass.getSimpleName
-    val schemaName = "/" + className.toString + "Schema.json"
-    val jsonToValidate: JSONObject = new JSONObject(jsonString)
+    val schemaName = className.toString + "Schema.json"
 
-    var jsonSchema: JSONObject = new JSONObject()
+    var jsonSchema: String = null
 
     try{
-      jsonSchema = new JSONObject(new JSONTokener(getClass.getResourceAsStream(schemaName)))
+      jsonSchema = Source.fromResource(schemaName).mkString
     } catch {
       case e: NullPointerException => info(s"File ${schemaName} not found, check your schema file")
         throw e
     }
 
-    val schema = SchemaLoader.load(jsonSchema)
+    val schema: JsonNode = asJsonNode(parse(jsonSchema))
+    val jsonToValidate: JsonNode = asJsonNode(parse(jsonString))
+    val validator = JsonSchemaFactory.byDefault().getValidator
 
-    try {
-      schema.validate(jsonToValidate)
-    } catch {
-      case e: ValidationException =>
-        e.getCausingExceptions.forEach(e => e.printStackTrace)
-        throw e
+    val processingReport = validator.validate(schema, jsonToValidate)
+    if (!processingReport.isSuccess) {
+      processingReport.forEach {
+        message: ProcessingMessage => info(message.asJson())
+      }
+      throw new ProcessingException
     }
+
   }
 
   def format(jsonString: String): String ={

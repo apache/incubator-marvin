@@ -28,7 +28,8 @@ object MetadataMock {
         new EngineActionMetadata(name="acquisitor", actionType="batch", port=778, host="localhost", artifactsToPersist=List("initial_dataset"), artifactsToLoad=List()),
         new EngineActionMetadata(name="tpreparator", actionType="batch", port=779, host="localhost", artifactsToPersist=List("dataset"), artifactsToLoad=List("initial_dataset")),
         new EngineActionMetadata(name="trainer", actionType="batch", port=780, host="localhost", artifactsToPersist=List("model"), artifactsToLoad=List("dataset")),
-        new EngineActionMetadata(name="evaluator", actionType="batch", port=781, host="localhost", artifactsToPersist=List("metrics"), artifactsToLoad=List("dataset", "model"))
+        new EngineActionMetadata(name="evaluator", actionType="batch", port=781, host="localhost", artifactsToPersist=List("metrics"), artifactsToLoad=List("dataset", "model")),
+        new EngineActionMetadata(name="feedback", actionType="online", port=782, host="localhost", artifactsToPersist=List(), artifactsToLoad=List())
       ),
       artifactsRemotePath = "",
       artifactManagerType = "HDFS",

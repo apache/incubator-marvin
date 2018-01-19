@@ -16,6 +16,8 @@
  */
 package org.marvin.executor.api
 
+import java.lang
+
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCode, StatusCodes}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.testkit.TestProbe
@@ -33,11 +35,12 @@ import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchHealthCheck, 
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
 import org.marvin.executor.actions.PipelineAction.PipelineExecute
 import org.marvin.executor.statemachine.Reload
-import org.marvin.model.MarvinEExecutorException
+import org.marvin.model.{EngineMetadata, MarvinEExecutorException}
 import org.marvin.testutil.MetadataMock
 import org.marvin.util.ProtocolUtil
 
 import scala.concurrent.Future
+import scala.reflect.ClassTag
 
 class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers with Inside with MockFactory {
 
@@ -99,6 +102,70 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
       val expectedMessage = OnlineExecute(message, GenericHttpAPI.defaultParams)
       testActors("predictor").expectMsg(expectedMessage)
+
+      check {
+        status shouldEqual StatusCodes.InternalServerError
+        responseAs[String] shouldEqual """{"errorMessage":"The engine was not able to provide a response within the specified timeout."}"""
+      }(result)
+
+    }
+  }
+
+  "/feedback endpoint" should {
+
+    "interpret the input message and respond with media type json" in {
+
+      val message = "testQuery"
+      val params = "testParams"
+      val response = "fooReply"
+
+      val result = Post("/feedback", HttpEntity(`application/json`, s"""{"params":"$params","message":"$message"}""")) ~> route ~> runRoute
+
+      val expectedMessage = OnlineExecute(message, params)
+      testActors("feedback").expectMsg(expectedMessage)
+      testActors("feedback").reply(response)
+
+      check {
+        status shouldEqual StatusCode.int2StatusCode(200)
+        contentType shouldEqual ContentTypes.`application/json`
+        responseAs[String] shouldEqual s"""{"result":"$response"}"""
+      }(result)
+    }
+
+    "gracefully fail when message is not informed" in {
+      Post("/predictor", HttpEntity(`application/json`, s"""{"params":"testParams"}""")) ~> route ~> check {
+        status shouldEqual StatusCodes.BadRequest
+        responseAs[String] shouldEqual s"""{"errorMessage":"requirement failed: The request payload must contain the attribute 'message'."}"""
+      }
+    }
+
+    "use default params when no params is informed" in {
+
+      val message = "testQuery"
+      val response = "noParams"
+
+      val result = Post("/feedback", HttpEntity(`application/json`, s"""{"message":"$message"}""")) ~> route ~> runRoute
+
+      val expectedMessage = OnlineExecute(message, GenericHttpAPI.defaultParams)
+      testActors("feedback").expectMsg(expectedMessage)
+      testActors("feedback").reply(response)
+
+      check{
+        status shouldEqual StatusCodes.OK
+        responseAs[String] shouldEqual s"""{"result":"$response"}"""
+      }(result)
+    }
+
+    "fail fast when the timeout is reached" in {
+
+      val message = "testQuery"
+
+      GenericHttpAPI.onlineActionTimeout = Timeout(50 millis)
+
+      val result = Post("/feedback", HttpEntity(`application/json`, s"""{"message":"$message"}""")) ~> route ~> runRoute
+
+      val expectedMessage = OnlineExecute(message, GenericHttpAPI.defaultParams)
+      testActors("feedback").expectMsg(expectedMessage)
 
       check {
         status shouldEqual StatusCodes.InternalServerError
@@ -583,11 +650,23 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
     "load paths, ip and port from system configuration" in {
 
-      val apiMock = mock[GenericHttpAPIOpen]
+      val apiMock = mock[GenericHttpAPIImpl]
+      val metadata = MetadataMock.simpleMockedMetadata()
+
       GenericHttpAPI.api = apiMock
 
-      (apiMock.setupSystem _).expects("a/fake/path/engine.metadata", "a/fake/path/engine.params", "", false).returning(null)
-      (apiMock.startServer _).expects("1.1.1.1", 9999, null).returning(1)
+      val metadataFilePath = getClass.getResource("/valid.metadata").getPath()
+      val paramsFilePath = getClass.getResource("/valid.params").getPath()
+
+      (GenericHttpAPI.api.readJsonIfFileExists[EngineMetadata](_:String, _:Boolean)(_:ClassTag[EngineMetadata])).expects(*, *, *).once()
+      (GenericHttpAPI.api.readJsonIfFileExists[String](_:String, _:Boolean)(_:ClassTag[String])).expects(*, *, *).once()
+
+
+
+      //(apiStub.readJsonIfFileExists[String] _).expects(*, *).returning("testParams")
+
+      //(apiStub.setupSystem _).expects(null, "", "", false).returning(null)
+      //(apiStub.startServer _).expects("1.1.1.1", 9999, null).returning(1)
 
       GenericHttpAPI.main(null)
     }
@@ -596,36 +675,36 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
   "setupSystem method" should {
 
     "throw a friendly exception when engine file does not exists" in {
-      val httpApi = new GenericHttpAPIOpen(new ProtocolUtil())
+      val httpApi = new GenericHttpAPIImpl()
 
       val existentFile = getClass.getResource("/test.json").getPath()
 
       val caught =
         intercept[MarvinEExecutorException] {
-          httpApi.setupSystem("not_existent_engine_file", existentFile, "", false)
+          //httpApi.setupSystem("not_existent_engine_file", existentFile, "", false)
         }
       caught.getMessage() shouldEqual "The file [not_existent_engine_file] does not exists. Check your engine configuration."
     }
 
     "throw a friendly exception when params file does not exists" in {
-      val httpApi = new GenericHttpAPIOpen(new ProtocolUtil())
+      val httpApi = new GenericHttpAPIImpl()
 
       val existentFile = getClass.getResource("/metadataToValidate.json").getPath()
 
       val caught =
         intercept[MarvinEExecutorException] {
-          httpApi.setupSystem(existentFile, "not_existent_params_file", "", false)
+          //httpApi.setupSystem(existentFile, "not_existent_params_file", "", false)
         }
       caught.getMessage() shouldEqual "The file [not_existent_params_file] does not exists. Check your engine configuration."
     }
 
     "do not throw exception and setup the system when params files are valid" in {
-      val httpApi = new GenericHttpAPIOpen(new ProtocolUtil())
+      val httpApi = new GenericHttpAPIImpl()
 
       val validMetadataFile = getClass.getResource("/valid.metadata").getPath()
       val validParamsFile = getClass.getResource("/valid.params").getPath()
 
-      val system = httpApi.setupSystem(validMetadataFile, validParamsFile, "", false)
+      //val system = httpApi.setupSystem(validMetadataFile, validParamsFile, "", false)
       system shouldNot be(null)
     }
   }
@@ -649,7 +728,8 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
       "tpreparator" -> TestProbe(),
       "trainer" -> TestProbe(),
       "evaluator" -> TestProbe(),
-      "pipeline" -> TestProbe()
+      "pipeline" -> TestProbe(),
+      "feedback" -> TestProbe()
     )
 
     GenericHttpAPI.actors = Map[String, ActorRef](
@@ -658,7 +738,8 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
       "tpreparator" -> testActors("tpreparator").ref,
       "trainer" -> testActors("trainer").ref,
       "evaluator" -> testActors("evaluator").ref,
-      "pipeline" -> testActors("pipeline").ref
+      "pipeline" -> testActors("pipeline").ref,
+      "feedback" -> testActors("feedback").ref
     )
 
     testActors
@@ -669,10 +750,4 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
     (protocolUtil.generateProtocol _).expects(*).returning(protocolValue)
     GenericHttpAPI.protocolUtil = protocolUtil
   }
-}
-
-class GenericHttpAPIOpen(var protocolService: ProtocolUtil) extends GenericHttpAPI {
-  override def setupSystem(engineFilePath: String, paramsFilePath: String, modelProtocol: String, enableManagement:Boolean): ActorSystem = super.setupSystem(engineFilePath, paramsFilePath, modelProtocol, enableManagement)
-  override def startServer(ipAddress: String, port: Int, system: ActorSystem): Unit = super.startServer(ipAddress, port, system)
-  override def terminate(): Future[Terminated] = super.terminate()
 }

@@ -16,55 +16,45 @@
  */
 package org.marvin.executor.manager
 
-import akka.actor.{Actor, ActorLogging, ActorPath}
+import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.util.Timeout
 import org.marvin.executor.manager.ExecutorManager.{GetMetadata, StopActor}
 import org.marvin.model.EngineMetadata
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
-import scala.util.{Failure, Success}
+import scala.util.Success
 
 object ExecutorManager {
   case class StopActor(actionName: String)
   case class GetMetadata()
 }
 
-class ExecutorManager(metadata: EngineMetadata, managedActorPaths: Map[String, ActorPath]) extends Actor with ActorLogging {
+class ExecutorManager(metadata: EngineMetadata, managedActorRefs: Map[String, ActorRef]) extends Actor with ActorLogging {
   implicit val ec = ExecutionContext.global
   implicit val futureTimeout = Timeout(30 seconds)
 
   override def preStart() = {
-    log.info(s"Executor Manager enabled !!!")
-    log.info(s"This is the manager path ${self.path}")
+    log.info(s"Executor Manager enabled and starting!!!")
+    log.info(s"Executor Manager path ${self.path}")
   }
 
   override def receive  = {
-
     case StopActor(actionName) =>
 
-      val originalSender = sender
+      val actorRef = managedActorRefs(actionName)
 
-      context.actorSelection(managedActorPaths(actionName)).resolveOne(futureTimeout.duration).onComplete {
-        case Success(actorRef) =>
-          log.info(s"Actor ${actorRef.path} found. Trying to stop selected actor..")
-          context.stop(actorRef)
+      log.info(s"Actor ${actorRef.path} found. Trying to stop selected actor..")
 
-          log.info(s"Actor ${actorRef.path} successfully stopped!")
+      context.stop(actorRef)
 
-          originalSender ! "Done"
+      log.info(s"Actor ${actorRef.path} successfully stopped!")
 
-        case Failure(ex) =>
-          ex.printStackTrace()
-
-          originalSender ! "Failure"
-      }
+      sender ! Success
 
     case GetMetadata =>
+      log.info(s"Getting Metadata object from engine ...")
       sender ! metadata
-
-    case _ : String =>
-      log.info("Message receivd")
 
   }
 }

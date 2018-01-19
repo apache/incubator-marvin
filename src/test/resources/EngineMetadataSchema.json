@@ -1,4 +1,6 @@
 {
+  "$schema" : "http://json-schema.org/draft-04/schema" ,
+  "id": "resource:/EngineMetadataSchema.json#",
   "title": "Metadata Schema",
   "description": "Schema for Engine Metadata validation",
   "type": "object",
@@ -58,6 +60,9 @@
     "hdfsHost": {
       "description": "HDFS host",
       "type": "string"
+    },
+    "actions": {
+      "$ref": "EngineActionSchema.json#/actions"
     }
   },
   "required": ["name", "version", "engineType", "artifactsRemotePath", "artifactManagerType", "onlineActionTimeout", "healthCheckTimeout", "reloadTimeout", "batchActionTimeout", "pipelineActions", "actions"]
