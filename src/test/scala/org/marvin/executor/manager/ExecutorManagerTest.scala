@@ -23,7 +23,7 @@ import org.marvin.executor.manager.ExecutorManager.{GetMetadata, StopActor}
 import org.marvin.testutil.MetadataMock
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
-import scala.util.{Failure, Success}
+import scala.util.Success
 
 class ExecutorManagerTest extends TestKit(
   ActorSystem("ExecutorManagerTest", ConfigFactory.parseString("""akka.loggers = ["akka.testkit.TestEventListener"]""")))

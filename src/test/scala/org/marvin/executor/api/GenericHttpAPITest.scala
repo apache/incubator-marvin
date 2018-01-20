@@ -31,13 +31,14 @@ import actions.HealthCheckResponse.Status
 import akka.actor.{ActorRef, ActorSystem, Terminated}
 import akka.event.Logging
 import akka.http.scaladsl.server.Route
+import com.typesafe.config.{Config, ConfigException}
 import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchHealthCheck, BatchReload}
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
 import org.marvin.executor.actions.PipelineAction.PipelineExecute
 import org.marvin.executor.statemachine.Reload
 import org.marvin.model.{EngineMetadata, MarvinEExecutorException}
 import org.marvin.testutil.MetadataMock
-import org.marvin.util.ProtocolUtil
+import org.marvin.util.{JsonUtil, ProtocolUtil}
 
 import scala.concurrent.Future
 import scala.reflect.ClassTag
@@ -648,28 +649,69 @@ class GenericHttpAPITest extends WordSpec with ScalatestRouteTest with Matchers 
 
   "main method" should {
 
-    "load paths, ip and port from system configuration" in {
+    "load files and confs to setup and start system" in {
 
       val apiMock = mock[GenericHttpAPIImpl]
       val metadata = MetadataMock.simpleMockedMetadata()
+      val params = "{\"value1\": \"1\"}"
+      val systemMock = mock[ActorSystem]
 
       GenericHttpAPI.api = apiMock
 
-      val metadataFilePath = getClass.getResource("/valid.metadata").getPath()
-      val paramsFilePath = getClass.getResource("/valid.params").getPath()
+      (apiMock.readJsonIfFileExists[EngineMetadata](_:String, _:Boolean)(_:ClassTag[EngineMetadata])).expects("a/fake/path/engine.metadata", true, *).once().returns(metadata)
+      (apiMock.readJsonIfFileExists[String](_:String, _:Boolean)(_:ClassTag[String])).expects("a/fake/path/engine.params", false, *).once().returns(params)
 
-      (GenericHttpAPI.api.readJsonIfFileExists[EngineMetadata](_:String, _:Boolean)(_:ClassTag[EngineMetadata])).expects(*, *, *).once()
-      (GenericHttpAPI.api.readJsonIfFileExists[String](_:String, _:Boolean)(_:ClassTag[String])).expects(*, *, *).once()
-
-
-
-      //(apiStub.readJsonIfFileExists[String] _).expects(*, *).returning("testParams")
-
-      //(apiStub.setupSystem _).expects(null, "", "", false).returning(null)
-      //(apiStub.startServer _).expects("1.1.1.1", 9999, null).returning(1)
+      (apiMock.setupConfig _).expects(false, "127.0.0.1", 50100).once()
+      (apiMock.setupSystem _).expects(metadata, JsonUtil.toJson(params), "", false).once().returns(systemMock)
+      (apiMock.startServer _).expects(*, *, systemMock).once()
 
       GenericHttpAPI.main(null)
     }
+  }
+
+  "setupConfig method" should {
+
+    "enabling admin" in {
+      val httpApi = new GenericHttpAPIImpl()
+      val host = "127.0.0.99"
+      val port = 9991
+      val config = httpApi.setupConfig(true, host, port)
+
+      config.getString("akka.actor.provider") shouldEqual "remote"
+      config.getString("akka.remote.artery.enabled") shouldEqual "on"
+      config.getString("akka.remote.artery.canonical.hostname") shouldEqual host
+      config.getInt("akka.remote.artery.canonical.port") shouldEqual port
+    }
+
+    "disabling admin" in {
+      val httpApi = new GenericHttpAPIImpl()
+      val host = "127.0.0.99"
+      val port = 9991
+      val config = httpApi.setupConfig(false, host, port)
+
+      config.getString("akka.actor.provider") shouldEqual "local"
+      config.getString("akka.remote.artery.enabled") shouldEqual "off"
+
+    }
+
+    "enabling and disabling admin in same session" in {
+      val httpApi = new GenericHttpAPIImpl()
+      val host = "127.0.0.99"
+      val port = 9991
+      val config = httpApi.setupConfig(true, host, port)
+
+      config.getString("akka.actor.provider") shouldEqual "remote"
+      config.getString("akka.remote.artery.enabled") shouldEqual "on"
+      config.getString("akka.remote.artery.canonical.hostname") shouldEqual host
+      config.getInt("akka.remote.artery.canonical.port") shouldEqual port
+
+      val config2 = httpApi.setupConfig(false, host, port)
+
+      config2.getString("akka.actor.provider") shouldEqual "local"
+      config2.getString("akka.remote.artery.enabled") shouldEqual "off"
+
+    }
+
   }
 
   "setupSystem method" should {

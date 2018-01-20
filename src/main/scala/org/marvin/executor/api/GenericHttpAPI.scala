@@ -55,7 +55,7 @@ class GenericHttpAPIImpl() extends GenericHttpAPI
 
 object GenericHttpAPI extends HttpMarvinApp {
   var system: ActorSystem = _
-  var customConf: Config = _
+  var config: Config = _
 
   var defaultParams: String = _
   var metadata: EngineMetadata = _
@@ -255,21 +255,22 @@ object GenericHttpAPI extends HttpMarvinApp {
     val defaultParams = JsonUtil.toJson(api.readJsonIfFileExists[Map[String, String]](paramsFilePath))
 
     //setup custom configuration for actor system
-    customConf = api.setupConf(enableAdmin, adminHost, adminPort)
+    api.setupConfig(enableAdmin, adminHost, adminPort)
 
     //setup actors system before start server
-    system = api.setupSystem(metadata, defaultParams, modelProtocolToLoad, enableAdmin)
+    api.setupSystem(metadata, defaultParams, modelProtocolToLoad, enableAdmin)
 
     //start http server
-    api.startServer(ipAddress, port, system)
+    api.startServer(ipAddress, port)
   }
 }
 
 trait GenericHttpAPI {
   def setupSystem(metadata: EngineMetadata, defaultParams: String, modelProtocol:String, enableAdmin:Boolean): ActorSystem = {
 
-    val system = ActorSystem(metadata.name, GenericHttpAPI.customConf)
+    val system = ActorSystem(metadata.name, GenericHttpAPI.config)
 
+    GenericHttpAPI.system = system
     GenericHttpAPI.metadata = metadata
     GenericHttpAPI.protocolUtil = new ProtocolUtil()
     GenericHttpAPI.defaultParams = defaultParams
@@ -311,7 +312,7 @@ trait GenericHttpAPI {
     system
   }
 
-  def setupConf(enableAdmin:Boolean, adminHost:String, adminPort:Int) = {
+  def setupConfig(enableAdmin:Boolean, adminHost:String, adminPort:Int) = {
     if (enableAdmin) {
 
       val configuration = """
@@ -328,20 +329,20 @@ trait GenericHttpAPI {
         }
       """.replace("{hostname}", adminHost).replace("{port}", adminPort.toString)
 
-      //return the new configuration
-      ConfigFactory.parseString(configuration).withFallback(ConfigFactory.load())
+      //set the new configuration
+      GenericHttpAPI.config = ConfigFactory.parseString(configuration).withFallback(ConfigFactory.load())
 
     } else {
-      //return the default configuration (from appication.conf file)
-      ConfigFactory.load()
+      //set the default configuration (from appication.conf file)
+      GenericHttpAPI.config = ConfigFactory.load()
     }
+
+    GenericHttpAPI.config
   }
 
-  def startServer(ipAddress: String, port: Int, system: ActorSystem): Unit = {
-    scala.sys.addShutdownHook{
-      system.terminate()
-    }
-    GenericHttpAPI.startServer(ipAddress, port, system)
+  def startServer(ipAddress: String, port: Int): Unit = {
+    scala.sys.addShutdownHook{GenericHttpAPI.system.terminate()}
+    GenericHttpAPI.startServer(ipAddress, port, GenericHttpAPI.system)
   }
 
   def terminate(): Future[Terminated] = {
