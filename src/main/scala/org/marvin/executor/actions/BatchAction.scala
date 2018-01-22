@@ -45,7 +45,6 @@ class BatchAction(actionName: String, metadata: EngineMetadata) extends Actor wi
   var engineActionMetadata: EngineActionMetadata = _
   var artifactsToLoad: String = _
   implicit val ec = context.dispatcher
-  var protocolUtil = new ProtocolUtil()
 
   override def preStart() = {
     engineActionMetadata = metadata.actionsMap(actionName)
@@ -77,7 +76,7 @@ class BatchAction(actionName: String, metadata: EngineMetadata) extends Actor wi
 
       log.info(s"Starting to process reload to $actionName. Protocol: [$protocol].")
 
-      val splitedProtocols = protocolUtil.splitProtocol(protocol, metadata)
+      val splitedProtocols = ProtocolUtil.splitProtocol(protocol, metadata)
 
       val futures:ListBuffer[Future[Any]] = ListBuffer[Future[Any]]()
       for(artifactName <- engineActionMetadata.artifactsToLoad) {

@@ -21,7 +21,7 @@ import org.marvin.model.EngineMetadata
 
 import scala.collection.immutable.HashMap
 
-class ProtocolUtil {
+object ProtocolUtil {
 
   def generateProtocol(actionName:String): String ={
     s"${actionName}_${UUID.randomString}"

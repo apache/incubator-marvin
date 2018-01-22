@@ -18,10 +18,10 @@ package org.marvin.util
 
 import com.fasterxml.jackson.databind.{DeserializationFeature, JsonNode, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import com.github.fge.jsonschema.core.exceptions.ProcessingException
 import com.github.fge.jsonschema.core.report.ProcessingMessage
 import com.github.fge.jsonschema.main.JsonSchemaFactory
 import grizzled.slf4j.Logging
-import com.github.fge.jsonschema.core.exceptions.ProcessingException
 import org.json4s.jackson.JsonMethods.{asJsonNode, parse}
 import spray.json._
 

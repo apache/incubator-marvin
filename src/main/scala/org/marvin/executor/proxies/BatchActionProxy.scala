@@ -20,7 +20,7 @@ import actions.BatchActionHandlerGrpc.BatchActionHandlerBlockingStub
 import actions.{BatchActionHandlerGrpc, BatchActionRequest, HealthCheckRequest, ReloadRequest}
 import akka.Done
 import io.grpc.ManagedChannelBuilder
-import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, Reload, HealthCheck}
+import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
 import org.marvin.model.EngineActionMetadata
 
 class BatchActionProxy(metadata: EngineActionMetadata) extends EngineProxy (metadata)  {

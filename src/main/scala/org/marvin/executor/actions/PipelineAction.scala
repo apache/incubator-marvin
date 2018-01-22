@@ -22,10 +22,10 @@ import akka.pattern.ask
 import akka.util.Timeout
 import org.marvin.executor.actions.PipelineAction.PipelineExecute
 import org.marvin.executor.proxies.BatchActionProxy
-import org.marvin.manager.ArtifactSaver
-import org.marvin.model.EngineMetadata
-import org.marvin.manager.ArtifactSaver.SaveToRemote
 import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, Reload}
+import org.marvin.manager.ArtifactSaver
+import org.marvin.manager.ArtifactSaver.SaveToRemote
+import org.marvin.model.EngineMetadata
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration._
