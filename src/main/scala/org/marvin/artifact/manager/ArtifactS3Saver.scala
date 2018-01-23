@@ -14,16 +14,16 @@
  * limitations under the License.
  *
  */
-package org.marvin.manager
+package org.marvin.artifact.manager
 
 import java.io.File
 
 import akka.Done
 import akka.actor.{Actor, ActorLogging}
-import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.amazonaws.services.s3.model.GetObjectRequest
+import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import org.apache.hadoop.fs.Path
-import org.marvin.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
+import org.marvin.artifact.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
 import org.marvin.model.EngineMetadata
 
 class ArtifactS3Saver(metadata: EngineMetadata) extends Actor with ActorLogging {

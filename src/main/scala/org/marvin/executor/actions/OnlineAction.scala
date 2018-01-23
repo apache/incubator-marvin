@@ -22,11 +22,11 @@ import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, Props, Stat
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
 import io.grpc.StatusRuntimeException
+import org.marvin.artifact.manager.ArtifactSaver
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
 import org.marvin.executor.proxies.EngineProxy.{ExecuteOnline, HealthCheck, Reload}
 import org.marvin.executor.proxies.OnlineActionProxy
-import org.marvin.manager.ArtifactSaver
-import org.marvin.manager.ArtifactSaver.SaveToLocal
+import org.marvin.artifact.manager.ArtifactSaver.SaveToLocal
 import org.marvin.model.{EngineActionMetadata, EngineMetadata}
 import org.marvin.util.ProtocolUtil
 

@@ -23,10 +23,10 @@ import org.marvin.model.EngineMetadata
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
-import scala.util.Success
+import scala.util.{Failure, Success}
 
 object ExecutorManager {
-  case class StopActor(actionName: String)
+  case class StopActor(actorName: String)
   case class GetMetadata()
 }
 
@@ -40,17 +40,23 @@ class ExecutorManager(metadata: EngineMetadata, managedActorRefs: Map[String, Ac
   }
 
   override def receive  = {
-    case StopActor(actionName) =>
+    case StopActor(actorName) =>
 
-      val actorRef = managedActorRefs(actionName)
+      if(managedActorRefs.contains(actorName)){
+        val actorRef = managedActorRefs(actorName)
 
-      log.info(s"Actor ${actorRef.path} found. Trying to stop selected actor..")
+        log.info(s"Actor ${actorRef.path} found. Trying to stop selected actor..")
 
-      context.stop(actorRef)
+        context.stop(actorRef)
 
-      log.info(s"Actor ${actorRef.path} successfully stopped!")
+        log.info(s"Actor ${actorRef.path} successfully stopped!")
 
-      sender ! Success
+        sender ! Success
+
+      }else{
+        log.info(s"Actor related with the key ${actorName} is not a valid manageable actor.")
+        sender ! Failure
+      }
 
     case GetMetadata =>
       log.info(s"Getting Metadata object from engine ...")

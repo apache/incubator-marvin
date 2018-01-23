@@ -41,6 +41,6 @@ class ExecutorClusterListener(seedNodes: immutable.Seq[Address]) extends Actor w
       log.info("Member is Removed: {} after {}", member.address, previousStatus)
 
     case _:MemberEvent =>
-      log.info("Uknow Message received ...")
+      log.info("Unknow Message received ...")
   }
 }

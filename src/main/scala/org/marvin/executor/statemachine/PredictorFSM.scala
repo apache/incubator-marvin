@@ -16,13 +16,14 @@
  */
 package org.marvin.executor.statemachine
 
-import akka.actor.{ActorRef, FSM, OneForOneStrategy, Props, SupervisorStrategy}
-
-import scala.concurrent.duration._
+import akka.actor.{ActorRef, FSM, Props}
+import org.marvin.exception.MarvinEExecutorException
 import org.marvin.executor.actions.OnlineAction
 import org.marvin.executor.actions.OnlineAction._
 import org.marvin.executor.proxies.{FailedToReload, Reloaded}
-import org.marvin.model.{EngineMetadata, MarvinEExecutorException}
+import org.marvin.model.EngineMetadata
+
+import scala.concurrent.duration._
 
 //receive events
 final case class Reload(protocol: String = "")

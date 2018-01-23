@@ -14,39 +14,42 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.api.exception
+package org.marvin.executor.api
 
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ExceptionHandler, MissingQueryParamRejection, RejectionHandler}
 import grizzled.slf4j.Logger
-import org.marvin.model.MarvinEExecutorException
+import org.marvin.exception.MarvinEExecutorException
 import spray.json.DefaultJsonProtocol._
 
 import scala.concurrent.TimeoutException
 
 case class ErrorResponse(errorMessage: String)
 
-object EngineExceptionAndRejectionHandler {
+object GenericAPIHandlers {
 
   lazy val logger = Logger[this.type]
 
   implicit val errorFormatter = jsonFormat1(ErrorResponse)
 
-  val marvinEngineExceptionHandler: ExceptionHandler =
+  val exceptions: ExceptionHandler =
     ExceptionHandler {
       case ex: IllegalArgumentException => {
         logger.debug("Endpoint thrown illegal argument exception.", ex)
+
         val error = ErrorResponse(errorMessage = ex.getMessage)
         complete(HttpResponse(StatusCodes.BadRequest, entity = toResponseEntityJson(error)))
       }
       case ex: TimeoutException => {
         logger.debug("Endpoint thrown timeout exception", ex)
+
         val error = ErrorResponse(errorMessage = "The engine was not able to provide a response within the specified timeout.")
         complete(HttpResponse(StatusCodes.InternalServerError, entity = toResponseEntityJson(error)))
       }
       case ex: MarvinEExecutorException => {
         logger.debug("Endpoint thrown Marvin EExecutor Exception", ex)
+
         val error = ErrorResponse(errorMessage = ex.getMessage())
         complete(HttpResponse(StatusCodes.ServiceUnavailable, entity = toResponseEntityJson(error)))
       }
@@ -56,21 +59,17 @@ object EngineExceptionAndRejectionHandler {
       }
     }
 
-  val marvinEngineRejectionHandler: RejectionHandler =
-    RejectionHandler
-      .newBuilder()
-      .handle {
-        case rj: MissingQueryParamRejection => {
-          logger.debug("Missing query parameters.")
-          val error = ErrorResponse(errorMessage = s"Missing query parameter. [${rj.parameterName}]")
+  val rejections: RejectionHandler =
+    RejectionHandler.newBuilder().handle {
+      case rj: MissingQueryParamRejection => {
+        logger.debug("Missing query parameters.")
 
-          complete(HttpResponse(StatusCodes.BadRequest, entity = toResponseEntityJson(error)))
-        }
+        val error = ErrorResponse(errorMessage = s"Missing query parameter. [${rj.parameterName}]")
+        complete(HttpResponse(StatusCodes.BadRequest, entity = toResponseEntityJson(error)))
       }
-      .result()
+    }.result()
 
   def toResponseEntityJson(error: ErrorResponse): ResponseEntity = {
-    HttpEntity(ContentTypes.`application/json`,
-      errorFormatter.write(error).toString())
+    HttpEntity(ContentTypes.`application/json`, errorFormatter.write(error).toString())
   }
 }

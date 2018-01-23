@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.marvin.testutil
+package org.marvin.fixtures
 
 import org.marvin.model.{EngineActionMetadata, EngineMetadata}
 

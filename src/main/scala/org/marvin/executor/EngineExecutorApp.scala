@@ -14,17 +14,21 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.api
+package org.marvin.executor
 
 import java.io.FileNotFoundException
 
 import akka.actor.{ActorRef, ActorSystem, Props}
+import com.fasterxml.jackson.core.JsonParseException
 import com.github.fge.jsonschema.core.exceptions.ProcessingException
 import com.typesafe.config.{Config, ConfigFactory}
+import grizzled.slf4j.Logger
+import org.marvin.exception.MarvinEExecutorException
 import org.marvin.executor.actions.{BatchAction, OnlineAction, PipelineAction}
+import org.marvin.executor.api.{GenericAPI, GenericAPIFunctions}
 import org.marvin.executor.manager.ExecutorManager
 import org.marvin.executor.statemachine.{PredictorFSM, Reload}
-import org.marvin.model.{EngineMetadata, MarvinEExecutorException}
+import org.marvin.model.EngineMetadata
 import org.marvin.util.{ConfigurationContext, JsonUtil}
 
 import scala.io.Source
@@ -53,7 +57,12 @@ class EngineExecutorApp {
   var executorManager: ActorRef = _
   var api: GenericAPIFunctions = _
 
+  lazy val log = Logger[this.type]
+
   def setupConfig(): Config = {
+
+    log.info("Configuring engine executor app...")
+
     if (vmParams("enableAdmin").asInstanceOf[Boolean]) {
       val configuration = """
         akka{
@@ -81,18 +90,26 @@ class EngineExecutorApp {
   }
 
   def getEngineMetadata(): EngineMetadata = {
-    readJsonIfFileExists[EngineMetadata](vmParams("metadataFilePath").asInstanceOf[String], true)
+    log.info("Getting metadata file from engine...")
+
+    val filePath = s"${vmParams("engineHome").asInstanceOf[String]}/engine.metadata"
+    readJsonIfFileExists[EngineMetadata](filePath, true)
   }
 
   def getEngineParameters(): String = {
-    JsonUtil.toJson(readJsonIfFileExists[Map[String, String]](vmParams("paramsFilePath").asInstanceOf[String]))
+    log.info("Getting default parameters file from engine...")
+
+    val filePath = s"${vmParams("engineHome").asInstanceOf[String]}/engine.params"
+    JsonUtil.toJson(readJsonIfFileExists[Map[String, String]](filePath))
   }
 
   def getVMParameters(): Map[String, Any] = {
+
+    log.info("Getting vm parameters...")
+
     //Get all VM options
     val parameters = Map[String, Any](
-      "metadataFilePath" -> s"${ConfigurationContext.getStringConfigOrDefault("engineHome", ".")}/engine.metadata",
-      "paramsFilePath" -> s"${ConfigurationContext.getStringConfigOrDefault("engineHome", ".")}/engine.params",
+      "engineHome" -> s"${ConfigurationContext.getStringConfigOrDefault("engineHome", "")}",
       "ipAddress" -> ConfigurationContext.getStringConfigOrDefault("ipAddress", "localhost"),
       "port" -> ConfigurationContext.getIntConfigOrDefault("port", 8000),
       "protocol" -> ConfigurationContext.getStringConfigOrDefault("protocol", ""),
@@ -105,27 +122,36 @@ class EngineExecutorApp {
   }
 
   def readJsonIfFileExists[T: ClassTag](filePath: String, validate: Boolean = false): T = {
+
+    log.info(s"Reading json file from [$filePath]...")
+
     Try(JsonUtil.fromJson[T](Source.fromFile(filePath).mkString, validate)) match {
       case Success(json) => json
       case Failure(ex) => {
         ex match {
           case ex: FileNotFoundException => throw new MarvinEExecutorException(s"The file [$filePath] does not exists." +
             s" Check your engine configuration.", ex)
-          case ex: ProcessingException => throw new MarvinEExecutorException(s"Invalid engine metadata file."  +
-            s" Check your engine metadata file.", ex)
+          case ex: ProcessingException => throw new MarvinEExecutorException(s"The file [$filePath] is invalid."  +
+            s" Check your file!", ex)
+          case ex: JsonParseException => throw new MarvinEExecutorException(s"The file [$filePath] is an invalid json file."  +
+            s" Check your file syntax!", ex)
           case _ => throw ex
         }
       }
     }
   }
 
-  def setupGenericAPI(): GenericAPI = {
+  def setupGenericAPI(): GenericAPIFunctions = {
+
+    log.info("Setting Generic API actor system...")
 
     val metadata = getEngineMetadata()
     val params = getEngineParameters()
     val config = setupConfig()
 
     val system = ActorSystem(metadata.name, config)
+
+    log.info("Initializing all actors in API actor system ...")
 
     val actors = Map[String, ActorRef](
       "predictor" -> system.actorOf(Props(new PredictorFSM(metadata)), name = "predictorFSM"),
@@ -142,15 +168,22 @@ class EngineExecutorApp {
     //send model protocol to be reloaded by predictor service
     actors("predictor") ! Reload(vmParams("protocol").asInstanceOf[String])
 
+    log.info("Generic API actor system setting done!")
+
     api
   }
 
   def setupAdministration() = {
-    if (vmParams("enableAdmin").asInstanceOf[Boolean])
+
+    if (vmParams("enableAdmin").asInstanceOf[Boolean]){
+      log.info("Enabling remote administration in engine executor actor system...")
+
       executorManager = api.getSystem.actorOf(Props(new ExecutorManager(api.getMetadata, api.manageableActors)), name="executorManager")
+    }
   }
 
   def start() = {
+    log.info("Starting Generic API ...")
     api.startServer(vmParams("ipAddress").asInstanceOf[String], vmParams("port").asInstanceOf[Int])
   }
 

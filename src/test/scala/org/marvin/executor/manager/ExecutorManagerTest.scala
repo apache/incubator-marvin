@@ -17,40 +17,41 @@
 package org.marvin.executor.manager
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
-import akka.testkit.{ImplicitSender, TestKit}
+import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
 import com.typesafe.config.ConfigFactory
 import org.marvin.executor.manager.ExecutorManager.{GetMetadata, StopActor}
-import org.marvin.testutil.MetadataMock
+import org.marvin.fixtures.MetadataMock
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
-import scala.util.Success
+import scala.util.{Failure, Success}
 
 class ExecutorManagerTest extends TestKit(
   ActorSystem("ExecutorManagerTest", ConfigFactory.parseString("""akka.loggers = ["akka.testkit.TestEventListener"]""")))
   with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
 
   override def afterAll {
-    TestKit.shutdownActorSystem(system)
+
   }
 
   "send StopActor message" must {
 
-    "with a valid actionName" in {
+    "with a valid actorName" in {
 
       val metadata = MetadataMock.simpleMockedMetadata()
+      val actorName = "test"
+      val managedActor = system.actorOf(Props(new MockedManagedActor()), actorName)
+      val managedActorRefs = Map[String, ActorRef](actorName -> managedActor)
 
-      val managedActor = system.actorOf(Props(new MockedManagedActor()), "testActor")
-      val managedActorRefs = Map[String, ActorRef]("test" -> managedActor)
-
-      val executorManager = system.actorOf(Props(new ExecutorManager(metadata, managedActorRefs)))
+      val executorManager = TestActorRef(new ExecutorManager(metadata, managedActorRefs))
 
       watch(managedActor)
 
-      executorManager ! StopActor(actionName="test")
+      executorManager ! StopActor(actorName)
 
       expectMsg(Success)
 
       expectTerminated(managedActor)
+
     }
 
     "with an invalid actionName" in {
@@ -59,11 +60,11 @@ class ExecutorManagerTest extends TestKit(
 
       val managedActorRefs = Map[String, ActorRef]()
 
-      val executorManager = system.actorOf(Props(new ExecutorManager(metadata, managedActorRefs)))
+      val executorManager = TestActorRef(new ExecutorManager(metadata, managedActorRefs))
 
-      executorManager ! StopActor(actionName="test")
+      executorManager ! StopActor(actorName="test2")
 
-      expectNoMsg()
+      expectMsg(Failure)
 
     }
   }
@@ -74,7 +75,7 @@ class ExecutorManagerTest extends TestKit(
 
       val metadata = MetadataMock.simpleMockedMetadata()
 
-      val executorManager = system.actorOf(Props(new ExecutorManager(metadata, Map[String, ActorRef]())))
+      val executorManager = TestActorRef(new ExecutorManager(metadata, Map[String, ActorRef]()))
 
       executorManager ! GetMetadata
 

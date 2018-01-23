@@ -16,8 +16,8 @@
  */
 package org.marvin.util
 
+import org.marvin.fixtures.MetadataMock
 import org.marvin.model.{EngineActionMetadata, EngineMetadata}
-import org.marvin.testutil.MetadataMock
 import org.scalatest.{Matchers, WordSpec}
 
 class ProtocolUtilTest extends WordSpec with Matchers {

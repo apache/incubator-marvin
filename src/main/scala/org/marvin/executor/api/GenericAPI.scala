@@ -32,7 +32,6 @@ import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchHealthCheck, 
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck}
 import org.marvin.executor.actions.PipelineAction.PipelineExecute
 import org.marvin.executor.api.GenericAPI.{DefaultBatchRequest, DefaultHttpResponse, DefaultOnlineRequest, HealthStatus}
-import org.marvin.executor.api.exception.EngineExceptionAndRejectionHandler.{marvinEngineExceptionHandler, marvinEngineRejectionHandler}
 import org.marvin.executor.statemachine.Reload
 import org.marvin.model.EngineMetadata
 import org.marvin.util.ProtocolUtil
@@ -85,8 +84,8 @@ class GenericAPI(system: ActorSystem,
   implicit val defaultBatchRequest: RootJsonFormat[DefaultBatchRequest] = jsonFormat1(DefaultBatchRequest)
   implicit val healthStatusFormat: RootJsonFormat[HealthStatus] = jsonFormat2(HealthStatus)
 
-  def routes: Route = handleRejections(marvinEngineRejectionHandler){
-    handleExceptions(marvinEngineExceptionHandler){
+  def routes: Route = handleRejections(GenericAPIHandlers.rejections){
+    handleExceptions(GenericAPIHandlers.exceptions){
       post {
         path("predictor") {
           entity(as[DefaultOnlineRequest]) { request =>

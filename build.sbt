@@ -16,7 +16,7 @@
  */
 name := "marvin-engine-executor"
 
-version := "0.0.1"
+version := "0.0.2"
 
 scalaVersion := "2.12.3"
 
@@ -56,8 +56,8 @@ dependencyOverrides ++= Set(
   "com.google.guava" %% "guava" % "19.0"
 )
 
-mainClass in (Compile, run) := Some("org.marvin.executor.api.GenericHttpAPI")
-mainClass in assembly := Some("org.marvin.executor.api.GenericHttpAPI")
+mainClass in (Compile, run) := Some("org.marvin.executor.api.GenericAPI")
+mainClass in assembly := Some("org.marvin.executor.api.GenericAPI")
 
 assemblyMergeStrategy in assembly := {
   case PathList("org", "apache", xs @_*) => MergeStrategy.first

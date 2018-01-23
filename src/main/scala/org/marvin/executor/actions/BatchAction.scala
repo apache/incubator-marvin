@@ -20,11 +20,11 @@ import akka.Done
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
+import org.marvin.artifact.manager.ArtifactSaver
 import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchHealthCheck, BatchReload}
 import org.marvin.executor.proxies.BatchActionProxy
 import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
-import org.marvin.manager.ArtifactSaver
-import org.marvin.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
+import org.marvin.artifact.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
 import org.marvin.model.{EngineActionMetadata, EngineMetadata}
 import org.marvin.util.ProtocolUtil
 

@@ -21,10 +21,10 @@ import actions.OnlineActionResponse
 import akka.actor.ActorSystem
 import akka.testkit.{EventFilter, ImplicitSender, TestFSMRef, TestKit, TestProbe}
 import com.typesafe.config.ConfigFactory
+import org.marvin.exception.MarvinEExecutorException
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
 import org.marvin.executor.proxies.Reloaded
-import org.marvin.model.MarvinEExecutorException
-import org.marvin.testutil.MetadataMock
+import org.marvin.fixtures.MetadataMock
 import org.scalatest.{Matchers, WordSpecLike}
 
 class PredictorFSMTest extends TestKit(

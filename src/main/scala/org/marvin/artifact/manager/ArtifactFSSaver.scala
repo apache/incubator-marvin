@@ -14,13 +14,13 @@
  * limitations under the License.
  *
  */
-package org.marvin.manager
+package org.marvin.artifact.manager
 
 import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 
 import akka.Done
 import akka.actor.{Actor, ActorLogging}
-import org.marvin.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
+import org.marvin.artifact.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
 import org.marvin.model.EngineMetadata
 
 class ArtifactFSSaver(metadata: EngineMetadata) extends Actor with ActorLogging {

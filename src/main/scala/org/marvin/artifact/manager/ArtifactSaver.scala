@@ -14,10 +14,11 @@
  * limitations under the License.
  *
  */
-package org.marvin.manager
+package org.marvin.artifact.manager
 
 import akka.actor.Props
-import org.marvin.model.{EngineMetadata, MarvinEExecutorException}
+import org.marvin.exception.MarvinEExecutorException
+import org.marvin.model.EngineMetadata
 
 object ArtifactSaver {
   case class SaveToLocal(artifactName: String, protocol:String)

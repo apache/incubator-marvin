@@ -27,8 +27,8 @@ import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchHealthCheck, 
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck}
 import org.marvin.executor.actions.PipelineAction.PipelineExecute
 import org.marvin.executor.statemachine.Reload
+import org.marvin.fixtures.MetadataMock
 import org.marvin.model.EngineMetadata
-import org.marvin.testutil.MetadataMock
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Inside, Matchers, WordSpec}
 
