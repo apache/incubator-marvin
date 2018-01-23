@@ -178,7 +178,7 @@ class EngineExecutorApp {
     if (vmParams("enableAdmin").asInstanceOf[Boolean]){
       log.info("Enabling remote administration in engine executor actor system...")
 
-      executorManager = api.getSystem.actorOf(Props(new ExecutorManager(api.getMetadata, api.manageableActors)), name="executorManager")
+      executorManager = api.getSystem.actorOf(Props(new ExecutorManager(api)), name="executorManager")
     }
   }
 

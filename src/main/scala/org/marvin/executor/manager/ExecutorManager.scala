@@ -16,10 +16,10 @@
  */
 package org.marvin.executor.manager
 
-import akka.actor.{Actor, ActorLogging, ActorRef}
+import akka.actor.{Actor, ActorLogging}
 import akka.util.Timeout
+import org.marvin.executor.api.{GenericAPI, GenericAPIFunctions}
 import org.marvin.executor.manager.ExecutorManager.{GetMetadata, StopActor}
-import org.marvin.model.EngineMetadata
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -30,7 +30,7 @@ object ExecutorManager {
   case class GetMetadata()
 }
 
-class ExecutorManager(metadata: EngineMetadata, managedActorRefs: Map[String, ActorRef]) extends Actor with ActorLogging {
+class ExecutorManager(api: GenericAPIFunctions) extends Actor with ActorLogging {
   implicit val ec = ExecutionContext.global
   implicit val futureTimeout = Timeout(30 seconds)
 
@@ -42,8 +42,8 @@ class ExecutorManager(metadata: EngineMetadata, managedActorRefs: Map[String, Ac
   override def receive  = {
     case StopActor(actorName) =>
 
-      if(managedActorRefs.contains(actorName)){
-        val actorRef = managedActorRefs(actorName)
+      if(api.manageableActors.contains(actorName)){
+        val actorRef = api.manageableActors(actorName)
 
         log.info(s"Actor ${actorRef.path} found. Trying to stop selected actor..")
 
@@ -60,7 +60,7 @@ class ExecutorManager(metadata: EngineMetadata, managedActorRefs: Map[String, Ac
 
     case GetMetadata =>
       log.info(s"Getting Metadata object from engine ...")
-      sender ! metadata
+      sender ! api.getMetadata
 
   }
 }

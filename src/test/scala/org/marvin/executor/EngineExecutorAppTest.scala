@@ -231,8 +231,6 @@ class EngineExecutorAppTest extends
       app.api = mockApi
 
       (mockApi.getSystem _).expects().returns(mockSystem).once()
-      (mockApi.getMetadata _).expects().returns(metadata).once()
-      (mockApi.manageableActors _).expects().returns(Map[String, ActorRef]()).once()
 
       app.setupAdministration()
 
