@@ -24,6 +24,9 @@ import org.marvin.executor.manager.ExecutorManager.{GetMetadata, StopActor}
 import org.marvin.fixtures.MetadataMock
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import akka.pattern.ask
+import akka.util.Timeout
+import scala.concurrent.duration._
 
 import scala.util.{Failure, Success}
 
@@ -31,14 +34,17 @@ class ExecutorManagerTest extends TestKit(
   ActorSystem("ExecutorManagerTest", ConfigFactory.parseString("""akka.loggers = ["akka.testkit.TestEventListener"]""")))
   with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll with MockFactory {
 
+  implicit val timeout = Timeout(1000 milliseconds).duration
+
+  override def afterAll(): Unit = TestKit.shutdownActorSystem(system)
+
   "send StopActor message" must {
 
     "with a valid actorName" in {
 
       val api = mock[GenericAPIFunctions]
       val actorName = "test"
-      val mySystem = ActorSystem()
-      val managedActor = mySystem.actorOf(Props(new MyActor()), actorName)
+      val managedActor = system.actorOf(Props(new MyActor()), actorName)
 
       val executorManager = TestActorRef(new ExecutorManager(api))
 
@@ -46,29 +52,24 @@ class ExecutorManagerTest extends TestKit(
 
       watch(managedActor)
 
-      executorManager ! StopActor(actorName)
+      val future = (executorManager ? StopActor(actorName))(timeout)
 
-      expectMsg(Success)
+      future.value.get shouldBe Success(Success)
 
       expectTerminated(managedActor)
-
-      TestKit.shutdownActorSystem(mySystem)
 
     }
 
     "with an invalid actionName" in {
 
       val api = mock[GenericAPIFunctions]
-      val mySystem = ActorSystem()
       val executorManager = TestActorRef(new ExecutorManager(api))
 
       (api.manageableActors _).expects().once().returns(Map[String, ActorRef]())
 
-      executorManager ! StopActor(actorName="test2")
+      val future = (executorManager ? StopActor("teste2"))(timeout)
 
-      expectMsg(Failure)
-
-      TestKit.shutdownActorSystem(mySystem)
+      future.value.get shouldBe Success(Failure)
 
     }
   }
@@ -76,7 +77,6 @@ class ExecutorManagerTest extends TestKit(
   "send GetMetadata message" must {
 
     "with success" in {
-      val mySystem = ActorSystem()
       val api = mock[GenericAPIFunctions]
       val metadata = MetadataMock.simpleMockedMetadata()
 
@@ -84,11 +84,9 @@ class ExecutorManagerTest extends TestKit(
 
       val executorManager = TestActorRef(new ExecutorManager(api))
 
-      executorManager ! GetMetadata
+      val future = ((executorManager ? GetMetadata)(timeout))
 
-      expectMsg(metadata)
-
-      TestKit.shutdownActorSystem(mySystem)
+      future.value.get shouldBe Success(metadata)
 
     }
   }
