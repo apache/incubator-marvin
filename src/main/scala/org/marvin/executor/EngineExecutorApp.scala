@@ -163,7 +163,7 @@ class EngineExecutorApp {
       "feedback" -> system.actorOf(Props(new OnlineAction("feedback", metadata)), name = "feedbackActor")
     )
 
-    val api = new GenericAPI(system, metadata, params, actors)
+    api = new GenericAPI(system, metadata, params, actors)
 
     //send model protocol to be reloaded by predictor service
     actors("predictor") ! Reload(vmParams("protocol").asInstanceOf[String])
