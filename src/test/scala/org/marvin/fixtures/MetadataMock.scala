@@ -46,4 +46,13 @@ object MetadataMock {
     )
   }
 
+  def simpleMockedEngineActionMetadata(actionType: String): EngineActionMetadata = {
+    actionType match{
+      case "batch" =>
+        new EngineActionMetadata(name="trainer", actionType="batch", port=780, host="localhost", artifactsToPersist=List("model"), artifactsToLoad=List("dataset"))
+      case "online" =>
+        new EngineActionMetadata(name="predictor", actionType="online", port=777, host="localhost", artifactsToPersist=List(), artifactsToLoad=List("model"))
+    }
+  }
+
 }

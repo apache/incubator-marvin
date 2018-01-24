@@ -16,7 +16,7 @@
  */
 package org.marvin.executor.proxies
 
-import actions.OnlineActionHandlerGrpc.{OnlineActionHandlerBlockingStub, OnlineActionHandlerStub}
+import actions.OnlineActionHandlerGrpc.{OnlineActionHandler, OnlineActionHandlerBlockingClient, OnlineActionHandlerBlockingStub, OnlineActionHandlerStub}
 import actions._
 import akka.pattern.pipe
 import io.grpc.ManagedChannelBuilder
@@ -28,8 +28,8 @@ final case class Reloaded(protocol: String)
 final case class FailedToReload(protocol: String = "")
 
 class OnlineActionProxy(metadata: EngineActionMetadata) extends EngineProxy (metadata)  {
-  var engineAsyncClient:OnlineActionHandlerStub = _
-  var engineClient:OnlineActionHandlerBlockingStub = _
+  var engineAsyncClient:OnlineActionHandler = _
+  var engineClient:OnlineActionHandlerBlockingClient = _
 
   implicit val ec = context.dispatcher
 
