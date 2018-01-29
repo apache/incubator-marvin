@@ -16,18 +16,16 @@
  */
 package org.marvin.util
 
+import org.marvin.fixtures.MetadataMock
 import org.marvin.model.{EngineActionMetadata, EngineMetadata}
-import org.marvin.testutil.MetadataMock
 import org.scalatest.{Matchers, WordSpec}
 
 class ProtocolUtilTest extends WordSpec with Matchers {
 
-  val protocolUtil = new ProtocolUtil()
-
   "generateProtocol" should {
 
     "generate a protocol with valid format" in {
-      val protocol = protocolUtil.generateProtocol("test")
+      val protocol = ProtocolUtil.generateProtocol("test")
       protocol should startWith("test_")
 
       val protocolWithoutPrefix = protocol.replace("test_", "")
@@ -42,8 +40,8 @@ class ProtocolUtilTest extends WordSpec with Matchers {
     "split a protocol message with one protocol only" in {
       val metadata = MetadataMock.simpleMockedMetadata()
 
-      val protocolStr = protocolUtil.generateProtocol("acquisitor")
-      val protocols = protocolUtil.splitProtocol(protocolStr, metadata)
+      val protocolStr = ProtocolUtil.generateProtocol("acquisitor")
+      val protocols = ProtocolUtil.splitProtocol(protocolStr, metadata)
 
       assert(protocols.contains("initial_dataset"))
       protocols.get("initial_dataset").mkString should be(protocolStr)
@@ -52,9 +50,9 @@ class ProtocolUtilTest extends WordSpec with Matchers {
     "split a protocol message with multiple protocols" in {
       val metadata = MetadataMock.simpleMockedMetadata()
 
-      val aProtocol = protocolUtil.generateProtocol("acquisitor")
-      val tProtocol = protocolUtil.generateProtocol("tpreparator")
-      val protocols = protocolUtil.splitProtocol(aProtocol + "," + tProtocol, metadata)
+      val aProtocol = ProtocolUtil.generateProtocol("acquisitor")
+      val tProtocol = ProtocolUtil.generateProtocol("tpreparator")
+      val protocols = ProtocolUtil.splitProtocol(aProtocol + "," + tProtocol, metadata)
 
       assert(protocols.contains("initial_dataset"))
       protocols.get("initial_dataset").mkString should be(aProtocol)
@@ -87,8 +85,8 @@ class ProtocolUtilTest extends WordSpec with Matchers {
           version = "1"
         )
 
-      val pProtocol = protocolUtil.generateProtocol("pipeline")
-      val protocols = protocolUtil.splitProtocol(pProtocol, metadata)
+      val pProtocol = ProtocolUtil.generateProtocol("pipeline")
+      val protocols = ProtocolUtil.splitProtocol(pProtocol, metadata)
 
       protocols.keys.size should be(2)
       protocols.keys.foreach(key => protocols.get(key).mkString should be(pProtocol))

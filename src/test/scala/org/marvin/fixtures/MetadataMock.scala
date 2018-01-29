@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.marvin.testutil
+package org.marvin.fixtures
 
 import org.marvin.model.{EngineActionMetadata, EngineMetadata}
 
@@ -44,6 +44,15 @@ object MetadataMock {
       reloadTimeout = 100,
       version = "1"
     )
+  }
+
+  def simpleMockedEngineActionMetadata(actionType: String): EngineActionMetadata = {
+    actionType match{
+      case "batch" =>
+        new EngineActionMetadata(name="trainer", actionType="batch", port=780, host="localhost", artifactsToPersist=List("model"), artifactsToLoad=List("dataset"))
+      case "online" =>
+        new EngineActionMetadata(name="predictor", actionType="online", port=777, host="localhost", artifactsToPersist=List(), artifactsToLoad=List("model"))
+    }
   }
 
 }

@@ -20,12 +20,12 @@ import akka.Done
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{EventFilter, ImplicitSender, TestKit, TestProbe}
 import com.typesafe.config.ConfigFactory
+import org.marvin.artifact.manager.ArtifactSaver.SaveToLocal
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
 import org.marvin.executor.proxies.EngineProxy.{ExecuteOnline, HealthCheck, Reload}
 import org.marvin.executor.proxies.Reloaded
-import org.marvin.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
+import org.marvin.fixtures.MetadataMock
 import org.marvin.model.EngineMetadata
-import org.marvin.testutil.MetadataMock
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
 import scala.concurrent.duration._

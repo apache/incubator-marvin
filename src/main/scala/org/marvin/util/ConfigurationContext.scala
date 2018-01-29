@@ -33,4 +33,8 @@ object ConfigurationContext {
     Try(config.getInt(s"${configPrefix}.${configKey}")).getOrElse(default)
   }
 
+  def getBooleanConfigOrDefault(configKey: String, default: Boolean): Boolean = {
+    Try(config.getBoolean(s"${configPrefix}.${configKey}")).getOrElse(default)
+  }
+
 }

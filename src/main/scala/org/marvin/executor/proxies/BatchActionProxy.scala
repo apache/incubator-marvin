@@ -16,15 +16,15 @@
  */
 package org.marvin.executor.proxies
 
-import actions.BatchActionHandlerGrpc.BatchActionHandlerBlockingStub
+import actions.BatchActionHandlerGrpc.BatchActionHandlerBlockingClient
 import actions.{BatchActionHandlerGrpc, BatchActionRequest, HealthCheckRequest, ReloadRequest}
 import akka.Done
 import io.grpc.ManagedChannelBuilder
-import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, Reload, HealthCheck}
+import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
 import org.marvin.model.EngineActionMetadata
 
 class BatchActionProxy(metadata: EngineActionMetadata) extends EngineProxy (metadata)  {
-  var engineClient:BatchActionHandlerBlockingStub = _
+  var engineClient:BatchActionHandlerBlockingClient = _
 
   override def preStart() = {
     log.info(s"${this.getClass().getCanonicalName} actor initialized...")

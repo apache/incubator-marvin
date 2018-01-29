@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.marvin.model
+package org.marvin.exception
 
 class MarvinEExecutorException(message: String, suppressed: Throwable) extends Throwable {
 

@@ -1,23 +1,26 @@
-/**
-  * Copyright [2017] [B2W Digital]
- **
- Licensed under the Apache License, Version 2.0 (the "License");
-*you may not use this file except in compliance with the License.
-*You may obtain a copy of the License at
- **
- http://www.apache.org/licenses/LICENSE-2.0
- **
- Unless required by applicable law or agreed to in writing, software
-*distributed under the License is distributed on an "AS IS" BASIS,
-*WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*See the License for the specific language governing permissions and
-*limitations under the License.
-  */
+/*
+ * Copyright [2017] [B2W Digital]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 name := "marvin-engine-executor"
 
-version := "0.0.1"
+version := "0.0.2"
 
 scalaVersion := "2.12.3"
+
+organization := "org.marvin"
 
 PB.targets in Compile := Seq(
   scalapb.gen() -> (sourceManaged in Compile).value
@@ -29,7 +32,8 @@ libraryDependencies ++= Seq(
   "org.clapper"       %% "grizzled-slf4j" % "1.3.0",
   "com.typesafe.akka" %% "akka-http-testkit" % "10.0.10" % Test,
   "org.scalatest"     %% "scalatest"     % "3.0.1" % Test,
-  "org.scalamock"     %% "scalamock-scalatest-support" % "3.5.0" % Test
+  "org.scalamock"     %% "scalamock-scalatest-support" % "3.5.0" % Test,
+  "com.typesafe.akka" %% "akka-cluster" % "2.5.9"
 )
 
 libraryDependencies ++= Seq (
@@ -52,8 +56,8 @@ dependencyOverrides ++= Set(
   "com.google.guava" %% "guava" % "19.0"
 )
 
-mainClass in (Compile, run) := Some("org.marvin.executor.api.GenericHttpAPI")
-mainClass in assembly := Some("org.marvin.executor.api.GenericHttpAPI")
+mainClass in (Compile, run) := Some("org.marvin.executor.EngineExecutorApp")
+mainClass in assembly := Some("org.marvin.executor.EngineExecutorApp")
 
 assemblyMergeStrategy in assembly := {
   case PathList("org", "apache", xs @_*) => MergeStrategy.first

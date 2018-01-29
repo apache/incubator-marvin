@@ -14,26 +14,26 @@
  * limitations under the License.
  *
  */
-package org.marvin.manager
+package org.marvin.artifact.manager
 
 import java.io.File
 
 import akka.Done
 import akka.actor.{Actor, ActorLogging}
-import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.amazonaws.services.s3.model.GetObjectRequest
+import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import org.apache.hadoop.fs.Path
-import org.marvin.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
+import org.marvin.artifact.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
 import org.marvin.model.EngineMetadata
 
 class ArtifactS3Saver(metadata: EngineMetadata) extends Actor with ActorLogging {
-  var S3Client: AmazonS3 = _
+  var s3Client: AmazonS3 = _
 
   override def preStart() = {
     log.info(s"${this.getClass().getCanonicalName} actor initialized...")
 
     //Create S3 Client with default credential informations(Environment Variable)
-    S3Client = AmazonS3ClientBuilder.standard.withRegion(System.getenv("AWS_DEFAULT_REGION")).build
+    s3Client = AmazonS3ClientBuilder.standard.withRegion(System.getenv("AWS_DEFAULT_REGION")).build
 
     log.info("Amazon S3 client initialized...")
   }
@@ -58,7 +58,7 @@ class ArtifactS3Saver(metadata: EngineMetadata) extends Actor with ActorLogging 
       log.info(s"Copying files from ${metadata.s3BucketName}: ${uris("remotePath")} to ${uris("localPath")}")
 
       //Get artifact named "uris("remotePath")" from S3 Bucket and save to local
-      S3Client.getObject(new GetObjectRequest(metadata.s3BucketName, uris("remotePath").toString), localToSave)
+      s3Client.getObject(new GetObjectRequest(metadata.s3BucketName, uris("remotePath").toString), localToSave)
 
       log.info(s"File ${uris("localPath")} saved!")
 
@@ -72,7 +72,7 @@ class ArtifactS3Saver(metadata: EngineMetadata) extends Actor with ActorLogging 
       log.info(s"Copying files from ${uris("localPath")} to ${metadata.s3BucketName}: ${uris("remotePath")}")
 
       //Get local artifact and save to S3 Bucket with name "uris("remotePath")"
-      S3Client.putObject(metadata.s3BucketName, uris("remotePath").toString, fileToUpload)
+      s3Client.putObject(metadata.s3BucketName, uris("remotePath").toString, fileToUpload)
 
       log.info(s"File ${uris("localPath")} saved!")
 
