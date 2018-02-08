@@ -42,7 +42,7 @@ final case class Model(protocol: String) extends Data
 class PredictorFSM(var predictorActor: ActorRef, metadata: EngineMetadata) extends FSM[State, Data]{
   def this(metadata: EngineMetadata) = this(null, metadata)
 
-  var reloadStateTimeout: FiniteDuration = metadata.reloadStateTimeout.getOrElse(180000) milliseconds
+  var reloadStateTimeout: FiniteDuration = metadata.reloadStateTimeout.getOrElse(180000D) milliseconds
 
   override def preStart() {
     if (predictorActor == null) predictorActor = context.system.actorOf(Props(new OnlineAction("predictor", metadata)), name = "predictorActor")

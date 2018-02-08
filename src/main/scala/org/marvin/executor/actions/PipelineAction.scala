@@ -21,10 +21,10 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 import org.marvin.artifact.manager.ArtifactSaver
+import org.marvin.artifact.manager.ArtifactSaver.SaveToRemote
 import org.marvin.executor.actions.PipelineAction.PipelineExecute
 import org.marvin.executor.proxies.BatchActionProxy
 import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, Reload}
-import org.marvin.artifact.manager.ArtifactSaver.SaveToRemote
 import org.marvin.model.EngineMetadata
 
 import scala.collection.mutable.ListBuffer
@@ -47,7 +47,7 @@ class PipelineAction(metadata: EngineMetadata) extends Actor with ActorLogging{
 
   override def receive  = {
     case PipelineExecute(protocol, params) =>
-      implicit val futureTimeout = Timeout(200 seconds)
+      implicit val futureTimeout = Timeout(metadata.pipelineTimeout milliseconds)
 
       log.info(s"Starting to process pipeline process with. Protocol: [$protocol] and Params: [$params].")
 

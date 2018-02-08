@@ -37,8 +37,8 @@ import org.marvin.model.EngineMetadata
 import org.marvin.util.ProtocolUtil
 import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 
-import scala.concurrent.duration._
 import scala.concurrent._
+import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 
 trait GenericAPIFunctions {
@@ -71,11 +71,11 @@ class GenericAPI(system: ActorSystem,
                  engineParams: String,
                  actors: Map[String, ActorRef]) extends HttpApp with SprayJsonSupport with DefaultJsonProtocol with GenericAPIFunctions {
 
-  val onlineActionTimeout = Timeout(metadata.onlineActionTimeout millisecond)
-  val healthCheckTimeout = Timeout(metadata.healthCheckTimeout millisecond)
-  val batchActionTimeout = Timeout(metadata.batchActionTimeout millisecond)
-  val reloadTimeout = Timeout(metadata.reloadTimeout millisecond)
-  val pipelineTimeout = Timeout((metadata.reloadTimeout + metadata.batchActionTimeout) * metadata.pipelineActions.length * 1.20 milliseconds)
+  val onlineActionTimeout = Timeout(metadata.onlineActionTimeout milliseconds)
+  val healthCheckTimeout = Timeout(metadata.healthCheckTimeout milliseconds)
+  val batchActionTimeout = Timeout(metadata.batchActionTimeout milliseconds)
+  val reloadTimeout = Timeout(metadata.reloadTimeout milliseconds)
+  val pipelineTimeout = Timeout(metadata.pipelineTimeout milliseconds)
 
   val log: LoggingAdapter = Logging.getLogger(system, this)
 
