@@ -33,6 +33,7 @@ import org.marvin.util.{ConfigurationContext, JsonUtil}
 
 import scala.io.Source
 import scala.reflect.ClassTag
+import scala.reflect.io.File
 import scala.util.{Failure, Success, Try}
 
 object EngineExecutorApp {
@@ -103,6 +104,15 @@ class EngineExecutorApp {
     JsonUtil.toJson(readJsonIfFileExists[Map[String, String]](filePath))
   }
 
+  def getDocsFilePath(): String = {
+    log.info("Getting default api docs file path from engine...")
+
+    val filePath = s"${vmParams("engineHome").asInstanceOf[String]}/docs.yaml"
+    if (! File(filePath).exists) throw new MarvinEExecutorException(s"The file [$filePath] does not exists." + s" Check your engine configuration.")
+
+    filePath
+  }
+
   def getVMParameters(): Map[String, Any] = {
 
     log.info("Getting vm parameters...")
@@ -148,6 +158,7 @@ class EngineExecutorApp {
     val metadata = getEngineMetadata()
     val params = getEngineParameters()
     val config = setupConfig()
+    val docsFilePath = getDocsFilePath()
 
     val system = ActorSystem(metadata.name, config)
 
@@ -163,7 +174,7 @@ class EngineExecutorApp {
       "feedback" -> system.actorOf(Props(new OnlineAction("feedback", metadata)), name = "feedbackActor")
     )
 
-    api = new GenericAPI(system, metadata, params, actors)
+    api = new GenericAPI(system, metadata, params, actors, docsFilePath)
 
     //send model protocol to be reloaded by predictor service
     actors("predictor") ! Reload(vmParams("protocol").asInstanceOf[String])

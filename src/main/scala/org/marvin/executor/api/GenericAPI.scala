@@ -69,7 +69,8 @@ object GenericAPI {
 class GenericAPI(system: ActorSystem,
                  metadata: EngineMetadata,
                  engineParams: String,
-                 actors: Map[String, ActorRef]) extends HttpApp with SprayJsonSupport with DefaultJsonProtocol with GenericAPIFunctions {
+                 actors: Map[String, ActorRef],
+                 docsFilePath: String) extends HttpApp with SprayJsonSupport with DefaultJsonProtocol with GenericAPIFunctions {
 
   val onlineActionTimeout = Timeout(metadata.onlineActionTimeout milliseconds)
   val healthCheckTimeout = Timeout(metadata.healthCheckTimeout milliseconds)
@@ -197,36 +198,47 @@ class GenericAPI(system: ActorSystem,
           }
       } ~
       get {
+        pathPrefix("docs"){
+          (pathEndOrSingleSlash & redirectToTrailingSlashIfMissing(StatusCodes.TemporaryRedirect)) {
+            getFromResource("docs/index.html")
+          } ~  {
+            path(docsFilePath.split("/").last){
+              getFromFile(docsFilePath)
+            } ~ {
+              getFromResourceDirectory("docs")
+            }
+          }
+        } ~
         path("predictor" / "health") {
           onComplete(check("predictor", "online")) { response =>
             matchHealthTry(response)
           }
         } ~
-          path("acquisitor" / "health") {
-            onComplete(check("acquisitor", "batch")) { response =>
-              matchHealthTry(response)
-            }
-          } ~
-          path("tpreparator" / "health") {
-            onComplete(check("tpreparator", "batch")) { response =>
-              matchHealthTry(response)
-            }
-          } ~
-          path("trainer" / "health") {
-            onComplete(check("trainer", "batch")) { response =>
-              matchHealthTry(response)
-            }
-          } ~
-          path("evaluator" / "health") {
-            onComplete(check("evaluator", "batch")) { response =>
-              matchHealthTry(response)
-            }
-          } ~
-          path("feedback" / "health") {
-            onComplete(check("feedback", "online")) { response =>
-              matchHealthTry(response)
-            }
+        path("acquisitor" / "health") {
+          onComplete(check("acquisitor", "batch")) { response =>
+            matchHealthTry(response)
           }
+        } ~
+        path("tpreparator" / "health") {
+          onComplete(check("tpreparator", "batch")) { response =>
+            matchHealthTry(response)
+          }
+        } ~
+        path("trainer" / "health") {
+          onComplete(check("trainer", "batch")) { response =>
+            matchHealthTry(response)
+          }
+        } ~
+        path("evaluator" / "health") {
+          onComplete(check("evaluator", "batch")) { response =>
+            matchHealthTry(response)
+          }
+        } ~
+        path("feedback" / "health") {
+          onComplete(check("feedback", "online")) { response =>
+            matchHealthTry(response)
+          }
+        }
       }
     }
   }

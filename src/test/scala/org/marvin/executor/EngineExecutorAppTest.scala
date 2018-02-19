@@ -173,6 +173,31 @@ class EngineExecutorAppTest extends
     }
   }
 
+  "getDocsFilePath method" should {
+
+    "with valid filePath" in {
+      val app = new EngineExecutorApp()
+
+      app.vmParams = Map[String, Any]("engineHome" -> getClass.getResource("/engine_home").getPath())
+
+      val filePath = app.getDocsFilePath()
+
+      filePath shouldEqual s"${app.vmParams("engineHome").asInstanceOf[String].mkString}/docs.yaml"
+    }
+
+    "with invalid filePath" in {
+      val app = new EngineExecutorApp()
+
+      app.vmParams = Map[String, Any]("engineHome" -> "invalid_path")
+
+      val caught = intercept[MarvinEExecutorException] {
+        app.getDocsFilePath()
+      }
+
+      caught.getMessage() shouldEqual "The file [invalid_path/docs.yaml] does not exists. Check your engine configuration."
+    }
+  }
+
   "start method" should {
 
     "works successfully" in {
