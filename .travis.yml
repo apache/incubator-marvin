@@ -30,7 +30,7 @@ before_cache:
 before_script:
 - unset SBT_OPTS
 
-script: sbt/sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport
+script: sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)

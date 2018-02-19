@@ -20,7 +20,7 @@ version := "0.0.2"
 
 scalaVersion := "2.12.3"
 
-organization := "org.marvin"
+organization := "com.github.marvin-ai"
 
 PB.targets in Compile := Seq(
   scalapb.gen() -> (sourceManaged in Compile).value
@@ -70,3 +70,15 @@ assemblyMergeStrategy in assembly := {
     oldStrategy(x)
   }
 }
+
+publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+}
+
+publishArtifact in Test := false
+
+useGpg := true
