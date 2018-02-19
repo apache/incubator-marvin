@@ -56,6 +56,8 @@ dependencyOverrides ++= Set(
   "com.google.guava" %% "guava" % "19.0"
 )
 
+libraryDependencies += "com.github.cb372" %% "scalacache-guava" % "0.22.0"
+
 mainClass in (Compile, run) := Some("org.marvin.executor.EngineExecutorApp")
 mainClass in assembly := Some("org.marvin.executor.EngineExecutorApp")
 

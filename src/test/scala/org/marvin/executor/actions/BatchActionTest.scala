@@ -16,20 +16,27 @@
  */
 package org.marvin.executor.actions
 
+import java.time.LocalDateTime
+
 import akka.Done
-import akka.actor.{ActorRef, ActorSystem, Props}
-import akka.testkit.{EventFilter, ImplicitSender, TestKit, TestProbe}
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.testkit.{EventFilter, ImplicitSender, TestActorRef, TestKit, TestProbe}
 import com.typesafe.config.ConfigFactory
 import org.marvin.artifact.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
-import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchHealthCheck, BatchReload}
+import org.marvin.exception.MarvinEExecutorException
+import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchExecutionStatus, BatchHealthCheck, BatchReload}
 import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
 import org.marvin.fixtures.MetadataMock
-import org.marvin.model.EngineMetadata
+import org.marvin.model._
+import org.marvin.util.{JsonUtil, LocalCache}
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+
+import scala.concurrent.duration._
 
 class BatchActionTest extends TestKit(
   ActorSystem("BatchActionTest", ConfigFactory.parseString("""akka.loggers = ["akka.testkit.TestEventListener"]""")))
-  with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
+  with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll with MockFactory {
 
   override def afterAll {
     TestKit.shutdownActorSystem(system)
@@ -42,12 +49,45 @@ class BatchActionTest extends TestKit(
       val mockedProxy = TestProbe()
       val mockedSaver = TestProbe()
       val metadata = MetadataMock.simpleMockedMetadata()
+      val mockedCache = mock[LocalCache[BatchExecution]]
 
-      val batchAction = system.actorOf(Props(new MockedBatchAction("acquisitor", metadata, mockedProxy.ref, mockedSaver.ref)))
+      val batchAction = system.actorOf(Props(new MockedBatchAction("acquisitor", metadata, mockedProxy.ref, mockedSaver.ref, mockedCache)))
 
       batchAction ! Done
       expectNoMsg()
       EventFilter.info("Work Done!")
+    }
+
+    "send BatchExecutionStatus message with valid protocol" in {
+
+      val metadata = MetadataMock.simpleMockedMetadata()
+      val mockedCache = mock[LocalCache[BatchExecution]]
+
+      val batchAction = system.actorOf(Props(new MockedBatchAction("acquisitor", metadata, null, null, mockedCache)))
+
+      val protocol = "fake_protocol"
+      val batchExecution = new BatchExecution("acquisitor", protocol, LocalDateTime.now, Working)
+
+      (mockedCache.load _).expects(protocol).returning(Option(batchExecution)).once()
+
+      batchAction ! BatchExecutionStatus(protocol)
+
+      expectMsg(JsonUtil.toJson(batchExecution))
+    }
+
+    "send BatchExecutionStatus message with invalid protocol" in {
+
+      val metadata = MetadataMock.simpleMockedMetadata()
+      val mockedCache = new LocalCache[BatchExecution](10, 1.minute)
+
+      val batchAction = system.actorOf(Props(new MockedBatchAction("acquisitor", metadata, null, null, mockedCache)))
+
+      val protocol = "fake_protocol"
+
+      batchAction ! BatchExecutionStatus(protocol)
+
+      val returnedMessage = expectMsgType[akka.actor.Status.Failure]
+      returnedMessage.cause shouldBe a[MarvinEExecutorException]
     }
 
     "send BatchExecute message" in {
@@ -55,11 +95,15 @@ class BatchActionTest extends TestKit(
       val mockedProxy = TestProbe()
       val mockedSaver = TestProbe()
       val metadata = MetadataMock.simpleMockedMetadata()
+      val mockedCache = mock[LocalCache[BatchExecution]]
 
-      val batchAction = system.actorOf(Props(new MockedBatchAction("acquisitor", metadata, mockedProxy.ref, mockedSaver.ref)))
+      val batchAction = system.actorOf(Props(new MockedBatchAction("acquisitor", metadata, mockedProxy.ref, mockedSaver.ref, mockedCache)))
 
       val protocol = "fake_protocol"
       val params = "fakeParams"
+
+      (mockedCache.save(_: String, _: BatchExecution)).expects(protocol, new BatchExecution("acquisitor", protocol, LocalDateTime.now, Working)).once()
+      (mockedCache.save(_: String, _: BatchExecution)).expects(protocol, new BatchExecution("acquisitor", protocol, LocalDateTime.now, Finished)).once()
 
       batchAction ! BatchExecute(protocol, params)
 
@@ -72,13 +116,66 @@ class BatchActionTest extends TestKit(
       expectNoMsg()
     }
 
+    "send BatchExecute message to get exception from proxy [execute msg]" in {
+
+      val mockedProxy = TestActorRef(new Actor {
+        def receive = {
+          case ExecuteBatch(protocol, params) => throw new Exception("boom")
+        }
+      })
+
+      val metadata = MetadataMock.simpleMockedMetadata()
+      val mockedCache = mock[LocalCache[BatchExecution]]
+
+      val batchAction = system.actorOf(Props(new MockedBatchAction("acquisitor", metadata, mockedProxy, null, mockedCache)))
+
+      val protocol = "fake_protocol"
+      val params = "fakeParams"
+
+      (mockedCache.save(_: String, _: BatchExecution)).expects(protocol, new BatchExecution("acquisitor", protocol, LocalDateTime.now, Working)).once()
+      (mockedCache.save(_: String, _: BatchExecution)).expects(protocol, new BatchExecution("acquisitor", protocol, LocalDateTime.now, Failed)).once()
+
+      batchAction ! BatchExecute(protocol, params)
+
+      expectNoMsg()
+    }
+
+    "send BatchExecute message to get exception from saver" in {
+
+      val mockedSaver = TestActorRef(new Actor {
+        def receive = {
+          case SaveToRemote(artifactName, protocol) => throw new Exception("boom")
+        }
+      })
+
+      val mockedProxy = TestProbe()
+      val metadata = MetadataMock.simpleMockedMetadata()
+      val mockedCache = mock[LocalCache[BatchExecution]]
+
+      val batchAction = system.actorOf(Props(new MockedBatchAction("acquisitor", metadata, mockedProxy.ref, mockedSaver, mockedCache)))
+
+      val protocol = "fake_protocol"
+      val params = "fakeParams"
+
+      (mockedCache.save(_: String, _: BatchExecution)).expects(protocol, new BatchExecution("acquisitor", protocol, LocalDateTime.now, Working)).once()
+      (mockedCache.save(_: String, _: BatchExecution)).expects(protocol, new BatchExecution("acquisitor", protocol, LocalDateTime.now, Failed)).once()
+
+      batchAction ! BatchExecute(protocol, params)
+
+      mockedProxy.expectMsg(ExecuteBatch(protocol, params))
+      mockedProxy.reply(Done)
+
+      expectNoMsg()
+    }
+
     "send BatchReload message with single protocol" in {
 
       val mockedProxy = TestProbe()
       val mockedSaver = TestProbe()
       val metadata = MetadataMock.simpleMockedMetadata()
+      val mockedCache = mock[LocalCache[BatchExecution]]
 
-      val batchAction = system.actorOf(Props(new MockedBatchAction("tpreparator", metadata, mockedProxy.ref, mockedSaver.ref)))
+      val batchAction = system.actorOf(Props(new MockedBatchAction("tpreparator", metadata, mockedProxy.ref, mockedSaver.ref, mockedCache)))
 
       val protocol = "acquisitor_12345protocol"
 
@@ -98,8 +195,9 @@ class BatchActionTest extends TestKit(
       val mockedProxy = TestProbe()
       val mockedSaver = TestProbe()
       val metadata = MetadataMock.simpleMockedMetadata()
+      val mockedCache = mock[LocalCache[BatchExecution]]
 
-      val batchAction = system.actorOf(Props(new MockedBatchAction("evaluator", metadata, mockedProxy.ref, mockedSaver.ref)))
+      val batchAction = system.actorOf(Props(new MockedBatchAction("evaluator", metadata, mockedProxy.ref, mockedSaver.ref, mockedCache)))
 
       val protocol = "tpreparator_12345protocol,trainer_12345protocol"
 
@@ -122,8 +220,9 @@ class BatchActionTest extends TestKit(
       val mockedProxy = TestProbe()
       val mockedSaver = TestProbe()
       val metadata = MetadataMock.simpleMockedMetadata()
+      val mockedCache = mock[LocalCache[BatchExecution]]
 
-      val batchAction = system.actorOf(Props(new MockedBatchAction("evaluator", metadata, mockedProxy.ref, mockedSaver.ref)))
+      val batchAction = system.actorOf(Props(new MockedBatchAction("evaluator", metadata, mockedProxy.ref, mockedSaver.ref, mockedCache)))
 
       batchAction ! BatchHealthCheck
 
@@ -138,8 +237,9 @@ class BatchActionTest extends TestKit(
       val mockedProxy = TestProbe()
       val mockedSaver = TestProbe()
       val metadata = MetadataMock.simpleMockedMetadata()
+      val mockedCache = mock[LocalCache[BatchExecution]]
 
-      val batchAction = system.actorOf(Props(new MockedBatchAction("evaluator", metadata, mockedProxy.ref, mockedSaver.ref)))
+      val batchAction = system.actorOf(Props(new MockedBatchAction("evaluator", metadata, mockedProxy.ref, mockedSaver.ref, mockedCache)))
 
       batchAction ! BatchHealthCheck
 
@@ -154,7 +254,8 @@ class BatchActionTest extends TestKit(
   class MockedBatchAction (actionName: String,
                            metadata: EngineMetadata,
                            _batchActionProxy: ActorRef,
-                           _artifactSaver: ActorRef
+                           _artifactSaver: ActorRef,
+                          _cache: LocalCache[BatchExecution]
                           ) extends BatchAction (actionName, metadata){
 
     override def preStart() = {
@@ -162,6 +263,7 @@ class BatchActionTest extends TestKit(
       artifactsToLoad = engineActionMetadata.artifactsToLoad.mkString(",")
       batchActionProxy = _batchActionProxy
       artifactSaver = _artifactSaver
+      cache = _cache
     }
   }
 }

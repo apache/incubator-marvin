@@ -16,17 +16,21 @@
  */
 package org.marvin.executor.actions
 
+import java.time.LocalDateTime
+import java.util.NoSuchElementException
+
 import akka.Done
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
 import org.marvin.artifact.manager.ArtifactSaver
-import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchHealthCheck, BatchReload}
+import org.marvin.artifact.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
+import org.marvin.exception.MarvinEExecutorException
+import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchExecutionStatus, BatchHealthCheck, BatchReload}
 import org.marvin.executor.proxies.BatchActionProxy
 import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
-import org.marvin.artifact.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
-import org.marvin.model.{EngineActionMetadata, EngineMetadata}
-import org.marvin.util.ProtocolUtil
+import org.marvin.model._
+import org.marvin.util.{JsonUtil, LocalCache, ProtocolUtil}
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
@@ -35,8 +39,9 @@ import scala.util.{Failure, Success}
 
 object BatchAction {
   case class BatchExecute(protocol: String, params: String)
-  case class BatchReload(protocol:String)
+  case class BatchReload(protocol: String)
   case class BatchHealthCheck()
+  case class BatchExecutionStatus(protocol: String)
 }
 
 class BatchAction(actionName: String, metadata: EngineMetadata) extends Actor with ActorLogging{
@@ -44,6 +49,7 @@ class BatchAction(actionName: String, metadata: EngineMetadata) extends Actor wi
   var artifactSaver: ActorRef = _
   var engineActionMetadata: EngineActionMetadata = _
   var artifactsToLoad: String = _
+  var cache: LocalCache[BatchExecution] = _
   implicit val ec = context.dispatcher
 
   override def preStart() = {
@@ -51,6 +57,7 @@ class BatchAction(actionName: String, metadata: EngineMetadata) extends Actor wi
     artifactsToLoad = engineActionMetadata.artifactsToLoad.mkString(",")
     batchActionProxy = context.actorOf(Props(new BatchActionProxy(engineActionMetadata)), name = "batchActionProxy")
     artifactSaver = context.actorOf(ArtifactSaver.build(metadata), name = "artifactSaver")
+    cache = new LocalCache[BatchExecution](maximumSize = 10000L, defaultTTL = 30.days)
   }
 
   override def receive  = {
@@ -59,16 +66,30 @@ class BatchAction(actionName: String, metadata: EngineMetadata) extends Actor wi
 
       log.info(s"Starting to process execute to $actionName. Protocol: [$protocol] and params: [$params].")
 
+      cache.save(protocol, new BatchExecution(actionName, protocol, LocalDateTime.now, Working))
+
       (batchActionProxy ? ExecuteBatch(protocol, params)).onComplete {
         case Success(response) =>
           log.info(s"Execute to $actionName completed [$response] ! Protocol: [$protocol]")
 
-          for(artifactName <- engineActionMetadata.artifactsToPersist){
-            artifactSaver ! SaveToRemote(artifactName, protocol)
+          val futures:ListBuffer[Future[Any]] = ListBuffer[Future[Any]]()
+          for(artifactName <- engineActionMetadata.artifactsToPersist) {
+            futures += (artifactSaver ? SaveToRemote(artifactName, protocol))
+          }
+
+          Future.sequence(futures).onComplete {
+            case Success(response) =>
+              log.info(s"Save to remote to $actionName completed [$response] ! Protocol: [$protocol]")
+              cache.save(protocol, new BatchExecution(actionName, protocol, LocalDateTime.now, Finished))
+
+            case Failure(failure) =>
+              cache.save(protocol, new BatchExecution(actionName, protocol, LocalDateTime.now, Failed))
+              throw failure
           }
 
         case Failure(failure) =>
-          failure.printStackTrace()
+          cache.save(protocol, new BatchExecution(actionName, protocol, LocalDateTime.now, Failed))
+          throw failure
       }
 
     case BatchReload(protocol) =>
@@ -100,6 +121,17 @@ class BatchAction(actionName: String, metadata: EngineMetadata) extends Actor wi
       val originalSender = sender
       ask(batchActionProxy, HealthCheck) pipeTo originalSender
 
+    case BatchExecutionStatus(protocol) =>
+      log.info(s"Getting batch execution status to protocol $protocol.")
+
+      try {
+        sender ! JsonUtil.toJson(cache.load(protocol).get)
+
+      }catch {
+        case _: NoSuchElementException =>
+          sender ! akka.actor.Status.Failure(new MarvinEExecutorException(s"Protocol $protocol not found!"))
+      }
+
     case Done =>
       log.info("Work Done!")
 
@@ -107,4 +139,5 @@ class BatchAction(actionName: String, metadata: EngineMetadata) extends Actor wi
       log.warning(s"Not valid message !!")
 
   }
+
 }

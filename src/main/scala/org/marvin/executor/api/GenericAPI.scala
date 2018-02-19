@@ -28,9 +28,9 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse, StatusC
 import akka.http.scaladsl.server.{HttpApp, Route, StandardRoute}
 import akka.pattern.ask
 import akka.util.Timeout
-import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchHealthCheck, BatchReload}
+import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchExecutionStatus, BatchHealthCheck, BatchReload}
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck}
-import org.marvin.executor.actions.PipelineAction.PipelineExecute
+import org.marvin.executor.actions.PipelineAction.{PipelineExecute, PipelineExecutionStatus}
 import org.marvin.executor.api.GenericAPI.{DefaultBatchRequest, DefaultHttpResponse, DefaultOnlineRequest, HealthStatus}
 import org.marvin.executor.statemachine.Reload
 import org.marvin.model.EngineMetadata
@@ -48,6 +48,7 @@ trait GenericAPIFunctions {
   def onlineExecute(actionName: String, params: String, message: String): Future[String]
   def reload(actionName: String, actionType:String, protocol: String): String
   def check(actionName: String, actionType:String): Future[HealthStatus]
+  def status(actionName: String, protocol: String): Future[String]
   def pipeline(params: String): String
   def getMetadata:EngineMetadata
   def getSystem:ActorSystem
@@ -238,6 +239,66 @@ class GenericAPI(system: ActorSystem,
           onComplete(check("feedback", "online")) { response =>
             matchHealthTry(response)
           }
+        } ~
+        path("acquisitor" / "status") {
+          parameters('protocol) { (protocol) =>
+            val responseFuture = status("acquisitor", protocol)
+
+            onComplete(responseFuture) {
+              case Success(response) => complete(DefaultHttpResponse(response))
+              case Failure(e) =>
+                log.info("RECEIVE FAILURE!!! " + e.getMessage + e.getClass)
+                failWith(e)
+            }
+          }
+        } ~
+        path("tpreparator" / "status") {
+          parameters('protocol) { (protocol) =>
+            val responseFuture = status("tpreparator", protocol)
+
+            onComplete(responseFuture) {
+              case Success(response) => complete(DefaultHttpResponse(response))
+              case Failure(e) =>
+                log.info("RECEIVE FAILURE!!! " + e.getMessage + e.getClass)
+                failWith(e)
+            }
+          }
+        } ~
+        path("trainer" / "status") {
+          parameters('protocol) { (protocol) =>
+            val responseFuture = status("trainer", protocol)
+
+            onComplete(responseFuture) {
+              case Success(response) => complete(DefaultHttpResponse(response))
+              case Failure(e) =>
+                log.info("RECEIVE FAILURE!!! " + e.getMessage + e.getClass)
+                failWith(e)
+            }
+          }
+        } ~
+        path("evaluator" / "status") {
+          parameters('protocol) { (protocol) =>
+            val responseFuture = status("evaluator", protocol)
+
+            onComplete(responseFuture) {
+              case Success(response) => complete(DefaultHttpResponse(response))
+              case Failure(e) =>
+                log.info("RECEIVE FAILURE!!! " + e.getMessage + e.getClass)
+                failWith(e)
+            }
+          }
+        } ~
+        path("pipeline" / "status") {
+          parameters('protocol) { (protocol) =>
+            val responseFuture = status("pipeline", protocol)
+
+            onComplete(responseFuture) {
+              case Success(response) => complete(DefaultHttpResponse(response))
+              case Failure(e) =>
+                log.info("RECEIVE FAILURE!!! " + e.getMessage + e.getClass)
+                failWith(e)
+            }
+          }
         }
       }
     }
@@ -311,6 +372,16 @@ class GenericAPI(system: ActorSystem,
 
       case "batch" =>
         (actors(actionName) ? BatchHealthCheck).mapTo[Status] collect asHealthStatus
+    }
+  }
+
+  def status(actionName: String, protocol: String): Future[String] = {
+    implicit val ec: ExecutionContextExecutorService = ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
+    implicit val futureTimeout: Timeout = healthCheckTimeout
+
+    actionName match {
+      case "pipeline" => (actors(actionName) ? PipelineExecutionStatus(protocol)).mapTo[String]
+      case _ => (actors(actionName) ? BatchExecutionStatus(protocol)).mapTo[String]
     }
   }
 

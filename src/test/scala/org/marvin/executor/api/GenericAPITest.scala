@@ -23,9 +23,10 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCode, StatusCod
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.testkit.TestProbe
-import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchHealthCheck, BatchReload}
+import org.marvin.exception.MarvinEExecutorException
+import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchExecutionStatus, BatchHealthCheck, BatchReload}
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck}
-import org.marvin.executor.actions.PipelineAction.PipelineExecute
+import org.marvin.executor.actions.PipelineAction.{PipelineExecute, PipelineExecutionStatus}
 import org.marvin.executor.statemachine.Reload
 import org.marvin.fixtures.MetadataMock
 import org.marvin.model.EngineMetadata
@@ -1015,6 +1016,201 @@ class GenericAPITest extends WordSpec with ScalatestRouteTest with Matchers with
         responseAs[String] shouldEqual """{"errorMessage":"The engine was not able to provide a response within the specified timeout."}"""
       }(result)
 
+    }
+  }
+
+  "/acquisitor/status endpoint" should {
+
+    val metadata = MetadataMock.simpleMockedMetadata()
+    val actor = TestProbe()
+    val defaultParams = ""
+    val api = new GenericAPI(system, metadata, defaultParams, Map[String, ActorRef]("acquisitor" -> actor.ref), null)
+
+    "be requested with a valid protocol" in {
+      val protocol = "testProtocol"
+      val result = Get(s"/acquisitor/status?protocol=$protocol") ~> api.routes ~> runRoute
+
+      val response = "foi"
+      val expectedMessage = BatchExecutionStatus(protocol)
+      actor.expectMsg(expectedMessage)
+      actor.reply(response)
+
+      check {
+        status shouldEqual StatusCode.int2StatusCode(200)
+        contentType shouldEqual ContentTypes.`application/json`
+        responseAs[String] shouldEqual s"""{"result":"$response"}"""
+      }(result)
+    }
+
+    "be requested with a invalid protocol" in {
+      val protocol = "testProtocol"
+      val result = Get(s"/acquisitor/status?protocol=$protocol") ~> api.routes ~> runRoute
+
+      val expectedMessage = BatchExecutionStatus(protocol)
+      actor.expectMsg(expectedMessage)
+      actor.reply(akka.actor.Status.Failure(new MarvinEExecutorException(s"Protocol $protocol not found!")))
+
+      check {
+        status shouldEqual StatusCode.int2StatusCode(503)
+        contentType shouldEqual ContentTypes.`application/json`
+        responseAs[String] shouldEqual s"""{"errorMessage":"Protocol testProtocol not found!"}"""
+      }(result)
+    }
+  }
+
+  "/tpreparator/status endpoint" should {
+
+    val metadata = MetadataMock.simpleMockedMetadata()
+    val actor = TestProbe()
+    val defaultParams = ""
+    val api = new GenericAPI(system, metadata, defaultParams, Map[String, ActorRef]("tpreparator" -> actor.ref), null)
+
+    "be requested with a valid protocol" in {
+      val protocol = "testProtocol"
+      val result = Get(s"/tpreparator/status?protocol=$protocol") ~> api.routes ~> runRoute
+
+      val response = "foi"
+      val expectedMessage = BatchExecutionStatus(protocol)
+      actor.expectMsg(expectedMessage)
+      actor.reply(response)
+
+      check {
+        status shouldEqual StatusCode.int2StatusCode(200)
+        contentType shouldEqual ContentTypes.`application/json`
+        responseAs[String] shouldEqual s"""{"result":"$response"}"""
+      }(result)
+    }
+
+    "be requested with a invalid protocol" in {
+      val protocol = "testProtocol"
+      val result = Get(s"/tpreparator/status?protocol=$protocol") ~> api.routes ~> runRoute
+
+      val expectedMessage = BatchExecutionStatus(protocol)
+      actor.expectMsg(expectedMessage)
+      actor.reply(akka.actor.Status.Failure(new MarvinEExecutorException(s"Protocol $protocol not found!")))
+
+      check {
+        status shouldEqual StatusCode.int2StatusCode(503)
+        contentType shouldEqual ContentTypes.`application/json`
+        responseAs[String] shouldEqual s"""{"errorMessage":"Protocol testProtocol not found!"}"""
+      }(result)
+    }
+  }
+
+  "/trainer/status endpoint" should {
+
+    val metadata = MetadataMock.simpleMockedMetadata()
+    val actor = TestProbe()
+    val defaultParams = ""
+    val api = new GenericAPI(system, metadata, defaultParams, Map[String, ActorRef]("trainer" -> actor.ref), null)
+
+    "be requested with a valid protocol" in {
+      val protocol = "testProtocol"
+      val result = Get(s"/trainer/status?protocol=$protocol") ~> api.routes ~> runRoute
+
+      val response = "foi"
+      val expectedMessage = BatchExecutionStatus(protocol)
+      actor.expectMsg(expectedMessage)
+      actor.reply(response)
+
+      check {
+        status shouldEqual StatusCode.int2StatusCode(200)
+        contentType shouldEqual ContentTypes.`application/json`
+        responseAs[String] shouldEqual s"""{"result":"$response"}"""
+      }(result)
+    }
+
+    "be requested with a invalid protocol" in {
+      val protocol = "testProtocol"
+      val result = Get(s"/trainer/status?protocol=$protocol") ~> api.routes ~> runRoute
+
+      val expectedMessage = BatchExecutionStatus(protocol)
+      actor.expectMsg(expectedMessage)
+      actor.reply(akka.actor.Status.Failure(new MarvinEExecutorException(s"Protocol $protocol not found!")))
+
+      check {
+        status shouldEqual StatusCode.int2StatusCode(503)
+        contentType shouldEqual ContentTypes.`application/json`
+        responseAs[String] shouldEqual s"""{"errorMessage":"Protocol testProtocol not found!"}"""
+      }(result)
+    }
+  }
+
+  "/evaluator/status endpoint" should {
+
+    val metadata = MetadataMock.simpleMockedMetadata()
+    val actor = TestProbe()
+    val defaultParams = ""
+    val api = new GenericAPI(system, metadata, defaultParams, Map[String, ActorRef]("evaluator" -> actor.ref), null)
+
+    "be requested with a valid protocol" in {
+      val protocol = "testProtocol"
+      val result = Get(s"/evaluator/status?protocol=$protocol") ~> api.routes ~> runRoute
+
+      val response = "foi"
+      val expectedMessage = BatchExecutionStatus(protocol)
+      actor.expectMsg(expectedMessage)
+      actor.reply(response)
+
+      check {
+        status shouldEqual StatusCode.int2StatusCode(200)
+        contentType shouldEqual ContentTypes.`application/json`
+        responseAs[String] shouldEqual s"""{"result":"$response"}"""
+      }(result)
+    }
+
+    "be requested with a invalid protocol" in {
+      val protocol = "testProtocol"
+      val result = Get(s"/evaluator/status?protocol=$protocol") ~> api.routes ~> runRoute
+
+      val expectedMessage = BatchExecutionStatus(protocol)
+      actor.expectMsg(expectedMessage)
+      actor.reply(akka.actor.Status.Failure(new MarvinEExecutorException(s"Protocol $protocol not found!")))
+
+      check {
+        status shouldEqual StatusCode.int2StatusCode(503)
+        contentType shouldEqual ContentTypes.`application/json`
+        responseAs[String] shouldEqual s"""{"errorMessage":"Protocol testProtocol not found!"}"""
+      }(result)
+    }
+  }
+
+  "/pipeline/status endpoint" should {
+
+    val metadata = MetadataMock.simpleMockedMetadata()
+    val actor = TestProbe()
+    val defaultParams = ""
+    val api = new GenericAPI(system, metadata, defaultParams, Map[String, ActorRef]("pipeline" -> actor.ref), null)
+
+    "be requested with a valid protocol" in {
+      val protocol = "testProtocol"
+      val result = Get(s"/pipeline/status?protocol=$protocol") ~> api.routes ~> runRoute
+
+      val response = "foi"
+      val expectedMessage = PipelineExecutionStatus(protocol)
+      actor.expectMsg(expectedMessage)
+      actor.reply(response)
+
+      check {
+        status shouldEqual StatusCode.int2StatusCode(200)
+        contentType shouldEqual ContentTypes.`application/json`
+        responseAs[String] shouldEqual s"""{"result":"$response"}"""
+      }(result)
+    }
+
+    "be requested with a invalid protocol" in {
+      val protocol = "testProtocol"
+      val result = Get(s"/pipeline/status?protocol=$protocol") ~> api.routes ~> runRoute
+
+      val expectedMessage = PipelineExecutionStatus(protocol)
+      actor.expectMsg(expectedMessage)
+      actor.reply(akka.actor.Status.Failure(new MarvinEExecutorException(s"Protocol $protocol not found!")))
+
+      check {
+        status shouldEqual StatusCode.int2StatusCode(503)
+        contentType shouldEqual ContentTypes.`application/json`
+        responseAs[String] shouldEqual s"""{"errorMessage":"Protocol testProtocol not found!"}"""
+      }(result)
     }
   }
 
