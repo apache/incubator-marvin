@@ -3,10 +3,11 @@
 	"version": "v0.0.1",
 	"engineType": "python",
 	"artifactsRemotePath": "/tmp/marvin",
+	"artifactManagerType": "fs",
 	"onlineActionTimeout": 1000,
     "healthCheckTimeout": 2000,
-	"reloadTimeout": 120,
-	"hdfsHost": "hdfs://marvin-hadoop:8020",
+	"reloadTimeout": 60000,
+	"batchActionTimeout": 60000,
 	"pipelineActions": ["acquisitor", "tpreparator", "trainer", "evaluator"],
 	"actions": [{
 		"name": "acquisitor",
@@ -48,5 +49,13 @@
 		"artifactsToPersist": [],
 		"artifactsToLoad": ["model", "metrics"],
 		"pipeline": ["ppreparator"]
+	}, {
+		"name": "feedback",
+		"actionType": "online",
+		"port": 50056,
+		"host": "localhost",
+		"artifactsToPersist": [],
+		"artifactsToLoad": [],
+		"pipeline": []
 	}]
 }
