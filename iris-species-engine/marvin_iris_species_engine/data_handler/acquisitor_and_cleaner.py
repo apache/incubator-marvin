@@ -29,5 +29,4 @@ class AcquisitorAndCleaner(EngineBaseDataHandler):
 
         iris = pd.read_csv(file_path)
         iris.drop('Id', axis=1, inplace=True)
-        raise Exception('Errorrrrrrrrrr!')
         self.initial_dataset = iris
