@@ -6,8 +6,8 @@
 	"artifactManagerType": "fs",
 	"onlineActionTimeout": 1000,
     "healthCheckTimeout": 2000,
-	"reloadTimeout": 600000,
-	"batchActionTimeout": 600000,
+	"reloadTimeout": 60000,
+	"batchActionTimeout": 60000,
 	"pipelineActions": ["acquisitor", "tpreparator", "trainer", "evaluator"],
 	"actions": [{
 		"name": "acquisitor",
