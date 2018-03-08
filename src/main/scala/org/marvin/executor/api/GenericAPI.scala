@@ -28,14 +28,15 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse, StatusC
 import akka.http.scaladsl.server.{HttpApp, Route, StandardRoute}
 import akka.pattern.ask
 import akka.util.Timeout
+import com.github.fge.jsonschema.core.exceptions.ProcessingException
 import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchExecutionStatus, BatchHealthCheck, BatchReload}
 import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck}
 import org.marvin.executor.actions.PipelineAction.{PipelineExecute, PipelineExecutionStatus}
-import org.marvin.executor.api.GenericAPI.{DefaultBatchRequest, DefaultHttpResponse, DefaultOnlineRequest, HealthStatus}
+import org.marvin.executor.api.GenericAPI._
 import org.marvin.executor.statemachine.Reload
 import org.marvin.model.EngineMetadata
-import org.marvin.util.ProtocolUtil
-import spray.json.{DefaultJsonProtocol, RootJsonFormat}
+import org.marvin.util.{JsonUtil, ProtocolUtil}
+import spray.json.{DefaultJsonProtocol, RootJsonFormat, _}
 
 import scala.concurrent._
 import scala.concurrent.duration._
@@ -63,15 +64,16 @@ trait GenericAPIFunctions {
 object GenericAPI {
   case class HealthStatus(status: String, additionalMessage: String)
   case class DefaultHttpResponse(result: String)
-  case class DefaultOnlineRequest(params: Option[String] = Option.empty, message: Option[String] = Option.empty)
-  case class DefaultBatchRequest(params: Option[String] = Option.empty)
+  case class DefaultOnlineRequest(params: Option[JsValue] = Option.empty, message: Option[JsValue] = Option.empty)
+  case class DefaultBatchRequest(params: Option[JsValue] = Option.empty)
 }
 
 class GenericAPI(system: ActorSystem,
                  metadata: EngineMetadata,
                  engineParams: String,
                  actors: Map[String, ActorRef],
-                 docsFilePath: String) extends HttpApp with SprayJsonSupport with DefaultJsonProtocol with GenericAPIFunctions {
+                 docsFilePath: String,
+                 schemas: Map[String, String]) extends HttpApp with SprayJsonSupport with DefaultJsonProtocol with GenericAPIFunctions {
 
   val onlineActionTimeout = Timeout(metadata.onlineActionTimeout milliseconds)
   val healthCheckTimeout = Timeout(metadata.healthCheckTimeout milliseconds)
@@ -83,7 +85,7 @@ class GenericAPI(system: ActorSystem,
 
   implicit val defaultHttpResponseFormat: RootJsonFormat[DefaultHttpResponse] = jsonFormat1(DefaultHttpResponse)
   implicit val defaultOnlineRequestFormat: RootJsonFormat[DefaultOnlineRequest] = jsonFormat2(DefaultOnlineRequest)
-  implicit val defaultBatchRequest: RootJsonFormat[DefaultBatchRequest] = jsonFormat1(DefaultBatchRequest)
+  implicit val defaultBatchRequestFormat: RootJsonFormat[DefaultBatchRequest] = jsonFormat1(DefaultBatchRequest)
   implicit val healthStatusFormat: RootJsonFormat[HealthStatus] = jsonFormat2(HealthStatus)
 
   def routes: Route = handleRejections(GenericAPIHandlers.rejections){
@@ -92,7 +94,10 @@ class GenericAPI(system: ActorSystem,
         path("predictor") {
           entity(as[DefaultOnlineRequest]) { request =>
             require(request.message.isDefined, "The request payload must contain the attribute 'message'.")
-            val responseFuture = onlineExecute("predictor", request.params.getOrElse(engineParams), request.message.get)
+
+            validate("predictor-message", request.message)
+
+            val responseFuture = onlineExecute("predictor", request.params.getOrElse(engineParams).toString, request.message.get.toString)
 
             onComplete(responseFuture) {
               case Success(response) => complete(DefaultHttpResponse(response))
@@ -105,7 +110,7 @@ class GenericAPI(system: ActorSystem,
         path("acquisitor") {
           entity(as[DefaultBatchRequest]) { request =>
             complete {
-              val response = batchExecute("acquisitor", request.params.getOrElse(engineParams))
+              val response = batchExecute("acquisitor", request.params.getOrElse(engineParams).toString)
               DefaultHttpResponse(response)
             }
           }
@@ -113,7 +118,7 @@ class GenericAPI(system: ActorSystem,
         path("tpreparator") {
           entity(as[DefaultBatchRequest]) { request =>
             complete {
-              val response = batchExecute("tpreparator", request.params.getOrElse(engineParams))
+              val response = batchExecute("tpreparator", request.params.getOrElse(engineParams).toString)
               DefaultHttpResponse(response)
             }
           }
@@ -121,7 +126,7 @@ class GenericAPI(system: ActorSystem,
         path("trainer") {
           entity(as[DefaultBatchRequest]) { request =>
             complete {
-              val response = batchExecute("trainer", request.params.getOrElse(engineParams))
+              val response = batchExecute("trainer", request.params.getOrElse(engineParams).toString)
               DefaultHttpResponse(response)
             }
           }
@@ -129,7 +134,7 @@ class GenericAPI(system: ActorSystem,
         path("evaluator") {
           entity(as[DefaultBatchRequest]) { request =>
             complete {
-              val response = batchExecute("evaluator", request.params.getOrElse(engineParams))
+              val response = batchExecute("evaluator", request.params.getOrElse(engineParams).toString)
               DefaultHttpResponse(response)
             }
           }
@@ -137,7 +142,7 @@ class GenericAPI(system: ActorSystem,
         path("pipeline") {
           entity(as[DefaultBatchRequest]) { request =>
             complete {
-              val response = pipeline(request.params.getOrElse(engineParams))
+              val response = pipeline(request.params.getOrElse(engineParams).toString)
               DefaultHttpResponse(response)
             }
           }
@@ -145,7 +150,10 @@ class GenericAPI(system: ActorSystem,
         path("feedback") {
           entity(as[DefaultOnlineRequest]) { request =>
             require(request.message.isDefined, "The request payload must contain the attribute 'message'.")
-            val responseFuture = onlineExecute("feedback", request.params.getOrElse(engineParams), request.message.get)
+
+            validate("feedback-message", request.message)
+
+            val responseFuture = onlineExecute("feedback", request.params.getOrElse(engineParams).toString, request.message.get.toString)
 
             onComplete(responseFuture) {
               case Success(response) => complete(DefaultHttpResponse(response))
@@ -298,6 +306,25 @@ class GenericAPI(system: ActorSystem,
                 log.info("RECEIVE FAILURE!!! " + e.getMessage + e.getClass)
                 failWith(e)
             }
+          }
+        }
+      }
+    }
+  }
+
+  def validate(schemaName: String, target: Option[JsValue]): Unit = {
+    if (schemas != null) {
+      val schema: String = schemas.getOrElse(schemaName, null)
+
+      if (schema != null && !target.isEmpty) {
+        try {
+          JsonUtil.validateJson(target.get.prettyPrint, schema)
+        } catch {
+          case e: ProcessingException => {
+            throw new IllegalArgumentException(e.getShortMessage)
+          }
+          case t: Throwable => {
+            throw t
           }
         }
       }

@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/marvin-ai/marvin-engine-executor.svg)](https://travis-ci.org/marvin-ai/marvin-engine-executor) [![codecov](https://codecov.io/gh/marvin-ai/marvin-engine-executor/branch/master/graph/badge.svg)](https://codecov.io/gh/marvin-ai/marvin-engine-executor)
 
+[![Join the chat at https://gitter.im/gitterHQ/gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marvin-ai)
+
 # Marvin Engine Executor (Server)
 
 This is the component responsable for coordinate execution of the steps (actions) in a Marvin engine. The engine-executor

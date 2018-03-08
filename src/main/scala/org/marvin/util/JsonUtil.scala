@@ -52,7 +52,7 @@ object JsonUtil extends Logging {
     jacksonMapper.readValue[T](jsonString, classTag[T].runtimeClass.asInstanceOf[Class[T]])
   }
 
-  def validateJson[T: ClassTag](jsonString: String) = {
+  def validateJson[T: ClassTag](jsonString: String): Unit = {
     val className = classTag[T].runtimeClass.getSimpleName
     val schemaName = className.toString + "Schema.json"
 
@@ -60,10 +60,19 @@ object JsonUtil extends Logging {
 
     try{
       jsonSchema = Source.fromResource(schemaName).mkString
+      validateJson(jsonString, jsonSchema)
     } catch {
       case e: NullPointerException => info(s"File ${schemaName} not found, check your schema file")
         throw e
     }
+  }
+
+  /**
+    * Validates a json against a schema file (Draft-4) informed.
+    * @param jsonString - The json string to be validated.
+    * @param jsonSchema - The content of the schema file as a string.
+    */
+  def validateJson(jsonString: String, jsonSchema: String): Unit = {
 
     val schema: JsonNode = asJsonNode(parse(jsonSchema))
     val jsonToValidate: JsonNode = asJsonNode(parse(jsonString))
@@ -71,12 +80,15 @@ object JsonUtil extends Logging {
 
     val processingReport = validator.validate(schema, jsonToValidate)
     if (!processingReport.isSuccess) {
+      val sb = new StringBuilder()
       processingReport.forEach {
-        message: ProcessingMessage => info(message.asJson())
+        message: ProcessingMessage => {
+          warn(message.asJson())
+          sb.append(message.getMessage)
+        }
       }
-      throw new ProcessingException
+      throw new ProcessingException(sb.toString)
     }
-
   }
 
   def format(jsonString: String): String ={

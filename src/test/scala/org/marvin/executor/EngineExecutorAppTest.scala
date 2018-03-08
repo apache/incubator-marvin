@@ -152,6 +152,42 @@ class EngineExecutorAppTest extends
     }
   }
 
+  "getSchema method" should {
+
+    "with valid file" in {
+      val app = new EngineExecutorApp()
+
+      app.vmParams = Map[String, Any]("engineHome" -> getClass.getResource("/engine_home").getPath())
+
+      val schema = app.getSchema("predictor", "message")
+
+      schema shouldEqual """{"title":"PredictMessage","type":"object","properties":{"firstName":{"type":"string"},"lastName":{"type":"string"},"age":{"description":"Age in years","type":"integer","minimum":0}},"required":["firstName","lastName"]}"""    }
+
+    "with invalid file" in {
+      val app = new EngineExecutorApp()
+
+      app.vmParams = Map[String, Any]("engineHome" -> "invalid_path")
+
+      val caught = intercept[MarvinEExecutorException] {
+        app.getSchema("predictor", "message")
+      }
+
+      caught.getMessage() shouldEqual "The file [invalid_path/predictor-message.schema] does not exists. Check your engine configuration."
+    }
+
+    "without a correct vmParameter key" in {
+      val app = new EngineExecutorApp()
+
+      app.vmParams = Map[String, Any]()
+
+      val caught = intercept[NoSuchElementException] {
+        app.getSchema("predictor", "message")
+      }
+
+      caught.getMessage() shouldEqual "key not found: engineHome"
+    }
+  }
+
   "getVMParameters method" should {
 
     "with valid filePath" in {
@@ -163,6 +199,7 @@ class EngineExecutorAppTest extends
 
       vmParams shouldEqual Map[String, Any](
         "engineHome" -> "a/fake/path",
+        "enableValidation" -> false,
         "ipAddress" -> "1.1.1.1",
         "port" -> 9999,
         "protocol" -> "",
@@ -280,7 +317,8 @@ class EngineExecutorAppTest extends
       app.vmParams = Map[String, Any](
         "engineHome" -> getClass.getResource("/engine_home").getPath(),
         "enableAdmin" -> false,
-        "protocol" -> ""
+        "protocol" -> "",
+        "enableValidation" -> false
       )
 
       val api = app.setupGenericAPI()
