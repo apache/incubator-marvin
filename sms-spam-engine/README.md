@@ -2,15 +2,112 @@
 
 ## Overview
 
-Marvin engine
+SMS Spam engine
 
 
 ## Requirements
 
-_REPLACE: Add here the list of requirements. For example:_
+ - Python 2.7.9 or higher
+ - Pandas 0.20.3 or higher
+ - Sklearn 0.18.2 or higher
 
- - Python 2.7
- - Numpy 1.11.0 or higher
+## Development
+
+### Getting started
+
+First, create a new virtualenv for this engine in your python toolbox env
+
+```
+marvin engine-generateenv /your/path/to/sms_spam_engine_env
+```
+
+Now move to the new env and run tests to confirm everything is fine
+
+```
+workon sms-spam-engine-env
+marvin test
+```
+
+You are now ready to code.
+
+
+### API docs
+
+Active your engine env
+
+```
+workon sms-spam-engine-env
+```
+
+Start http server
+
+```
+marvin engine-httpserver
+```
+
+Open the API doc page in your browser
+
+```
+localhost:8000/docs/
+```
+
+You can send request directly from docs page to you engine server using "Try it out" and "Execute" buttons
+
+
+### Adding new dependencies
+
+It\`s very important. All development dependencies should be added to `setup.py`.
+
+### Running tests
+
+This project uses *[py.test](http://pytest.org/)* as test runner and *[Tox](https://tox.readthedocs.io)* to manage virtualenvs.
+
+To run all tests use the following command
+
+```
+marvin test
+```
+
+To run specific test
+
+```
+marvin test tests/test_file.py::TestClass::test_method
+```
+
+
+### Writting documentation
+
+The project documentation is written using *[Jupyter](http://jupyter.readthedocs.io/)* notebooks. 
+You can start the notebook server from the command line by running the following command
+
+```
+marvin notebook
+```
+
+Use notebooks to demonstrate how to use the lib features. It can also be useful to show some use cases.
+
+
+### Bumping version
+
+```
+marvin pkg-bumpversion [patch|minor|major]
+git add . && git commit -m "Bump version"
+```
+
+
+### Tagging version
+
+```
+marvin pkg-createtag
+git push origin master --follow-tags
+```
+
+
+### Logging
+
+The default log level is set to _WARNING_. You can change the log level at runtime setting another value to one of the following environment variable: `MARVIN_SMS_SPAM_ENGINE_LOG_LEVEL` or `LOG_LEVEL`. The available values are _CRITICAL_, _ERROR_, _WARNING_, _INFO_ and _DEBUG_.
+
+Be careful using `LOG_LEVEL`, it may affect another lib.
 
 
 ## Installation
@@ -68,76 +165,4 @@ Under the hood, this engine uses Fabric to define provisioning and deployment
 process. Check the `fabfile.py` for more information. You can add new tasks or
 edit existing ones to match your provisioning and deployment pipeline.
 
-## Development
 
-### Getting started
-
-First, create a new virtualenv
-
-```
-mkvirtualenv marvin_sms_spam_engine_env
-```
-
-Now install the development dependencies
-
-```
-make marvin
-```
-
-You are now ready to code.
-
-
-### Adding new dependencies
-
-It\`s very important. All development dependencies should be added to `setup.py`.
-
-### Running tests
-
-This project uses *[py.test](http://pytest.org/)* as test runner and *[Tox](https://tox.readthedocs.io)* to manage virtualenvs.
-
-To run all tests use the following command
-
-```
-marvin test
-```
-
-To run specific test
-
-```
-marvin test tests/test_file.py::TestClass::test_method
-```
-
-
-### Writting documentation
-
-The project documentation is written using *[Jupyter](http://jupyter.readthedocs.io/)* notebooks. 
-You can start the notebook server from the command line by running the following command
-
-```
-marvin notebook
-```
-
-Use notebooks to demonstrate how to use the lib features. It can also be useful to show some use cases.
-
-
-### Bumping version
-
-```
-marvin pkg-bumpversion [patch|minor|major]
-git add . && git commit -m "Bump version"
-```
-
-
-### Tagging version
-
-```
-marvin pkg-createtag
-git push origin master --follow-tags
-```
-
-
-### Logging
-
-The default log level is set to _WARNING_. You can change the log level at runtime setting another value to one of the following environment variable: `MARVIN_SMS_SPAM_ENGINE_LOG_LEVEL` or `LOG_LEVEL`. The available values are _CRITICAL_, _ERROR_, _WARNING_, _INFO_ and _DEBUG_.
-
-Be careful using `LOG_LEVEL`, it may affect another lib.
