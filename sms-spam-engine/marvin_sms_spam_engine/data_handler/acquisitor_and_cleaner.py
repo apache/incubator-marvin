@@ -24,11 +24,9 @@ class AcquisitorAndCleaner(EngineBaseDataHandler):
         super(AcquisitorAndCleaner, self).__init__(**kwargs)
 
     def execute(self, params, **kwargs):
-
         data_file = MarvinData.download_file("https://s3.amazonaws.com/marvin-engines-data/spam.csv")
         data = pd.read_csv(data_file, encoding='latin-1')
         data = data.drop(["Unnamed: 2", "Unnamed: 3", "Unnamed: 4"], axis=1)
         data = data.rename(columns={"v1": "label", "v2": "text"})
         data['label_num'] = data.label.map({'ham': 0, 'spam': 1})
-
         self.marvin_initial_dataset = data
