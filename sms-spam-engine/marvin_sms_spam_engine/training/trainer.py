@@ -30,3 +30,4 @@ class Trainer(EngineBaseTraining):
             "clf": clf,
             "vect": self.marvin_dataset["vect"]
         }
+

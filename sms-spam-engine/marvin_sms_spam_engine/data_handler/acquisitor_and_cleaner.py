@@ -32,3 +32,4 @@ class AcquisitorAndCleaner(EngineBaseDataHandler):
         data['label_num'] = data.label.map({'ham': 0, 'spam': 1})
 
         self.marvin_initial_dataset = data
+

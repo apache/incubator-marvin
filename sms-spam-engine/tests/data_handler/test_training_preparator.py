@@ -18,6 +18,8 @@ class TestTrainingPreparator:
             "label": ["ham", "spam", "ham", "spam", "ham", "spam"]
         }
 
+        mocked_params = {"test_size": 0.3, "random_state": 10}
+
         ac = TrainingPreparator(initial_dataset=test_dataset)
         ac.execute(params=mocked_params)
 

@@ -29,3 +29,4 @@ class MetricsEvaluator(EngineBaseTraining):
         self.marvin_metrics = metrics
 
         print("Prediction accuracy: " + str(metrics))
+

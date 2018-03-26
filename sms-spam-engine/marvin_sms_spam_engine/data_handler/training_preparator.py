@@ -26,7 +26,7 @@ class TrainingPreparator(EngineBaseDataHandler):
     def execute(self, params, **kwargs):
         X_train, X_test, y_train, y_test = train_test_split(
             self.marvin_initial_dataset["text"], self.marvin_initial_dataset["label"],
-            test_size=0.3, random_state=10)
+            test_size=params["test_size"], random_state=params["random_state"])
 
         vect = CountVectorizer()
         vect.fit(X_train)
@@ -38,3 +38,4 @@ class TrainingPreparator(EngineBaseDataHandler):
             "y_test": y_test,
             "vect": vect
         }
+
