@@ -12,6 +12,7 @@ from marvin_python_toolbox.engine_base import EngineBaseDataHandler
 from marvin_python_toolbox.common.data import MarvinData
 import pandas as pd
 
+
 __all__ = ['AcquisitorAndCleaner']
 
 
@@ -29,4 +30,5 @@ class AcquisitorAndCleaner(EngineBaseDataHandler):
         data = data.drop(["Unnamed: 2", "Unnamed: 3", "Unnamed: 4"], axis=1)
         data = data.rename(columns={"v1": "label", "v2": "text"})
         data['label_num'] = data.label.map({'ham': 0, 'spam': 1})
+
         self.marvin_initial_dataset = data

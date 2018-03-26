@@ -8,9 +8,9 @@ Use this module to add the project main code.
 
 from .._compatibility import six
 from .._logging import get_logger
+from marvin_python_toolbox.engine_base import EngineBaseDataHandler
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
-from marvin_python_toolbox.engine_base import EngineBaseDataHandler
 
 __all__ = ['TrainingPreparator']
 
@@ -24,7 +24,6 @@ class TrainingPreparator(EngineBaseDataHandler):
         super(TrainingPreparator, self).__init__(**kwargs)
 
     def execute(self, params, **kwargs):
-
         X_train, X_test, y_train, y_test = train_test_split(
             self.marvin_initial_dataset["text"], self.marvin_initial_dataset["label"],
             test_size=0.3, random_state=10)

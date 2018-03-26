@@ -23,7 +23,6 @@ class Predictor(EngineBasePrediction):
         super(Predictor, self).__init__(**kwargs)
 
     def execute(self, input_message, params, **kwargs):
-
         final_prediction = self.marvin_model["clf"].predict(input_message)[0]
 
-        return {"predicted_value": final_prediction}
+        return final_prediction

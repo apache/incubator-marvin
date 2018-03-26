@@ -13,8 +13,7 @@ import pandas as pd
 
 
 @mock.patch('marvin_sms_spam_engine.training.metrics_evaluator.accuracy_score')
-@mock.patch('marvin_sms_spam_engine.training.metrics_evaluator.classification_report')
-def test_execute(classification_report_mocked, accuracy_score_mocked, mocked_params):
+def test_execute(accuracy_score_mocked, mocked_params):
 
     feature_df = pd.DataFrame(data={'col1': [1, 2], 'col2': [3, 4]})
     label_df = pd.DataFrame(data={'col1': [0, 1]})
@@ -30,6 +29,5 @@ def test_execute(classification_report_mocked, accuracy_score_mocked, mocked_par
     ac = MetricsEvaluator(model=model_mocked, dataset=data_source)
     ac.execute(params=mocked_params)
 
-    classification_report_mocked.assert_called_once()
     accuracy_score_mocked.assert_called_once()
     assert not ac._params

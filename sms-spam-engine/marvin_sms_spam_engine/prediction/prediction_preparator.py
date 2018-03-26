@@ -23,7 +23,6 @@ class PredictionPreparator(EngineBasePrediction):
         super(PredictionPreparator, self).__init__(**kwargs)
 
     def execute(self, input_message, params, **kwargs):
-
         input_message = self.marvin_model["vect"].transform(input_message)
 
         return input_message

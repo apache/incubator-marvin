@@ -8,8 +8,8 @@ Use this module to add the project main code.
 
 from .._compatibility import six
 from .._logging import get_logger
-from sklearn.naive_bayes import MultinomialNB
 from marvin_python_toolbox.engine_base import EngineBaseTraining
+from sklearn.naive_bayes import MultinomialNB
 
 __all__ = ['Trainer']
 
@@ -23,7 +23,6 @@ class Trainer(EngineBaseTraining):
         super(Trainer, self).__init__(**kwargs)
 
     def execute(self, params, **kwargs):
-
         clf = MultinomialNB()
         clf.fit(self.marvin_dataset['X_train'], self.marvin_dataset['y_train'])
 
