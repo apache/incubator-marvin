@@ -20,6 +20,6 @@ def test_execute(mocked_params):
     model_mocked = {"vect": vect}
 
     ac = PredictionPreparator(model=model_mocked)
-    ac.execute(input_message=test_df, params=mocked_params)
+    ac.execute(input_message="this is a mocked message", params=mocked_params)
 
     assert not ac._params
