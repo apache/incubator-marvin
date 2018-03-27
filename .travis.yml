@@ -5,7 +5,9 @@ dist: trusty
 matrix:
     include:
         - os: linux
-          python: 2.7
+          python: "2.7"
+        - os: linux
+          python: "3.6"
         - os: osx
           language: generic
 
@@ -24,10 +26,10 @@ before_install:
   - sudo pip install --upgrade pip
   - sudo pip install virtualenvwrapper --ignore-installed six
   - source virtualenvwrapper.sh
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv sample-env         ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv sms-spam-engine-env         ; fi
 
 install:
-  - cd sample-engine
+  - cd sms-spam-engine
   - make marvin
 
 script:
