@@ -22,8 +22,8 @@ class Predictor(EngineBasePrediction):
     def __init__(self, **kwargs):
         super(Predictor, self).__init__(**kwargs)
 
-    def execute(self, input_message, **kwargs):
-        y_pred = self.model.predict(input_message)
+    def execute(self, input_message, params, **kwargs):
+        y_pred = self.marvin_model.predict(input_message)
         
         sentence = []
         entities = {}

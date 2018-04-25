@@ -24,13 +24,13 @@ class AcquisitorAndCleaner(EngineBaseDataHandler):
     def __init__(self, **kwargs):
         super(AcquisitorAndCleaner, self).__init__(**kwargs)
 
-    def execute(self, **kwargs):
+    def execute(self, params, **kwargs):
         nltk.download(info_or_id='conll2002', download_dir=os.environ["MARVIN_DATA_PATH"])
         train_sents = list(nltk.corpus.conll2002.iob_sents('esp.train'))
         test_sents = list(nltk.corpus.conll2002.iob_sents('esp.testb'))
-        self.initial_dataset = {"train_sents": train_sents,
+        self.marvin_initial_dataset = {"train_sents": train_sents,
                                 "test_sents": test_sents}
 
         logger.info("An example of training sentences:")
-        for annotated_token in self.initial_dataset["train_sents"][2]:
+        for annotated_token in self.marvin_initial_dataset["train_sents"][2]:
             logger.info(annotated_token)

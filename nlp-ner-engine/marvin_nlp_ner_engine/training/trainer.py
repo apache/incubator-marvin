@@ -21,7 +21,7 @@ logger = get_logger('trainer')
 
 class Trainer(EngineBaseTraining):
 
-    def __init__(self, **kwargs):
+    def __init__(self, params, **kwargs):
         super(Trainer, self).__init__(**kwargs)
 
     def execute(self, **kwargs):
@@ -32,10 +32,10 @@ class Trainer(EngineBaseTraining):
                                     max_iterations=100, 
                                     all_possible_transitions=True
                                 )
-        crf.fit(self.dataset['train'][0], self.dataset['train'][1])
-        self.model = crf
+        crf.fit(self.marvin_dataset['train'][0], self.marvin_dataset['train'][1])
+        self.marvin_model = crf
 
         logger.info("Model trained to recognize the following entities: ")
-        labels = list(self.model.classes_)
+        labels = list(self.marvin_model.classes_)
         labels.remove('O')  # O is used to tag no entity
         logger.info(labels)

@@ -19,7 +19,7 @@ logger = get_logger('training_preparator')
 
 class TrainingPreparator(EngineBaseDataHandler):
 
-    def __init__(self, **kwargs):
+    def __init__(self, params, **kwargs):
         super(TrainingPreparator, self).__init__(**kwargs)
 
     @classmethod
@@ -79,11 +79,11 @@ class TrainingPreparator(EngineBaseDataHandler):
         return [token for token, postag, label in sent]
 
     def execute(self, **kwargs):
-        X_train = [TrainingPreparator.sent2features(s) for s in self.initial_dataset['train_sents']]
-        y_train = [TrainingPreparator.sent2labels(s) for s in self.initial_dataset['train_sents']]
+        X_train = [TrainingPreparator.sent2features(s) for s in self.marvin_initial_dataset['train_sents']]
+        y_train = [TrainingPreparator.sent2labels(s) for s in self.marvin_initial_dataset['train_sents']]
 
-        X_test = [TrainingPreparator.sent2features(s) for s in self.initial_dataset['test_sents']]
-        y_test = [TrainingPreparator.sent2labels(s) for s in self.initial_dataset['test_sents']]
+        X_test = [TrainingPreparator.sent2features(s) for s in self.marvin_initial_dataset['test_sents']]
+        y_test = [TrainingPreparator.sent2labels(s) for s in self.marvin_initial_dataset['test_sents']]
 
-        self.dataset = {"train": [X_train, y_train],
+        self.marvin_dataset = {"train": [X_train, y_train],
                         "test": [X_test, y_test]}

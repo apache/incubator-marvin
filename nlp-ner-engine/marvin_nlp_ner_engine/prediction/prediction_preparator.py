@@ -23,6 +23,6 @@ class PredictionPreparator(EngineBasePrediction):
     def __init__(self, **kwargs):
         super(PredictionPreparator, self).__init__(**kwargs)
 
-    def execute(self, input_message, **kwargs):
+    def execute(self, input_message, params, **kwargs):
         features = [TrainingPreparator.sent2features(input_message["sentence1"])]
         return features
