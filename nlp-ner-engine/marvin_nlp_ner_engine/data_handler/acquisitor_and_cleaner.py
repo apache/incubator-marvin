@@ -24,7 +24,7 @@ class AcquisitorAndCleaner(EngineBaseDataHandler):
         super(AcquisitorAndCleaner, self).__init__(**kwargs)
 
     def execute(self, params, **kwargs):
-        nltk.download(info_or_id='conll2002', download_dir=os.environ["MARVIN_DATA_PATH"])
+        nltk.download('conll2002')
         train_sents = list(nltk.corpus.conll2002.iob_sents('esp.train'))
         test_sents = list(nltk.corpus.conll2002.iob_sents('esp.testb'))
 
