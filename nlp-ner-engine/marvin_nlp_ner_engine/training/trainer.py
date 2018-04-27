@@ -7,7 +7,6 @@ Use this module to add the project main code.
 """
 
 import sklearn_crfsuite
-
 from .._compatibility import six
 from .._logging import get_logger
 
@@ -21,21 +20,20 @@ logger = get_logger('trainer')
 
 class Trainer(EngineBaseTraining):
 
-    def __init__(self, params, **kwargs):
+    def __init__(self, **kwargs):
         super(Trainer, self).__init__(**kwargs)
 
-    def execute(self, **kwargs):
+    def execute(self, params, **kwargs):
         crf = sklearn_crfsuite.CRF(
-                                    algorithm='lbfgs', 
-                                    c1=0.10789964607864502, 
-                                    c2=0.082422264927260847, 
-                                    max_iterations=100, 
-                                    all_possible_transitions=True
-                                )
-        crf.fit(self.marvin_dataset['train'][0], self.marvin_dataset['train'][1])
-        self.marvin_model = crf
+            algorithm='lbfgs',
+            c1=0.10789964607864502,
+            c2=0.082422264927260847,
+            max_iterations=100,
+            all_possible_transitions=True
+        )
+        crf.fit(self.marvin_dataset['X_train'], self.marvin_dataset['y_train'])
 
-        logger.info("Model trained to recognize the following entities: ")
-        labels = list(self.marvin_model.classes_)
-        labels.remove('O')  # O is used to tag no entity
-        logger.info(labels)
+        self.marvin_model = {
+            'crf': crf
+        }
+

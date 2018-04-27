@@ -23,25 +23,6 @@ class Predictor(EngineBasePrediction):
         super(Predictor, self).__init__(**kwargs)
 
     def execute(self, input_message, params, **kwargs):
-        y_pred = self.marvin_model.predict(input_message)
-        
-        sentence = []
-        entities = {}
-        
-        for i, token in enumerate(input_message[0]):
-            word = token["word.lower()"]
-            sentence.append(word)
-            
-            label = y_pred[0][i]
-            if label != "O":
-                if label in entities:
-                    entities[label].append(word)
-                else:
-                    entities[label] = [word]
-        example_of_prediction = {}
-        example_of_prediction["sentence"] = ' '.join(sentence)
-        example_of_prediction["entities_found"] = {}
-        for k, v in entities.items():
-            example_of_prediction["entities_found"][k] = ' '.join(v)
+        final_prediction = self.marvin_model['crf'].predict(input_message)
 
-        return example_of_prediction
+        return final_prediction
