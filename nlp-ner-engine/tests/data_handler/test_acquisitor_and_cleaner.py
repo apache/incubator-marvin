@@ -15,6 +15,7 @@ from marvin_nlp_ner_engine.data_handler import AcquisitorAndCleaner
 @mock.patch('marvin_nlp_ner_engine.data_handler.acquisitor_and_cleaner.nltk.download')
 @mock.patch('marvin_nlp_ner_engine.data_handler.acquisitor_and_cleaner.nltk.corpus.conll2002.iob_sents')
 def test_execute(sents_mocked, download_mocked, mocked_params):
+    nltk.download('conll2002')
     ac = AcquisitorAndCleaner()
     ac.execute(params=mocked_params)
 
