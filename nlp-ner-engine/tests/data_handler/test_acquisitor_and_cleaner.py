@@ -17,4 +17,4 @@ def test_execute(download_mocked, mocked_params):
     ac = AcquisitorAndCleaner()
     ac.execute(params=mocked_params)
 
-    download_mocked.assert_called_with(download_dir=ANY, info_or_id='conll2002')
+    download_mocked.assert_called_with('conll2002')
