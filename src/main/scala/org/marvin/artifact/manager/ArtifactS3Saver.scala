@@ -49,18 +49,30 @@ class ArtifactS3Saver(metadata: EngineMetadata) extends Actor with ActorLogging 
     )
   }
 
+  def validatePath(path: Path, isRemote: Boolean): Boolean = {
+    if (isRemote) {
+      s3Client.doesObjectExist(metadata.s3BucketName, path.toString)
+    } else {
+      new java.io.File(path.toString).exists
+    }
+  }
+
   override def receive: Receive = {
     case SaveToLocal(artifactName, protocol) =>
       log.info("Receive message and starting to working...")
       val uris = generatePaths(artifactName, protocol)
       val localToSave = new File(uris("localPath").toString)
 
-      log.info(s"Copying files from ${metadata.s3BucketName}: ${uris("remotePath")} to ${uris("localPath")}")
-
-      //Get artifact named "uris("remotePath")" from S3 Bucket and save to local
-      s3Client.getObject(new GetObjectRequest(metadata.s3BucketName, uris("remotePath").toString), localToSave)
-
-      log.info(s"File ${uris("localPath")} saved!")
+      // Validate if the protocol is correct
+      if (validatePath(uris("remotePath"), true)) {
+        log.info(s"Copying files from ${metadata.s3BucketName}: ${uris("remotePath")} to ${uris("localPath")}")
+        //Get artifact named "uris("remotePath")" from S3 Bucket and save it to local
+        s3Client.getObject(new GetObjectRequest(metadata.s3BucketName, uris("remotePath").toString), localToSave)
+        log.info(s"File ${uris("localPath")} saved!")
+      }
+      else {
+        log.error(s"Invalid protocol: ${protocol}, save process canceled!")
+      }
 
       sender ! Done
 
@@ -69,12 +81,16 @@ class ArtifactS3Saver(metadata: EngineMetadata) extends Actor with ActorLogging 
       val uris = generatePaths(artifactName, protocol)
       val fileToUpload = new File(uris("localPath").toString)
 
-      log.info(s"Copying files from ${uris("localPath")} to ${metadata.s3BucketName}: ${uris("remotePath")}")
-
-      //Get local artifact and save to S3 Bucket with name "uris("remotePath")"
-      s3Client.putObject(metadata.s3BucketName, uris("remotePath").toString, fileToUpload)
-
-      log.info(s"File ${uris("localPath")} saved!")
+      // Validate if the protocol is correct
+      if (validatePath(uris("localPath"), false)) {
+        log.info(s"Copying files from ${uris("localPath")} to ${metadata.s3BucketName}: ${uris("remotePath")}")
+        //Get local artifact and save to S3 Bucket with name "uris("remotePath")"
+        s3Client.putObject(metadata.s3BucketName, uris("remotePath").toString, fileToUpload)
+        log.info(s"File ${uris("localPath")} saved!")
+      }
+      else {
+        log.error(s"Invalid protocol: ${protocol}, save process canceled!")
+      }
 
       sender ! Done
 

@@ -34,14 +34,14 @@ object MetadataMock {
       artifactsRemotePath = "",
       artifactManagerType = "HDFS",
       s3BucketName = "marvin-artifact-bucket",
-      batchActionTimeout = 100,
+      batchActionTimeout = 2000,
       engineType = "python",
       hdfsHost = "",
-      healthCheckTimeout = 100,
-      onlineActionTimeout = 100,
+      healthCheckTimeout = 2000,
+      onlineActionTimeout = 2000,
       pipelineActions = List("acquisitor", "tpreparator"),
       reloadStateTimeout = Some(500),
-      reloadTimeout = 100,
+      reloadTimeout = 2000,
       version = "1"
     )
   }

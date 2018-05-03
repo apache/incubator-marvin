@@ -8,6 +8,7 @@ import akka.testkit.{ImplicitSender, TestKit}
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.GetObjectRequest
 import com.typesafe.config.ConfigFactory
+import org.apache.hadoop.fs.Path
 import org.marvin.artifact.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
 import org.marvin.fixtures.MetadataMock
 import org.marvin.model.EngineMetadata
@@ -27,7 +28,7 @@ class ArtifactS3SaverTest extends TestKit(
     "receive SaveToLocal message" in {
       val metadata = MetadataMock.simpleMockedMetadata()
       val _s3Client = mock[AmazonS3]
-      val actor = system.actorOf(Props(new ArtifactS3SaverMock(metadata, _s3Client)))
+      val actor = system.actorOf(Props(new ArtifactS3SaverMock(metadata, _s3Client, true)))
 
       val protocol = "protocol"
       val artifactName = "model"
@@ -42,7 +43,7 @@ class ArtifactS3SaverTest extends TestKit(
     "receive SaveToRemote message" in {
       val metadata = MetadataMock.simpleMockedMetadata()
       val _s3Client = mock[AmazonS3]
-      val actor = system.actorOf(Props(new ArtifactS3SaverMock(metadata, _s3Client)))
+      val actor = system.actorOf(Props(new ArtifactS3SaverMock(metadata, _s3Client, true)))
 
       val protocol = "protocol"
       val artifactName = "model"
@@ -66,10 +67,15 @@ class ArtifactS3SaverTest extends TestKit(
       }
     }
 
-  class ArtifactS3SaverMock(metadata: EngineMetadata, _s3Client: AmazonS3) extends ArtifactS3Saver(metadata) {
+  class ArtifactS3SaverMock(metadata: EngineMetadata, _s3Client: AmazonS3, _isRemote: Boolean) extends ArtifactS3Saver(metadata) {
     def _preStart(): Unit = super.preStart()
     override def preStart(): Unit = {
       s3Client = _s3Client
+    }
+
+    override def validatePath(path: Path, isRemote: Boolean): Boolean = {
+      if (_isRemote) true
+      else false
     }
   }
 }
