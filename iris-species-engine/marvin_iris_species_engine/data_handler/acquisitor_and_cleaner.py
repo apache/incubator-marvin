@@ -24,9 +24,9 @@ class AcquisitorAndCleaner(EngineBaseDataHandler):
     def __init__(self, **kwargs):
         super(AcquisitorAndCleaner, self).__init__(**kwargs)
 
-    def execute(self, **kwargs):
-        file_path = MarvinData.download_file(url=self.params["data_url"])
+    def execute(self, params, **kwargs):
+        file_path = MarvinData.download_file(url=params["data_url"])
 
         iris = pd.read_csv(file_path)
         iris.drop('Id', axis=1, inplace=True)
-        self.initial_dataset = iris
+        self.marvin_initial_dataset = iris

@@ -22,5 +22,5 @@ class PredictionPreparator(EngineBasePrediction):
     def __init__(self, **kwargs):
         super(PredictionPreparator, self).__init__(**kwargs)
 
-    def execute(self, input_message, **kwargs):
-        return input_message['message']
+    def execute(self, input_message, params, **kwargs):
+        return input_message
