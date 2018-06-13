@@ -37,9 +37,11 @@ script:
   - cd nlp-ner-engine
   - make marvin
   - marvin test
+  - cd ..
   - cd sms-spam-engine
   - make marvin
   - marvin test
+  - cd ..
   - cd iris-species-engine
   - make marvin
   - marvin test
