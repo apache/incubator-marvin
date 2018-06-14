@@ -9,6 +9,7 @@ from sklearn import metrics as sk_metrics
 
 from .._compatibility import six
 from .._logging import get_logger
+from six import iteritems
 
 from marvin_python_toolbox.engine_base import EngineBaseTraining
 
@@ -36,7 +37,7 @@ class MetricsEvaluator(EngineBaseTraining):
             prediction = self.marvin_model[m].predict(_test_X)
             _metrics[m] = sk_metrics.accuracy_score(prediction, _test_y)
 
-        _metrics = sorted(_metrics.iteritems(), key=lambda kv: (kv[1], kv[0]), reverse=True)
+        _metrics = sorted(iteritems(_metrics), key=lambda kv: (kv[1], kv[0]), reverse=True)
 
         self.marvin_metrics = {
             "best_model": _metrics[0],
