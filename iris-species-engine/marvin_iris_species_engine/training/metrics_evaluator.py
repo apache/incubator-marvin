@@ -36,7 +36,7 @@ class MetricsEvaluator(EngineBaseTraining):
             prediction = self.marvin_model[m].predict(_test_X)
             _metrics[m] = sk_metrics.accuracy_score(prediction, _test_y)
 
-        _metrics = sorted(_metrics.iteritems(), key=lambda (k, v): (v, k), reverse=True)
+        _metrics = sorted(_metrics.iteritems(), key=lambda kv: (kv[1], kv[0]), reverse=True)
 
         self.marvin_metrics = {
             "best_model": _metrics[0],
