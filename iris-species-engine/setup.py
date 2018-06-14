@@ -72,7 +72,7 @@ setup(
         'numpy==1.13.1',
         'pandas==0.20.3',
         'matplotlib==2.0.2',
-        'marvin-python-toolbox==0.0.3',
+        'marvin-python-toolbox==0',
         'seaborn==0.8.1'
     ],
     dependency_links=['git+https://github.com/marvin-ai/marvin-python-toolbox.git/@v0.0.3#egg=marvin_python_toolbox-0'],
