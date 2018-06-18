@@ -31,6 +31,7 @@ help:
 	@echo "        Remove marvin setup.py dependencies."
 
 marvin:
+	pip install --upgrade pip
 	pip install -e . --process-dependency-links
 	marvin --help
 
