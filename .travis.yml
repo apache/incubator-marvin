@@ -35,13 +35,16 @@ install:
 
 script:
   - cd nlp-ner-engine
+  - workon nlp-ner-engine-env
   - make marvin
   - marvin test
   - cd ..
   - cd sms-spam-engine
+  - workon sms-spam-engine-env
   - make marvin
   - marvin test
   - cd ..
   - cd iris-species-engine
+  - workon iris-species-engine-env
   - make marvin
   - marvin test
