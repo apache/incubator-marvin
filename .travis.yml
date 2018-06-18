@@ -26,26 +26,22 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz -y ; fi
   - sudo pip install --upgrade pip
   - sudo pip install virtualenvwrapper --ignore-installed six
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then echo "export WORKON_HOME=$HOME/.virtualenvs" >> $HOME/.bash_profile ; fi
   - source virtualenvwrapper.sh
   
 install:
-  - mkvirtualenv nlp-ner-engine-env
-  - mkvirtualenv sms-spam-engine-env
-  - mkvirtualenv iris-species-engine-env
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv nlp-ner-engine-env         ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv sms-spam-engine-env        ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv iris-species-engine-env    ; fi
 
 script:
   - cd nlp-ner-engine
-  - workon nlp-ner-engine-env
   - make marvin
   - marvin test
   - cd ..
   - cd sms-spam-engine
-  - workon sms-spam-engine-env
   - make marvin
   - marvin test
   - cd ..
   - cd iris-species-engine
-  - workon iris-species-engine-env
   - make marvin
   - marvin test
