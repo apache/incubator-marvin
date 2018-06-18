@@ -30,9 +30,9 @@ before_install:
   
 install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then echo "export WORKON_HOME=$HOME/.virtualenvs" >> $HOME/.bash_profile ; fi
-  - then mkvirtualenv nlp-ner-engine-env
-  - then mkvirtualenv sms-spam-engine-env
-  - then mkvirtualenv iris-species-engine-env
+  - mkvirtualenv nlp-ner-engine-env
+  - mkvirtualenv sms-spam-engine-env
+  - mkvirtualenv iris-species-engine-env
 
 script:
   - cd nlp-ner-engine
