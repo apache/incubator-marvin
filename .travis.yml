@@ -29,9 +29,9 @@ before_install:
   - source virtualenvwrapper.sh
   
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv nlp-ner-engine-env         ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv sms-spam-engine-env         ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv iris-species-engine-env         ; fi
+  - mkvirtualenv nlp-ner-engine-env
+  - mkvirtualenv sms-spam-engine-env
+  - mkvirtualenv iris-species-engine-env
 
 script:
   - cd nlp-ner-engine
