@@ -29,28 +29,23 @@ before_install:
   - source virtualenvwrapper.sh
   
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv nlp-ner-engine-env         ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv sms-spam-engine-env        ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv iris-species-engine-env    ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then echo "export WORKON_HOME=$HOME/.virtualenvs" >> $HOME/.bash_profile ; fi
+  - then mkvirtualenv nlp-ner-engine-env
+  - then mkvirtualenv sms-spam-engine-env
+  - then mkvirtualenv iris-species-engine-env
 
 script:
   - cd nlp-ner-engine
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mkvirtualenv nlp-ner-engine-env       ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then setvirtualenvproject                  ; fi
   - workon nlp-ner-engine-env
   - make marvin
   - marvin test
   - cd ..
   - cd sms-spam-engine
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mkvirtualenv sms-spam-engine-env      ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then setvirtualenvproject                  ; fi
   - workon sms-spam-engine-env
   - make marvin
   - marvin test
   - cd ..
   - cd iris-species-engine
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mkvirtualenv iris-species-engine-env  ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then setvirtualenvproject                  ; fi
   - workon iris-species-engine-env
   - make marvin
   - marvin test
