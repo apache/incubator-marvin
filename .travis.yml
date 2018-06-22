@@ -27,11 +27,27 @@ before_install:
   - sudo pip install --upgrade pip
   - sudo pip install virtualenvwrapper --ignore-installed six
   - source virtualenvwrapper.sh
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv nlp-ner-engine-env         ; fi
 
 install:
-  - cd nlp-ner-engine
-  - make marvin
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv nlp-ner-engine-env         ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv sms-spam-engine-env        ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv iris-species-engine-env    ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv mnist-keras-engine-env     ; fi
+  
 
 script:
+  - cd nlp-ner-engine
+  - make marvin
+  - marvin test
+  - cd ..
+  - cd sms-spam-engine
+  - make marvin
+  - marvin test
+  - cd ..
+  - cd iris-species-engine
+  - make marvin
+  - marvin test
+  - cd ..
+  - cd mnist-keras-engine
+  - make marvin
   - marvin test
