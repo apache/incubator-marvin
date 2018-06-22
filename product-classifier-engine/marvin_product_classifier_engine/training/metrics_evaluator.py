@@ -28,7 +28,7 @@ class MetricsEvaluator(EngineBaseTraining):
 
         accuracy = accuracy_score(y_prediction, self.marvin_dataset["y_test"])
 
-        print accuracy
+        print(accuracy)
 
         self.marvin_metrics = accuracy
 
