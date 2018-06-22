@@ -34,7 +34,6 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv iris-species-engine-env    ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv mnist-keras-engine-env     ; fi
   
-
 script:
   - cd nlp-ner-engine
   - make marvin
