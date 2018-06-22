@@ -10,8 +10,6 @@ except ImportError:
 from marvin_iris_species_engine.prediction import PredictionPreparator
 
 
-class TestPredictionPreparator:
-    def test_execute(self, mocked_params):
-        ac = PredictionPreparator(params=mocked_params)
-        ac.execute(input_message="fake message")
-        assert ac.params == mocked_params
+def test_execute(mocked_params):
+    ac = PredictionPreparator()
+    ac.execute(input_message="fake message", params=mocked_params)

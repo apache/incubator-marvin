@@ -22,8 +22,8 @@ class Predictor(EngineBasePrediction):
     def __init__(self, **kwargs):
         super(Predictor, self).__init__(**kwargs)
 
-    def execute(self, input_message, **kwargs):
+    def execute(self, input_message, params, **kwargs):
         return {
-            "svm_petals": self.model['svm_petals'].predict(input_message)[0],
-            "svm_sepals": self.model['svm_sepals'].predict(input_message)[0]
+            "svm_petals": self.marvin_model['svm_petals'].predict(input_message)[0],
+            "svm_sepals": self.marvin_model['svm_sepals'].predict(input_message)[0]
         }
