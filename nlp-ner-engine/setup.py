@@ -66,7 +66,7 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    dependency_links=['git+https://github.com/marvin-ai/marvin-python-toolbox.git/@v0.0.3#egg=marvin_python_toolbox-0'],
+    dependency_links=['git+https://github.com/marvin-ai/marvin-python-toolbox.git/@master#egg=marvin_python_toolbox-0'],
     install_requires=[
         'scikit-learn==0.18.2',
         'scipy==0.19.1',
