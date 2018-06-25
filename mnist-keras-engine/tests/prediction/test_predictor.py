@@ -11,7 +11,12 @@ from marvin_mnist_keras_engine.prediction import Predictor
 
 
 class TestPredictor:
-    def test_execute(self, mocked_params):
-        ac = Predictor()
-        ac.execute(input_message="fake message", params=mocked_params)
-        assert not ac._params
+    def test_execute(mocked_params):
+
+    	mocked_model = mock.MagicMock()
+
+        ac = Predictor(model=mocked_model)
+        ac.execute(input_message="test_message", params=mocked_params)
+
+        mocked_model.predict_classes.assert_called_once_with("test_message")
+        mocked_model.predict.assert_called_once_with("test_message")

@@ -10,8 +10,16 @@ except ImportError:
 from marvin_mnist_keras_engine.prediction import PredictionPreparator
 
 
-class TestPredictionPreparator:
-    def test_execute(self, mocked_params):
-        ac = PredictionPreparator()
-        ac.execute(input_message="fake message", params=mocked_params)
-        assert not ac._params
+@mock.patch('marvin_mnist_keras_engine.prediction.prediction_preparator.cv2.resize')
+@mock.patch('marvin_mnist_keras_engine.prediction.prediction_preparator.cv2.imdecode')
+@mock.patch('marvin_mnist_keras_engine.prediction.prediction_preparator.urllib2.urlopen')
+def test_execute(mocked_urlopen, mocked_imdecode, mocked_resize, mocked_params):
+
+    message = ["test_message"]
+
+    ac = PredictionPreparator(model="test_model")
+    ac.execute(input_message=message, params=mocked_params)
+
+    mocked_urlopen.assert_called_once_with(["test_message"])
+    mocked_imdecode.assert_called_once()
+    mocked_resize.assert_called_once()
