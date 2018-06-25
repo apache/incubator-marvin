@@ -13,7 +13,7 @@ from marvin_mnist_keras_engine.prediction import Predictor
 class TestPredictor:
     def test_execute(mocked_params):
 
-    	mocked_model = mock.MagicMock()
+        mocked_model = mock.MagicMock()
 
         ac = Predictor(model=mocked_model)
         ac.execute(input_message="test_message", params=mocked_params)

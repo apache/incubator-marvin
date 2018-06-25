@@ -11,7 +11,7 @@ from .._logging import get_logger
 from ..model_serializer import ModelSerializer
 import numpy as np
 import cv2
-import urllib2
+from six.moves.urllib.request import urlopen
 from marvin_python_toolbox.engine_base import EngineBasePrediction
 
 __all__ = ['PredictionPreparator']
@@ -27,7 +27,7 @@ class PredictionPreparator(ModelSerializer, EngineBasePrediction):
 
     def execute(self, input_message, params, **kwargs):
 
-        resp = urllib2.urlopen(input_message)
+        resp = urlopen(input_message)
         img = np.asarray(bytearray(resp.read()), dtype="uint8")
 
         img = cv2.imdecode(img, cv2.IMREAD_COLOR)
