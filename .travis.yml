@@ -35,10 +35,6 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv mnist-keras-engine-env     ; fi
   
 script:
-  - cd mnist-keras-engine
-  - make marvin
-  - marvin test
-  - cd ..
   - cd nlp-ner-engine
   - make marvin
   - marvin test
@@ -50,4 +46,7 @@ script:
   - cd iris-species-engine
   - make marvin
   - marvin test
-
+  - cd ..
+  - cd mnist-keras-engine
+  - make marvin
+  - marvin test
