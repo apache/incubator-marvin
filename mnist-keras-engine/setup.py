@@ -82,7 +82,7 @@ setup(
     ],
     dependency_links=['git+https://github.com/marvin-ai/marvin-python-toolbox.git/@master#egg=marvin_python_toolbox-0'],
     tests_require=[
-        'pytest>=2.6.4',
+        'pytest>=3.6.0',
         'pytest-cov>=1.8.1',
         'mock>=2.0.0',
         'virtualenv>=15.0.1',
