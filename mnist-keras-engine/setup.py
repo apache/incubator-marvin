@@ -78,6 +78,7 @@ setup(
         'tensorflow==1.5.0',
         'np-utils==0.5.4',
         'h5py==2.7.1',
+        'pytest==3.6.0',
         'opencv-python==3.4.0.12'
     ],
     dependency_links=['git+https://github.com/marvin-ai/marvin-python-toolbox.git/@master#egg=marvin_python_toolbox-0'],
