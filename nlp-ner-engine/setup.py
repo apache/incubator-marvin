@@ -73,7 +73,7 @@ setup(
         'numpy==1.13.1',
         'pandas==0.20.3',
         'matplotlib==2.0.2',
-        'marvin-python-toolbox==0.0.3',
+        'marvin-python-toolbox==0',
         'nltk==3.2.5',
         'sklearn-crfsuite==0.3.6',
     ],
