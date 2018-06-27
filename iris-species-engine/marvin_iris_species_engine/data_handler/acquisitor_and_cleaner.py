@@ -25,7 +25,6 @@ class AcquisitorAndCleaner(EngineBaseDataHandler):
         super(AcquisitorAndCleaner, self).__init__(**kwargs)
 
     def execute(self, params, **kwargs):
-    	#import ipdb; ipdb.set_trace()
         file_path = MarvinData.download_file(url=params["data_url"])
 
         iris = pd.read_csv(file_path)

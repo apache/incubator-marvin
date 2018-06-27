@@ -10,8 +10,11 @@ except ImportError:
 from marvin_image_classification_engine.prediction import Predictor
 
 
-class TestPredictor:
-    def test_execute(self, mocked_params):
-        ac = Predictor(params=mocked_params)
-        ac.execute(input_message="fake message")
-        assert ac.params == mocked_params
+def test_execute(mocked_params):
+
+    mocked_model = mock.MagicMock()
+
+    ac = Predictor(model=mocked_model)
+    ac.execute(input_message="test_message", params=mocked_params)
+
+    mocked_model.predict.assert_called_once_with('test_message')

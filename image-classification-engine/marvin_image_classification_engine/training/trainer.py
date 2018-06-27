@@ -61,19 +61,19 @@ class Trainer(ModelSerializer, EngineBaseTraining):
                 yield (image, np.array([int(label)]))
 
 
-    def execute(self, **kwargs):
+    def execute(self, params, **kwargs):
         model = self.build_model(trainable=True)
         model.compile(loss='binary_crossentropy',
-                      optimizer=optimizers.SGD(lr=self.params['LEARNING_RATE'], momentum=self.params['MOMENTUM']),
+                      optimizer=optimizers.SGD(lr=params['LEARNING_RATE'], momentum=params['MOMENTUM']),
                       metrics=['accuracy'])
 
-        training_data = self.generate_samples(self.dataset['train'])
-        validation_data = self.generate_samples(self.dataset['val'])
+        training_data = self.generate_samples(self.marvin_dataset['train'])
+        validation_data = self.generate_samples(self.marvin_dataset['val'])
 
         model.fit_generator(training_data,
-                            steps_per_epoch=self.params['STEPS'],
-                            epochs=self.params['EPOCHS'],
+                            steps_per_epoch=params['STEPS'],
+                            epochs=params['EPOCHS'],
                             validation_data=validation_data,
-                            validation_steps=self.params['VAL_STEPS'])
+                            validation_steps=params['VAL_STEPS'])
 
-        self.model = model
+        self.marvin_model = model

@@ -33,14 +33,14 @@ class AcquisitorAndCleaner(EngineBaseDataHandler):
             shuffle(samples)
         return samples
 
-    def execute(self, **kwargs):
-        data = os.path.join(MarvinData.data_path, os.path.basename(self.params['DATA']))
+    def execute(self, params, **kwargs):
+        data = os.path.join(MarvinData.data_path, os.path.basename(params['DATA']))
         if not os.path.exists(data):
             print("Downloading...")
-            data = MarvinData.download_file(url=self.params["DATA"])
+            data = MarvinData.download_file(url=params["DATA"])
             print("Extracting...")
             os.system('tar xvf {} --directory {}'.format(data, MarvinData.data_path))
             print("Done.")
-        train = self.read_samples(os.path.join(MarvinData.data_path, self.params['TRAIN']))
-        val = self.read_samples(os.path.join(MarvinData.data_path, self.params['VALID']))
-        self.initial_dataset = ((train, val))
+        train = self.read_samples(os.path.join(MarvinData.data_path, params['TRAIN']))
+        val = self.read_samples(os.path.join(MarvinData.data_path, params['VALID']))
+        self.marvin_initial_dataset = ((train, val))
