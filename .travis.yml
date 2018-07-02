@@ -18,6 +18,8 @@ scala: 2.12.3
 
 jdk: oraclejdk8
 
+bundler_args: --retry 5
+
 cache:
   directories:
   - $HOME/.sbt
@@ -31,8 +33,6 @@ before_script:
 - unset SBT_OPTS
 
 script: sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport
-
-bundler_args: --retry 5
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
