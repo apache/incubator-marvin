@@ -68,7 +68,11 @@ class PredictorFSM(var predictorActor: ActorRef, metadata: EngineMetadata) exten
       goto(Ready) using Model(protocol)
     }
     case Event(FailedToReload(protocol), _) => {
-      log.error(s"Failed to reload with protocol {$protocol}")
+      if(protocol == null || protocol.isEmpty)
+        log.warning("No valid model protocol found, " +
+          "if this is the first start up of the server without any trained model, please ignore the previous IOError from toolbox!")
+      else
+        log.error(s"Failed to reload with protocol {$protocol}")
       goto(Unavailable)
     }
     case Event(StateTimeout, _) => {
