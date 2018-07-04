@@ -33,20 +33,29 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv sms-spam-engine-env        ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv iris-species-engine-env    ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv product-classifier-engine-env         ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv mnist-keras-engine-env     ; fi
 
 script:
   - cd nlp-ner-engine
-  - make marvin
+  - make clean marvin
   - marvin test
   - cd ..
   - cd sms-spam-engine
-  - make marvin
+  - make clean marvin
   - marvin test
   - cd ..
   - cd iris-species-engine
-  - make marvin
+  - make clean marvin
+  - marvin test
+  - cd ..
+  - cd mnist-keras-engine
+  - make clean marvin
   - marvin test
   - cd ..
   - cd product-classifier-engine
-  - make marvin
+  - make clean marvin
+  - marvin test
+  - cd ..
+  - cd mnist-keras-engine
+  - make clean marvin
   - marvin test

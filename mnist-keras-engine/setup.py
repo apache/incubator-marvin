@@ -8,7 +8,7 @@ from setuptools.command.test import test as TestCommand
 def _get_version():
     """Return the project version from VERSION file."""
 
-    with open(join(dirname(__file__), 'marvin_nlp_ner_engine/VERSION'), 'rb') as f:
+    with open(join(dirname(__file__), 'marvin_mnist_keras_engine/VERSION'), 'rb') as f:
         version = f.read().decode('ascii').strip()
     return version
 
@@ -43,14 +43,14 @@ class Tox(TestCommand):
 
 
 setup(
-    name='marvin_nlp_ner_engine',
+    name='marvin_mnist_keras_engine',
     version=_get_version(),
     url='',
-    description='Named-Entity-Recognition example using Marvin platform',
+    description='Marvin engine',
     long_description=open(join(dirname(__file__), 'README.md')).read(),
-    author='Marvin AI Researcher',
-    maintainer='erick.maziero',
-    maintainer_email='egmaziero@gmail.com',
+    author='Marvin AI Community',
+    maintainer='Marvin AI Community',
+    maintainer_email='marvin-ai@googlegroups.com',
     packages=find_packages(exclude=('tests', 'tests.*')),
     include_package_data=True,
     zip_safe=False,
@@ -66,17 +66,22 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    dependency_links=['git+https://github.com/marvin-ai/marvin-python-toolbox.git/@master#egg=marvin_python_toolbox-0'],
     install_requires=[
         'scikit-learn==0.18.2',
         'scipy==0.19.1',
-        'numpy==1.13.1',
         'pandas==0.20.3',
         'matplotlib==2.0.2',
         'marvin-python-toolbox==0',
-        'nltk==3.2.5',
-        'sklearn-crfsuite==0.3.6',
+        'Fabric==1.14.0',
+        'keras==2.1.4',
+        'tensorflow==1.5.0',
+        'np-utils==0.5.4',
+        'h5py==2.7.1',
+        'pytest==2.9.2',
+        'pluggy==0.3.1',
+        'opencv-python==3.4.0.12'
     ],
+    dependency_links=['git+https://github.com/marvin-ai/marvin-python-toolbox.git/@master#egg=marvin_python_toolbox-0'],
     tests_require=[
         'pytest>=2.6.4',
         'pytest-cov>=1.8.1',
