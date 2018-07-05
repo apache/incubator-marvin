@@ -207,7 +207,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 16,
+   "execution_count": 12,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -216,7 +216,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 17,
+   "execution_count": 13,
    "metadata": {
     "marvin_cell": "ppreparator"
    },
@@ -241,7 +241,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 18,
+   "execution_count": 14,
    "metadata": {
     "marvin_cell": "predictor"
    },
@@ -252,7 +252,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 19,
+   "execution_count": 15,
    "metadata": {},
    "outputs": [
     {
