@@ -1,0 +1,221 @@
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Coverage report</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script type="text/javascript" src="jquery.ba-throttle-debounce.min.js"></script>
+    <script type="text/javascript" src="jquery.tablesorter.min.js"></script>
+    <script type="text/javascript" src="jquery.hotkeys.js"></script>
+    <script type="text/javascript" src="coverage_html.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(coverage.index_ready);
+    </script>
+</head>
+<body class="indexfile">
+
+<div id="header">
+    <div class="content">
+        <h1>Coverage report:
+            <span class="pc_cov">91%</span>
+        </h1>
+
+        <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
+
+        <form id="filter_container">
+            <input id="filter" type="text" value="" placeholder="filter..." />
+        </form>
+    </div>
+</div>
+
+<div class="help_panel">
+    <img id="panel_icon" src="keybd_open.png" alt="Hide keyboard shortcuts" />
+    <p class="legend">Hot-keys on this page</p>
+    <div>
+    <p class="keyhelp">
+        <span class="key">n</span>
+        <span class="key">s</span>
+        <span class="key">m</span>
+        <span class="key">x</span>
+        
+        <span class="key">c</span> &nbsp; change column sorting
+    </p>
+    </div>
+</div>
+
+<div id="index">
+    <table class="index">
+        <thead>
+            
+            <tr class="tablehead" title="Click to sort">
+                <th class="name left headerSortDown shortkey_n">Module</th>
+                <th class="shortkey_s">statements</th>
+                <th class="shortkey_m">missing</th>
+                <th class="shortkey_x">excluded</th>
+                
+                <th class="right shortkey_c">coverage</th>
+            </tr>
+        </thead>
+        
+        <tfoot>
+            <tr class="total">
+                <td class="name left">Total</td>
+                <td>256</td>
+                <td>22</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="234 256">91%</td>
+            </tr>
+        </tfoot>
+        <tbody>
+            
+            <tr class="file">
+                <td class="name left"><a href="marvin_image_classification_engine___init___py.html">marvin_image_classification_engine/__init__.py</a></td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="6 6">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="marvin_image_classification_engine__compatibility_py.html">marvin_image_classification_engine/_compatibility.py</a></td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="7 7">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="marvin_image_classification_engine__logging_py.html">marvin_image_classification_engine/_logging.py</a></td>
+                <td>37</td>
+                <td>5</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="32 37">86%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="marvin_image_classification_engine_data_handler___init___py.html">marvin_image_classification_engine/data_handler/__init__.py</a></td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="2 2">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="marvin_image_classification_engine_data_handler_acquisitor_and_cleaner_py.html">marvin_image_classification_engine/data_handler/acquisitor_and_cleaner.py</a></td>
+                <td>30</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="30 30">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="marvin_image_classification_engine_data_handler_training_preparator_py.html">marvin_image_classification_engine/data_handler/training_preparator.py</a></td>
+                <td>36</td>
+                <td>3</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="33 36">92%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="marvin_image_classification_engine_model_serializer_py.html">marvin_image_classification_engine/model_serializer.py</a></td>
+                <td>11</td>
+                <td>6</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="5 11">45%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="marvin_image_classification_engine_prediction___init___py.html">marvin_image_classification_engine/prediction/__init__.py</a></td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="3 3">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="marvin_image_classification_engine_prediction_feedback_py.html">marvin_image_classification_engine/prediction/feedback.py</a></td>
+                <td>11</td>
+                <td>2</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="9 11">82%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="marvin_image_classification_engine_prediction_prediction_preparator_py.html">marvin_image_classification_engine/prediction/prediction_preparator.py</a></td>
+                <td>19</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="19 19">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="marvin_image_classification_engine_prediction_predictor_py.html">marvin_image_classification_engine/prediction/predictor.py</a></td>
+                <td>12</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="12 12">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="marvin_image_classification_engine_training___init___py.html">marvin_image_classification_engine/training/__init__.py</a></td>
+                <td>2</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="2 2">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="marvin_image_classification_engine_training_metrics_evaluator_py.html">marvin_image_classification_engine/training/metrics_evaluator.py</a></td>
+                <td>30</td>
+                <td>1</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="29 30">97%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="marvin_image_classification_engine_training_trainer_py.html">marvin_image_classification_engine/training/trainer.py</a></td>
+                <td>50</td>
+                <td>5</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="45 50">90%</td>
+            </tr>
+            
+        </tbody>
+    </table>
+
+    <p id="no_rows">
+        No items found using the specified filter.
+    </p>
+</div>
+
+<div id="footer">
+    <div class="content">
+        <p>
+            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v4.5.1</a>,
+            created at 2018-06-27 11:51
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

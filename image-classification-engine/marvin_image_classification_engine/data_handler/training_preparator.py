@@ -23,7 +23,7 @@ class TrainingPreparator(EngineBaseDataHandler):
 
     def __init__(self, **kwargs):
         super(TrainingPreparator, self).__init__(**kwargs)
-        self.image_path = os.path.join(MarvinData.data_path, self.params['TRAIN_IMAGES'])
+        self.image_path = os.path.join(MarvinData.data_path, "Images")
         if not os.path.exists(self.image_path):
             os.makedirs(self.image_path)
             os.makedirs(os.path.join(self.image_path, '0'))
@@ -46,17 +46,17 @@ class TrainingPreparator(EngineBaseDataHandler):
             data.append((imname, label))
         return data
 
-    def execute(self, **kwargs):
-        train, val = self.initial_dataset
+    def execute(self, params, **kwargs):
+        train, val = self.marvin_initial_dataset
 
-        training_data = self.convert_images(self.params['IMAGES'],
+        training_data = self.convert_images(params['IMAGES'],
                                             train,
-                                            w=self.params['W'],
-                                            h=self.params['H'])
+                                            w=params['W'],
+                                            h=params['H'])
 
-        validation_data = self.convert_images(self.params['IMAGES'],
+        validation_data = self.convert_images(params['IMAGES'],
                                               val,
-                                              w=self.params['W'],
-                                              h=self.params['H'])
+                                              w=params['W'],
+                                              h=params['H'])
 
-        self.dataset = {'train': training_data, 'val': validation_data}
+        self.marvin_dataset = {'train': training_data, 'val': validation_data}

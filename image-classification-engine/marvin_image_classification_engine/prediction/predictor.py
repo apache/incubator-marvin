@@ -22,5 +22,5 @@ class Predictor(ModelSerializer, EngineBasePrediction):
     def __init__(self, **kwargs):
         super(Predictor, self).__init__(**kwargs)
 
-    def execute(self, input_message, **kwargs):
-        return {"Contains airplane": self.model.predict(input_message).squeeze().tolist()}
+    def execute(self, input_message, params, **kwargs):
+        return {"Contains airplane": self.marvin_model.predict(input_message).squeeze().tolist()}

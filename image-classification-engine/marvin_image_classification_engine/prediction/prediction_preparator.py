@@ -26,7 +26,7 @@ class PredictionPreparator(ModelSerializer, EngineBasePrediction):
     def __init__(self, **kwargs):
         super(PredictionPreparator, self).__init__(**kwargs)
 
-    def execute(self, input_message, **kwargs):
+    def execute(self, input_message, params, **kwargs):
         image = cv2.imread(os.path.join(MarvinData.data_path, input_message["message"]))
         image = cv2.resize(image, (150, 150))
         image = image[np.newaxis, :, :, (2, 1, 0)]
