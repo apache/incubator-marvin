@@ -4,6 +4,14 @@ from os.path import dirname, join
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
+REQUIREMENT_TESTS = [
+    'pytest>=2.6.4',
+    'pytest-cov>=1.8.1',
+    'mock>=2.0.0',
+    'virtualenv>=15.0.1',
+    'tox>=2.2.0'
+]
+
 
 def _get_version():
     """Return the project version from VERSION file."""
@@ -79,13 +87,10 @@ setup(
         'h5py==2.7.1',
     ],
     dependency_links=['git+https://github.com/marvin-ai/marvin-python-toolbox.git/@master#egg=marvin_python_toolbox-0'],
-    tests_require=[
-        'pytest>=2.6.4',
-        'pytest-cov>=1.8.1',
-        'mock>=2.0.0',
-        'virtualenv>=15.0.1',
-        'tox>=2.2.0',
-    ],
+    tests_require=REQUIREMENT_TESTS,
+    extras_require={
+        'testing': REQUIREMENT_TESTS,
+    },
     cmdclass={
         'test': Tox,
     },

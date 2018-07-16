@@ -35,6 +35,7 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv image-classification-engine-env    ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv product-classifier-engine-env         ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv mnist-keras-engine-env     ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv kaggle-titanic-engine-env         ; fi
 
 script:
   - cd nlp-ner-engine
@@ -58,5 +59,9 @@ script:
   - marvin test
   - cd ..
   - cd product-classifier-engine
+  - make clean marvin
+  - marvin test
+  - cd ..
+  - cd kaggle-titanic-engine
   - make clean marvin
   - marvin test

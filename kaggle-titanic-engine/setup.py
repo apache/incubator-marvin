@@ -4,6 +4,7 @@ from os.path import dirname, join
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
+
 REQUIREMENT_TESTS = [
     'pytest>=2.6.4',
     'pytest-cov>=1.8.1',
@@ -16,7 +17,7 @@ REQUIREMENT_TESTS = [
 def _get_version():
     """Return the project version from VERSION file."""
 
-    with open(join(dirname(__file__), 'marvin_iris_species_engine/VERSION'), 'rb') as f:
+    with open(join(dirname(__file__), 'marvin_titanic_engine/VERSION'), 'rb') as f:
         version = f.read().decode('ascii').strip()
     return version
 
@@ -51,14 +52,14 @@ class Tox(TestCommand):
 
 
 setup(
-    name='marvin_iris_species_engine',
+    name='marvin_titanic_engine',
     version=_get_version(),
     url='',
-    description='Iris Species classification engine from Kaggle',
+    description='a look at the kaggle data fr the titanic',
     long_description=open(join(dirname(__file__), 'README.md')).read(),
-    author='Marvin AI Researcher',
-    maintainer='Daniel Takabayashi',
-    maintainer_email='daniel.takabayashi@gmail.com',
+    author='jeremy.elster',
+    maintainer='jeremy.elster',
+    maintainer_email='jeremy.elster@b2wdigital.com',
     packages=find_packages(exclude=('tests', 'tests.*')),
     include_package_data=True,
     zip_safe=False,
@@ -81,7 +82,7 @@ setup(
         'pandas==0.20.3',
         'matplotlib==2.0.2',
         'marvin-python-toolbox==0',
-        'seaborn==0.8.1'
+        'Fabric==1.14.0',
     ],
     dependency_links=['git+https://github.com/marvin-ai/marvin-python-toolbox.git/@master#egg=marvin_python_toolbox-0'],
     tests_require=REQUIREMENT_TESTS,

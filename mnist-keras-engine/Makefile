@@ -29,7 +29,7 @@ help:
 	@echo "        Runs the docker run command with marvin env default parameters."
 
 marvin:
-	pip install -e . --process-dependency-links
+	pip install -e ".[testing]" --process-dependency-links
 	marvin --help
 
 update:
