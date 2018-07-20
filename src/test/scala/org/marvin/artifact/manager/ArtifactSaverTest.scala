@@ -25,7 +25,7 @@ class ArtifactSaverTest extends WordSpec with Matchers {
     "return Props with actorClass ArtifactHdfsSaver" in {
       val props = ArtifactSaver.build(new EngineMetadata("name",
         "version", "engineType", null, "artifactsRemotePath", "HDFS", "marvin-artifact-bucket", List("acquisitor"),
-        3000, 3000, 3000, Option(3000), 3000, "testHost"))
+        3000, 3000, 3000, 3000, Option(3000), 3000, "testHost"))
       assert(props.actorClass().toString == "class org.marvin.artifact.manager.ArtifactHdfsSaver")
     }
   }
@@ -34,7 +34,7 @@ class ArtifactSaverTest extends WordSpec with Matchers {
     "return Props with actorClass ArtifactS3Saver" in {
       val props = ArtifactSaver.build(new EngineMetadata("name",
         "version", "engineType", null, "artifactsRemotePath", "S3", "marvin-artifact-bucket", List("acquisitor"),
-        3000, 3000, 3000, Option(3000), 3000, "testHost"))
+        3000, 3000, 3000, 3000, Option(3000), 3000, "testHost"))
       assert(props.actorClass().toString == "class org.marvin.artifact.manager.ArtifactS3Saver")
     }
   }
@@ -43,7 +43,7 @@ class ArtifactSaverTest extends WordSpec with Matchers {
     "return Props with actorClass ArtifactFSSaver" in {
       val props = ArtifactSaver.build(new EngineMetadata("name",
         "version", "engineType", null, "artifactsRemotePath", "fs", "marvin-artifact-bucket", List("acquisitor"),
-        3000, 3000, 3000, Option(3000), 3000, "testHost"))
+        3000, 3000, 3000, 3000, Option(3000), 3000, "testHost"))
       assert(props.actorClass().toString == "class org.marvin.artifact.manager.ArtifactFSSaver")
     }
   }

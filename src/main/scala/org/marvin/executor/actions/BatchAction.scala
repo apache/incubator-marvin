@@ -24,9 +24,9 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
 import org.marvin.artifact.manager.ArtifactSaver
-import org.marvin.artifact.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
+import org.marvin.artifact.manager.ArtifactSaver.{GetArtifact, SaveToLocal, SaveToRemote}
 import org.marvin.exception.MarvinEExecutorException
-import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchExecutionStatus, BatchHealthCheck, BatchReload}
+import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchExecutionStatus, BatchHealthCheck, BatchReload, BatchMetrics}
 import org.marvin.executor.proxies.BatchActionProxy
 import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
 import org.marvin.model._
@@ -42,6 +42,7 @@ object BatchAction {
   case class BatchReload(protocol: String)
   case class BatchHealthCheck()
   case class BatchExecutionStatus(protocol: String)
+  case class BatchMetrics(protocol: String)
 }
 
 class BatchAction(actionName: String, metadata: EngineMetadata) extends Actor with ActorLogging{
@@ -113,6 +114,13 @@ class BatchAction(actionName: String, metadata: EngineMetadata) extends Actor wi
         case Failure(failure) =>
           failure.printStackTrace()
       }
+
+    case BatchMetrics(protocol) =>
+      implicit val futureTimeout = Timeout(metadata.metricsTimeout milliseconds)
+      log.info(s"Starting to process BatchMetrics for Protocol: [$protocol].")
+
+      val originalSender = sender
+      ask(artifactSaver, GetArtifact("metrics", protocol)) pipeTo originalSender
 
     case BatchHealthCheck =>
       implicit val futureTimeout = Timeout(metadata.healthCheckTimeout milliseconds)

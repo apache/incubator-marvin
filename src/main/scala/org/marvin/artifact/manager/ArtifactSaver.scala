@@ -23,6 +23,7 @@ import org.marvin.model.EngineMetadata
 object ArtifactSaver {
   case class SaveToLocal(artifactName: String, protocol:String)
   case class SaveToRemote(artifactName: String, protocol:String)
+  case class GetArtifact(artifactName: String, protocol:String)
 
   def build(metadata: EngineMetadata): Props = {
     metadata.artifactManagerType.toUpperCase match {
