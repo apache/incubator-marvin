@@ -1,0 +1,67 @@
+language: python
+sudo: required
+dist: trusty
+
+matrix:
+    include:
+        - os: linux
+          python: "2.7"
+        - os: linux
+          python: "3.6"
+        - os: osx
+          language: generic
+
+before_install:
+  - curl https://d3kbcqa49mib13.cloudfront.net/spark-2.1.1-bin-hadoop2.6.tgz -o ./spark-2.1.1-bin-hadoop2.6.tgz
+  - sudo tar -xf ./spark-2.1.1-bin-hadoop2.6.tgz
+  - mkdir -p marvin_data
+  - mkdir -p marvin_home
+  - export MARVIN_HOME=./marvin_home
+  - export MARVIN_DATA_PATH=./marvin_data
+  - export SPARK_HOME=./spark-2.1.1-bin-hadoop2.6
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py          ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo python get-pip.py                   ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update                    ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install openssl graphviz  ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz -y ; fi
+  - sudo pip install --upgrade pip
+  - sudo pip install virtualenvwrapper --ignore-installed six
+  - source virtualenvwrapper.sh
+
+install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv nlp-ner-engine-env         ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv sms-spam-engine-env        ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv iris-species-engine-env    ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv image-classification-engine-env    ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv product-classifier-engine-env         ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv mnist-keras-engine-env     ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv kaggle-titanic-engine-env         ; fi
+
+script:
+  - cd nlp-ner-engine
+  - make clean marvin
+  - marvin test
+  - cd ..
+  - cd sms-spam-engine
+  - make clean marvin
+  - marvin test
+  - cd ..
+  - cd iris-species-engine
+  - make clean marvin
+  - marvin test
+  - cd ..
+  - cd image-classification-engine
+  - make clean marvin
+  - marvin test
+  - cd ..
+  - cd mnist-keras-engine
+  - make clean marvin
+  - marvin test
+  - cd ..
+  - cd product-classifier-engine
+  - make clean marvin
+  - marvin test
+  - cd ..
+  - cd kaggle-titanic-engine
+  - make clean marvin
+  - marvin test

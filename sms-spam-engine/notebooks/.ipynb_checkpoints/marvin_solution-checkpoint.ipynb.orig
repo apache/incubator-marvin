@@ -1,0 +1,299 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Acquisitor and Cleaner"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Download data file\n",
+    "Drop unused columns\n",
+    "Rename text(feature) and label columns\n",
+    "Rename label value to 0 and 1"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from marvin_python_toolbox.common.data import MarvinData\n",
+    "import pandas as pd"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {
+    "marvin_cell": "acquisitor"
+   },
+   "outputs": [],
+   "source": [
+    "data_file = MarvinData.download_file(\"https://s3.amazonaws.com/marvin-engines-data/spam.csv\")\n",
+    "data = pd.read_csv(data_file, encoding='latin-1')\n",
+    "data = data.drop([\"Unnamed: 2\", \"Unnamed: 3\", \"Unnamed: 4\"], axis=1)\n",
+    "data = data.rename(columns={\"v1\": \"label\", \"v2\": \"text\"})\n",
+    "data['label_num'] = data.label.map({'ham': 0, 'spam': 1})\n",
+    "\n",
+    "marvin_initial_dataset = data"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Training Preparator"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Split text and label datas in test and train proportion\n",
+    "Text transformation using sklearn.feature_extraction library\n",
+    "Learn a vocabulary dictionary of all tokens in the raw documents"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.feature_extraction.text import CountVectorizer\n",
+    "from sklearn.model_selection import train_test_split"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "params = {\"test_size\": 0.3, \"random_state\": 10}"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {
+    "marvin_cell": "tpreparator"
+   },
+   "outputs": [],
+   "source": [
+    "X_train, X_test, y_train, y_test = train_test_split(\n",
+    "            marvin_initial_dataset[\"text\"], marvin_initial_dataset[\"label\"],\n",
+    "            test_size=params[\"test_size\"], random_state=params[\"random_state\"])\n",
+    "\n",
+    "vect = CountVectorizer()\n",
+    "vect.fit(X_train)\n",
+    "\n",
+    "marvin_dataset = {\n",
+    "    \"X_train\": vect.transform(X_train),\n",
+    "    \"X_test\": vect.transform(X_test),\n",
+    "    \"y_train\": y_train,\n",
+    "    \"y_test\": y_test,\n",
+    "    \"vect\": vect\n",
+    "    }"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Trainer"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Create classifier\n",
+    "Multinomial Naive Bayes has good performance for text data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.naive_bayes import MultinomialNB"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {
+    "marvin_cell": "trainer"
+   },
+   "outputs": [],
+   "source": [
+    "clf = MultinomialNB()\n",
+    "clf.fit(marvin_dataset['X_train'], marvin_dataset['y_train'])\n",
+    "\n",
+    "marvin_model = {\n",
+    "    \"clf\": clf,\n",
+    "    \"vect\": marvin_dataset[\"vect\"]\n",
+    "}"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Metrics Evaluator"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Find predction accuracy using sklearn.metrics library"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.metrics import accuracy_score"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {
+    "marvin_cell": "evaluator"
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Prediction accuracy: 0.989234449761\n"
+     ]
+    }
+   ],
+   "source": [
+    "prediction = marvin_model[\"clf\"].predict(marvin_dataset[\"X_test\"])\n",
+    "metrics = accuracy_score(prediction, marvin_dataset[\"y_test\"])\n",
+    "\n",
+    "marvin_metrics = metrics\n",
+    "\n",
+    "print(\"Prediction accuracy: \" + str(metrics))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Prediction Preparator"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Input message is processed by CountVectorizer before going to predictor"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "input_message = [\"This is me.....\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {
+    "marvin_cell": "ppreparator"
+   },
+   "outputs": [],
+   "source": [
+    "input_message = marvin_model[\"vect\"].transform(input_message)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Predictor"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Do prediction"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {
+    "marvin_cell": "predictor"
+   },
+   "outputs": [],
+   "source": [
+    "final_prediction = marvin_model[\"clf\"].predict(input_message)[0]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Predicted value: ham\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(\"Predicted value: \" + final_prediction)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 2",
+   "language": "python",
+   "name": "python2"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 2
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython2",
+   "version": "2.7.12"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
