@@ -1,0 +1,91 @@
+# Copyright [2018] Apache Marvin-AI
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+matrix:
+  include:
+    # Engine Executor
+    - language: scala
+      scala:
+        - 2.12.6
+      jdk: oraclejdk8
+      cache:
+        directories:
+        - $HOME/.sbt
+        - $HOME/.m2
+        - $HOME/.ivy2
+      before_cache:
+        - find $HOME/.ivy2 -name \"ivydata-*.properties\" -delete
+        - find $HOME/.sbt -name \"*.lock\" -delete
+      before_script:
+        - cd engine-executor
+        - unset SBT_OPTS
+      script: sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport
+    # Python Toolbox
+    # Python Toolbox - Linux
+    - language: python
+      os: linux
+      python:
+        - 2.7
+        - 3.6
+      before_install:
+        - cd python-toolbox
+        - curl https://d3kbcqa49mib13.cloudfront.net/spark-2.1.1-bin-hadoop2.6.tgz -o ./spark-2.1.1-bin-hadoop2.6.tgz
+        - sudo tar -xf ./spark-2.1.1-bin-hadoop2.6.tgz
+        - mkdir -p marvin_data
+        - mkdir -p marvin_home
+        - export MARVIN_HOME=./marvin_home
+        - export MARVIN_DATA_PATH=./marvin_data
+        - export SPARK_HOME=./spark-2.1.1-bin-hadoop2.6
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py  ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo python get-pip.py         ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update                    ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install openssl graphviz  ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz -y    ; fi
+        - sudo pip install --upgrade pip
+        - sudo pip install virtualenvwrapper --ignore-installed six
+        - source virtualenvwrapper.sh
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv marvin-env        ; fi
+      install:
+        - pip install codecov
+        - make marvin
+      script:
+        - marvin test
+        - codecov
+    # Python Toolbox - OSX
+    - language: generic
+      os: osx
+      before_install:
+        - cd python-toolbox
+        - curl https://d3kbcqa49mib13.cloudfront.net/spark-2.1.1-bin-hadoop2.6.tgz -o ./spark-2.1.1-bin-hadoop2.6.tgz
+        - sudo tar -xf ./spark-2.1.1-bin-hadoop2.6.tgz
+        - mkdir -p marvin_data
+        - mkdir -p marvin_home
+        - export MARVIN_HOME=./marvin_home
+        - export MARVIN_DATA_PATH=./marvin_data
+        - export SPARK_HOME=./spark-2.1.1-bin-hadoop2.6
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py  ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo python get-pip.py         ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update                    ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install openssl graphviz  ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz -y    ; fi
+        - sudo pip install --upgrade pip
+        - sudo pip install virtualenvwrapper --ignore-installed six
+        - source virtualenvwrapper.sh
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv marvin-env        ; fi
+      install:
+        - pip install codecov
+        - make marvin
+      script:
+        - marvin test
+        - codecov
