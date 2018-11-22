@@ -95,6 +95,7 @@ class EngineBaseAction():
             self._local_saved_objects[object_reference] = object_file_path
 
     def _load_obj(self, object_reference, force=False):
+        object_reference = object_reference if object_reference.startswith('_') else '_%s' % object_reference
         if (getattr(self, object_reference, None) is None and self._persistence_mode == 'local') or force:
             object_file_path = self._get_object_file_path(object_reference)
             logger.info("Loading object from {}".format(object_file_path))
