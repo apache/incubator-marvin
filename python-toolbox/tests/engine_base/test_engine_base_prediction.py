@@ -16,6 +16,10 @@
 # limitations under the License.
 
 import pytest
+try:
+    import mock
+except ImportError:
+    import unittest.mock as mock
 
 from marvin_python_toolbox.engine_base import EngineBasePrediction
 
@@ -26,7 +30,10 @@ def engine_action():
         def execute(self, **kwargs):
             return 1
 
-    return EngineAction(default_root_path="/tmp/.marvin")
+    return EngineAction(
+        default_root_path="/tmp/.marvin",
+        persistence_mode="local"
+    )
 
 
 class TestEngineBasePrediction:
@@ -38,3 +45,32 @@ class TestEngineBasePrediction:
     def test_metrics(self, engine_action):
         engine_action.marvin_metrics = [3]
         assert engine_action.marvin_metrics == engine_action._metrics == [3]
+
+
+class TestEnsureReloadActionReplaceObjectAttr:
+
+    @mock.patch('marvin_python_toolbox.engine_base.engine_base_action.EngineBaseAction._serializer_load')
+    def test_first_load_from_artifact_works(self, mock_serializer, engine_action):
+        mock_serializer.return_value = "MOCKED"
+
+        assert engine_action._model == None
+
+        engine_action._load_obj(object_reference="model")
+        
+        assert engine_action._model == engine_action.marvin_model == "MOCKED"
+
+    @mock.patch('marvin_python_toolbox.engine_base.engine_base_action.EngineBaseAction._serializer_load')
+    def test_reload_works_before_first_load(self, mock_serializer, engine_action):
+        mock_serializer.return_value = "MOCKED"
+
+        assert engine_action._model == None
+
+        engine_action._load_obj(object_reference="model")
+
+        assert engine_action._model == engine_action.marvin_model == "MOCKED"
+
+        mock_serializer.return_value = "NEW MOCKED"
+
+        engine_action._load_obj(object_reference="model", force=True)
+
+        assert engine_action._model == engine_action.marvin_model == "NEW MOCKED"
