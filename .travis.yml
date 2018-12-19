@@ -30,7 +30,7 @@ matrix:
       before_script:
         - cd engine-executor
         - unset SBT_OPTS
-      script: travis_retry sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport
+      script: travis_retry sbt -batch ++$TRAVIS_SCALA_VERSION coverage test coverageReport
     # Python Toolbox
     # Python Toolbox - Linux
     - language: python
