@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+import "scalapb/scalapb.proto";
+
+option (scalapb.options) = {
+  package_name: "main.scala.org.marvin.repl"
+  flat_package: true
+};
+
+package repl;
+
+// The Toolbox Control service definition.
+service Toolbox {
+    // Sends a toolbox cmd
+    rpc ToolboxControl (CommandRequest) returns (LoggerReply) {}
+}
+
+// The Docker Control service definition.
+service Notebook {
+    // Sends a docker cmd
+    rpc NotebookControl (CommandRequest) returns (stream LoggerReply) {}
+}
+
+// The request message containing the user's cmd from the client side.
+message CommandRequest {
+    string cmd = 1;
+}
+
+// The response message containing the log information from the server side.
+message LoggerReply {
+    string logInfo = 1;
+}

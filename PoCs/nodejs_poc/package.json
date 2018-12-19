@@ -1,0 +1,16 @@
+{
+  "name": "marvin_repl",
+  "version": "0.0.1",
+  "description": "Marvin REPL",
+  "main": "index.js",
+  "scripts": {
+    "test": "node tests/*.test.js | tap-spec"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "node-docker-api": "^1.1.22",
+    "tap-spec": "^5.0.0",
+    "tape": "^4.9.1"
+  }
+}

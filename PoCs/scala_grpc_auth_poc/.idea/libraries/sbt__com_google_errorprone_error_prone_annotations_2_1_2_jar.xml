@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="sbt: com.google.errorprone:error_prone_annotations:2.1.2:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.google.errorprone/error_prone_annotations/jars/error_prone_annotations-2.1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.google.errorprone/error_prone_annotations/srcs/error_prone_annotations-2.1.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
