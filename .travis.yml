@@ -30,7 +30,7 @@ matrix:
       before_script:
         - cd engine-executor
         - unset SBT_OPTS
-      script: sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport
+      script: travis_retry sbt -batch ++$TRAVIS_SCALA_VERSION coverage test coverageReport
     # Python Toolbox
     # Python Toolbox - Linux
     - language: python
@@ -40,7 +40,7 @@ matrix:
         - 3.6
       before_install:
         - cd python-toolbox
-        - curl https://d3kbcqa49mib13.cloudfront.net/spark-2.1.1-bin-hadoop2.6.tgz -o ./spark-2.1.1-bin-hadoop2.6.tgz
+        - travis_retry curl https://d3kbcqa49mib13.cloudfront.net/spark-2.1.1-bin-hadoop2.6.tgz -o ./spark-2.1.1-bin-hadoop2.6.tgz
         - sudo tar -xf ./spark-2.1.1-bin-hadoop2.6.tgz
         - mkdir -p marvin_data
         - mkdir -p marvin_home
@@ -52,12 +52,12 @@ matrix:
         - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update                    ; fi
         - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install openssl graphviz  ; fi
         - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz -y    ; fi
-        - sudo pip install --upgrade pip
-        - sudo pip install virtualenvwrapper --ignore-installed six
+        - travis_retry sudo pip install --upgrade pip
+        - travis_retry sudo pip install virtualenvwrapper --ignore-installed six
         - source virtualenvwrapper.sh
         - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv marvin-env        ; fi
       install:
-        - pip install codecov
+        - travis_retry pip install codecov
         - make marvin
       script:
         - marvin test
@@ -67,7 +67,7 @@ matrix:
       os: osx
       before_install:
         - cd python-toolbox
-        - curl https://d3kbcqa49mib13.cloudfront.net/spark-2.1.1-bin-hadoop2.6.tgz -o ./spark-2.1.1-bin-hadoop2.6.tgz
+        - travis_retry curl https://d3kbcqa49mib13.cloudfront.net/spark-2.1.1-bin-hadoop2.6.tgz -o ./spark-2.1.1-bin-hadoop2.6.tgz
         - sudo tar -xf ./spark-2.1.1-bin-hadoop2.6.tgz
         - mkdir -p marvin_data
         - mkdir -p marvin_home
@@ -79,12 +79,12 @@ matrix:
         - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update                    ; fi
         - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install openssl graphviz  ; fi
         - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz -y    ; fi
-        - sudo pip install --upgrade pip
-        - sudo pip install virtualenvwrapper --ignore-installed six
+        - travis_retry sudo pip install --upgrade pip
+        - travis_retry sudo pip install virtualenvwrapper --ignore-installed six
         - source virtualenvwrapper.sh
         - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv marvin-env        ; fi
       install:
-        - pip install codecov
+        - travis_retry pip install codecov
         - make marvin
       script:
         - marvin test
