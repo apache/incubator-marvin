@@ -52,4 +52,3 @@
  [installguide]: https://github.com/apache/incubator-marvin/blob/master/python-toolbox/README.md
  [aissue]: https://issues.apache.org/jira/projects/MARVIN/issues?filter=allopenissues
  [marvinai]: https://github.com/apache/incubator-marvin
-
