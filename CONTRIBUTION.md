@@ -31,12 +31,18 @@
 
  ## Where to ask for help
 
- 1. [Github Issue Tracker][tbissue]: for discussions about new features or established bugs
- 2. [Gitter chat][gchat]: for real-time discussion
+ 1. [Apache Jira Issue Tracker][aissue]: for discussions about new features or established bugs
+ 2. <dev@marvin.apache.org>: for general development discussions
 
  ## Separate Code Repositories
 
  [Marvin-AI][marvinai] maintains all your code and documentation in multiple repositories on the Github. This includes the primary repository and several others repositories for different components.
+
+ ## Standard procedure for contribution
+
+ 1. Fork the repository from [Here][marvinai].
+ 2. Create a new branch in the forked repository for new changes.
+ 3. Create pull request from your branch to the main repository using a name that start with issue ID.
 
  # Code of Conduct
 
@@ -44,7 +50,6 @@
 
  [codepage]: https://github.com/apache/incubator-marvin/blob/master/python-toolbox/CODE_OF_CONDUCT.md
  [installguide]: https://github.com/apache/incubator-marvin/blob/master/python-toolbox/README.md
- [tbissue]: https://issues.apache.org/jira/projects/MARVIN/issues?filter=allopenissues
- [gchat]: https://gitter.im/marvin-ai
+ [aissue]: https://issues.apache.org/jira/projects/MARVIN/issues?filter=allopenissues
  [marvinai]: https://github.com/apache/incubator-marvin
 
