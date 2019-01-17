@@ -19,7 +19,10 @@ limitations under the License.
 
 ![](https://github.com/apache/incubator-marvin-website/blob/master/site/assets/themes/apache/img/logo.png?raw=true)
 
-[![Build Status](https://travis-ci.org/apache/incubator-marvin.svg?branch=master)](https://travis-ci.org/apache/incubator-marvin)
+Branch | Status | CodeCov
+-|-|-
+[master](https://github.com/apache/incubator-marvin) | [![Build Status](https://travis-ci.org/apache/incubator-marvin.svg?branch=master)](https://travis-ci.org/apache/incubator-marvin) | [![Codecov](https://codecov.io/gh/apache/incubator-marvin/branch/master/graph/badge.svg)](https://codecov.io/gh/apache/incubator-marvin)
+[develop](https://github.com/apache/incubator-marvin/tree/develop) | [![Build Status](https://travis-ci.org/apache/incubator-marvin.svg?branch=develop)](https://travis-ci.org/apache/incubator-marvin/branches) | [![Build Status](https://codecov.io/gh/apache/incubator-marvin/branch/develop/graph/badge.svg)](https://codecov.io/gh/apache/incubator-marvin/branch/develop)
 
 **Marvin** is an open-source Artificial Intelligence platform that focuses on helping data scientists deliver meaningful solutions to complex problems. Supported by a standardized large-scale, language-agnostic architecture, Marvin simplifies the process of exploration and modeling.
 
@@ -39,9 +42,9 @@ limitations under the License.
 
 ## Contributing
 
-Please follow the [Contribution Guidelines](https://issues.apache.org/jira/projects/MARVIN/issues/MARVIN-8)
+Please follow the [Contribution Guidelines](CONTRIBUTION.md)
 
-For website and documentation contribution, check our [Website Repository](https://github.com/apache/incubator-marvin)
+For website and documentation contribution, check our [Website Repository](https://github.com/apache/incubator-marvin-website)
 
 ## License
 
