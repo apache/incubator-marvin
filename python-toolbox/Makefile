@@ -37,16 +37,16 @@ help:
 	@echo "        Build and upload the toolbox as a wheel package in pypi."
 
 marvin:
-	pip install -e ".[testing]" --process-dependency-links
+	pip install -e ".[testing]"
 	touch .dev
 	marvin --help
 
 update:
-	pip install -e . --process-dependency-links -U 
+	pip install -e . -U
 
 marvin-prod:
-	pip install . --process-dependency-links
-	rm -f .dev 
+	pip install .
+	rm -f .dev
 	marvin --help
 
 clean-pyc:
@@ -55,7 +55,7 @@ clean-pyc:
 	find . -name '*~' -exec rm -f  {} +
 
 clean-build:
-	rm -f .prod 
+	rm -f .prod
 	rm -rf *.egg-info
 	rm -rf .cache
 	rm -rf .eggs
