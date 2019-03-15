@@ -80,7 +80,8 @@ REQUIREMENTS_EXTERNAL = [
     'urllib3>=1.21.1',
     'idna>=2.5',
     'bleach>=1.5.0',
-    'numpy==1.13.3'
+    'numpy>=1.16.2',
+    'Unidecode==1.0.23',
 ]
 
 # Test dependencies
