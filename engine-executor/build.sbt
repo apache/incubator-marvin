@@ -16,11 +16,11 @@
  */
 name := "marvin-engine-executor"
 
-version := "0.0.4"
+version := "0.0.5"
 
 scalaVersion := "2.12.3"
 
-organization := "com.github.marvin-ai"
+organization := "org.apache.marvin"
 
 PB.targets in Compile := Seq(
   scalapb.gen() -> (sourceManaged in Compile).value

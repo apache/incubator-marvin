@@ -1,10 +1,8 @@
 [![Build Status](https://travis-ci.org/marvin-ai/marvin-python-toolbox.svg)](https://travis-ci.org/marvin-ai/marvin-python-toolbox) [![codecov](https://codecov.io/gh/marvin-ai/marvin-python-toolbox/branch/master/graph/badge.svg)](https://codecov.io/gh/marvin-ai/marvin-python-toolbox)
 
-[![Join the chat at https://gitter.im/gitterHQ/gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marvin-ai)
+# Marvin Toolbox v0.0.5
 
-# Marvin Toolbox v0.0.4
-
-![](https://images-americanas.b2w.io/img/_staging/marvin/marvin.png)
+![](https://github.com/apache/incubator-marvin-website/blob/master/site/assets/themes/apache/img/logo.png?raw=true)
 
 # Quick Start
 
@@ -110,3 +108,4 @@ marvin engine-dryrun
 ```
 
 > Marvin is a project started at B2W Digital offices and released open source on September 2017.
+> The project is donated to Apache Software Foundation on August 2018.
