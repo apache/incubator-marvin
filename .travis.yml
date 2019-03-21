@@ -58,6 +58,7 @@ matrix:
         - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv marvin-env        ; fi
       install:
         - travis_retry pip install codecov
+        - travis_retry pip install unidecode
         - make marvin
       script:
         - marvin test
@@ -85,6 +86,7 @@ matrix:
         - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkvirtualenv marvin-env        ; fi
       install:
         - travis_retry pip install codecov
+        - travis_retry pip install unidecode
         - make marvin
       script:
         - marvin test
