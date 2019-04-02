@@ -27,7 +27,7 @@ from setuptools.command.test import test as TestCommand
 PACKAGE_NAME = 'marvin_python_toolbox'
 PACKAGE_DESCRIPTION = 'Marvin Python Toolbox'
 
-URL = 'https://github.com/marvin-ai/marvin-python-toolbox'
+URL = 'https://github.com/apache/incubator-marvin'
 
 AUTHOR_NAME = 'Daniel Takabayashi'
 AUTHOR_EMAIL = 'daniel.takabayashi@gmail.com'
