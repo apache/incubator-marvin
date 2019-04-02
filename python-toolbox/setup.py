@@ -25,12 +25,12 @@ from setuptools.command.test import test as TestCommand
 
 # Package basic info
 PACKAGE_NAME = 'marvin_python_toolbox'
-PACKAGE_DESCRIPTION = 'Marvin Python Toolbox'
+PACKAGE_DESCRIPTION = 'Apache Marvin Python Toolbox'
 
 URL = 'https://github.com/apache/incubator-marvin'
 
 AUTHOR_NAME = 'Daniel Takabayashi'
-AUTHOR_EMAIL = 'daniel.takabayashi@gmail.com'
+AUTHOR_EMAIL = 'taka@apache.org'
 
 PYTHON_2 = True
 PYTHON_3 = True
