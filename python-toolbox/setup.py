@@ -25,12 +25,12 @@ from setuptools.command.test import test as TestCommand
 
 # Package basic info
 PACKAGE_NAME = 'marvin_python_toolbox'
-PACKAGE_DESCRIPTION = 'Marvin Python Toolbox'
+PACKAGE_DESCRIPTION = 'Apache Marvin Python Toolbox'
 
-URL = 'https://github.com/marvin-ai/marvin-python-toolbox'
+URL = 'https://github.com/apache/incubator-marvin'
 
 AUTHOR_NAME = 'Daniel Takabayashi'
-AUTHOR_EMAIL = 'daniel.takabayashi@gmail.com'
+AUTHOR_EMAIL = 'taka@apache.org'
 
 PYTHON_2 = True
 PYTHON_3 = True
@@ -80,7 +80,8 @@ REQUIREMENTS_EXTERNAL = [
     'urllib3>=1.21.1',
     'idna>=2.5',
     'bleach>=1.5.0',
-    'numpy==1.13.3'
+    'numpy>=1.16.2',
+    'Unidecode==1.0.23',
 ]
 
 # Test dependencies
@@ -88,7 +89,7 @@ REQUIREMENTS_TESTS = [
     'tox>=2.2.0',
     'mock>=2.0.0',
     'pytest>=2.9.2',
-    'pytest-cov>=1.8.1',
+    'pytest-cov>=1.8.1,<2.6',
     'pytest-watch>=4.1.0',
     'pytest-testmon>=0.8.2',
     'Keras>=2.2.0',

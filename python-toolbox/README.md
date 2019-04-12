@@ -1,10 +1,8 @@
 [![Build Status](https://travis-ci.org/marvin-ai/marvin-python-toolbox.svg)](https://travis-ci.org/marvin-ai/marvin-python-toolbox) [![codecov](https://codecov.io/gh/marvin-ai/marvin-python-toolbox/branch/master/graph/badge.svg)](https://codecov.io/gh/marvin-ai/marvin-python-toolbox)
 
-[![Join the chat at https://gitter.im/gitterHQ/gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marvin-ai)
+# Marvin Toolbox v0.0.5
 
-# Marvin Toolbox v0.0.4
-
-![](https://images-americanas.b2w.io/img/_staging/marvin/marvin.png)
+![](https://github.com/apache/incubator-marvin-website/blob/master/site/assets/themes/apache/img/logo.png?raw=true)
 
 # Quick Start
 
@@ -13,9 +11,9 @@
 **Marvin** is an open-source Artificial Intelligence platform that focuses on helping data scientists deliver meaningful solutions to complex problems. Supported by a standardized large-scale, language-agnostic architecture, Marvin simplifies the process of exploration and modeling.
 
 ## Getting Started
-* [Installing Marvin (Ubuntu)](https://www.marvin-ai.org/book/overview-1/ubuntu)
-* [Installing Marvin (MacOS)](https://www.marvin-ai.org/book/overview-1/mac)
-* [Installing Marvin (Other OS) Vagrant](https://www.marvin-ai.org/book/overview-1/vagrant)
+* [Installing Marvin (Ubuntu)](https://marvin.apache.org/marvin-platform-book/ch2_toolbox_installation/ubuntu/)
+* [Installing Marvin (MacOS)](https://marvin.apache.org/marvin-platform-book/ch2_toolbox_installation/mac/)
+* [Installing Marvin (Other OS) Vagrant](https://marvin.apache.org/marvin-platform-book/ch2_toolbox_installation/vagrant/)
 * [Creating a new engine](#creating-a-new-engine)
 * [Working in an existing engine](#working-in-an-existing-engine)
 * [Command line interface](#command-line-interface)
@@ -110,3 +108,4 @@ marvin engine-dryrun
 ```
 
 > Marvin is a project started at B2W Digital offices and released open source on September 2017.
+> The project is donated to Apache Software Foundation on August 2018.

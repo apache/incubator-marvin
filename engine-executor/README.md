@@ -1,14 +1,12 @@
 [![Build Status](https://travis-ci.org/marvin-ai/marvin-engine-executor.svg)](https://travis-ci.org/marvin-ai/marvin-engine-executor) [![codecov](https://codecov.io/gh/marvin-ai/marvin-engine-executor/branch/master/graph/badge.svg)](https://codecov.io/gh/marvin-ai/marvin-engine-executor)
 
-[![Join the chat at https://gitter.im/gitterHQ/gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marvin-ai)
-
 # Marvin Engine Executor (Server)
 
 This is the component responsable for coordinate execution of the steps (actions) in a Marvin engine. The engine-executor
 is able to communicate with engines through gRPC protocol. More details about the contract can be found 
 on the protobuf file.
 
-The latest stable build can be downloaded from [here](https://s3.amazonaws.com/marvin-engine-executor/marvin-engine-executor-assembly-0.0.4.jar).
+Last stable build v0.0.4 can be downloaded from [here](https://s3.amazonaws.com/marvin-engine-executor/marvin-engine-executor-assembly-0.0.4.jar).
 
 ### install requirements
 
@@ -41,3 +39,4 @@ java -DmarvinConfig.engineHome=/path -DmarvinConfig.ipAddress=0.0.0.0 -DmarvinCo
 ```
 
 > Marvin is a project started at B2W Digital offices and released open source on September 2017.
+> The project is donated to Apache Software Foundation on August 2018.
