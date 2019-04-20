@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright [2017] [B2W Digital]
+# Copyright [2019] [Apache Software Foundation]
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -368,7 +368,7 @@ def generate_env(engine_path, python):
 @click.option('--name', '-n', prompt='Project name', help='Project name')
 @click.option('--description', '-d', prompt='Short description', default='Marvin engine', help='Library short description')
 @click.option('--mantainer', '-m', prompt='Mantainer name', default='Marvin AI Community', help='Mantainer name')
-@click.option('--email', '-e', prompt='Mantainer email', default='marvin-ai@googlegroups.com', help='Mantainer email')
+@click.option('--email', '-e', prompt='Mantainer email', default='dev@marvin.apache.org', help='Mantainer email')
 @click.option('--package', '-p', default='', help='Package name')
 @click.option('--dest', '-d', envvar='MARVIN_HOME', type=click.Path(exists=True), help='Root folder path for the creation')
 @click.option('--no-env', is_flag=True, default=False, help='Don\'t create the virtual enviroment')

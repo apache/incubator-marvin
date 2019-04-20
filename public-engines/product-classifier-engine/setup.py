@@ -59,7 +59,7 @@ setup(
     long_description=open(join(dirname(__file__), 'README.md')).read(),
     author='Marvin AI Community',
     maintainer='Marvin AI Community',
-    maintainer_email='marvin-ai@googlegroups.com',
+    maintainer_email='dev@marvin.apache.org',
     packages=find_packages(exclude=('tests', 'tests.*')),
     include_package_data=True,
     zip_safe=False,
@@ -84,7 +84,7 @@ setup(
         'marvin-python-toolbox==0',
         'Fabric==1.14.0',
     ],
-    dependency_links=['git+https://github.com/marvin-ai/marvin-python-toolbox.git/@master#egg=marvin_python_toolbox-0'],
+    dependency_links=['git+https://github.com/apache/incubator-marvin@master#subdirectory=python-toolbox#egg=marvin_python_toolbox-0'],
     tests_require=REQUIREMENT_TESTS,
     extras_require={
         'testing': REQUIREMENT_TESTS,

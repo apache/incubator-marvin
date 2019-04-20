@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright [2017] [B2W Digital]
+# Copyright [2019] [Apache Software Foundation]
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ PACKAGE_DESCRIPTION = 'Apache Marvin Python Toolbox'
 URL = 'https://github.com/apache/incubator-marvin'
 
 AUTHOR_NAME = 'Daniel Takabayashi'
-AUTHOR_EMAIL = 'taka@apache.org'
+AUTHOR_EMAIL = 'dev@marvin.apache.org'
 
 PYTHON_2 = True
 PYTHON_3 = True

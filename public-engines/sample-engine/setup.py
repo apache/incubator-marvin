@@ -1,5 +1,5 @@
 
-# Copyright [2017] [B2W Digital]
+# Copyright [2019] [Apache Software Foundation]
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -64,8 +64,8 @@ setup(
     description='Marvin engine',
     long_description=open(join(dirname(__file__), 'README.md')).read(),
     author='Marvin AI Researcher',
-    maintainer='B2W Labs Team',
-    maintainer_email='@b2wdigital.com',
+    maintainer='Apache Software Foundation',
+    maintainer_email='dev@marvin.apache.org',
     packages=find_packages(exclude=('tests', 'tests.*')),
     include_package_data=True,
     zip_safe=False,
@@ -90,7 +90,7 @@ setup(
         'matplotlib==2.0.2',
         'marvin-python-toolbox==0',
     ],
-    dependency_links=['git+https://github.com/marvin-ai/marvin-python-toolbox.git/@master#egg=marvin_python_toolbox-0'],
+    dependency_links=['git+https://github.com/apache/incubator-marvin@master#subdirectory=python-toolbox#egg=marvin_python_toolbox-0'],
     tests_require=[
         'pytest>=2.6.4',
         'pytest-cov>=1.8.1',
