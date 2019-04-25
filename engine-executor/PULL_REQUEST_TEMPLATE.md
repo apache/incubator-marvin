@@ -14,4 +14,4 @@ How to test new changes:
 -
 -
 
-@marvin-ai/marvin-core-team
+dev@marvin.apache.org

@@ -4,8 +4,8 @@ info:
   title: marvin_image_classification_engine API Doc
   contact:
       name: mantainer Daniel Takabayashi
-      email: daniel.takabayashi@b2wdigital.com
-      url: 
+      email: dev@marvin.apache.org
+      url: https://marvin.apache.org
   license:
     name: Apache License 2.0
 servers:

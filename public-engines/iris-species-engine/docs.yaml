@@ -4,8 +4,8 @@ info:
   title: marvin_iris_species_engine API Doc
   contact:
       name: mantainer Daniel Takabayashi
-      email: daniel.takabayashi@b2wdigital.com
-      url: https://github.com/marvin-ai
+      email: dev@marvin.apache.org
+      url: https://marvin.apache.org
   license:
     name: Apache License 2.0
 servers:

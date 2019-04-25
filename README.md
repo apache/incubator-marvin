@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# [Apache Marvin AI Platform](https://marvin.apache.org/)
+# [Apache Marvin AI Platform](https://marvin.apache.org)
 
 ![](https://github.com/apache/incubator-marvin-website/blob/master/site/assets/themes/apache/img/logo.png?raw=true)
 

@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/marvin-ai/marvin-python-toolbox.svg)](https://travis-ci.org/marvin-ai/marvin-python-toolbox) [![codecov](https://codecov.io/gh/marvin-ai/marvin-python-toolbox/branch/master/graph/badge.svg)](https://codecov.io/gh/marvin-ai/marvin-python-toolbox)
+[![Build Status](https://travis-ci.org/apache/incubator-marvin.svg)](https://travis-ci.org/apache/incubator-marvin) [![codecov](https://codecov.io/gh/apache/incubator-marvin/branch/develop/graph/badge.svg)](https://codecov.io/gh/apache/incubator-marvin/branch/develop)
 
 # Marvin Toolbox v0.0.5
 
@@ -92,7 +92,8 @@ Commands:
 
 1. Clone the example engine from the repository
 ```
-git clone https://github.com/marvin-ai/engines.git
+git clone https://github.com/apache/incubator-marvin.git
+cd public-engines
 ```
 
 2. Generate a new Marvin engine environment for the Iris species engine
