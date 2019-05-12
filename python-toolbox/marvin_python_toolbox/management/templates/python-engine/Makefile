@@ -31,15 +31,15 @@ help:
 	@echo "        Runs the docker run command with marvin env default parameters."
 
 marvin:
-	pip install -e ".[testing]" --process-dependency-links
+	pip install -e ".[testing]"
 	marvin --help
 
 marvin-prod:
-	pip install . --process-dependency-links
+	pip install .
 	marvin --help
 
 update:
-	pip install -e . -U --process-dependency-links
+	pip install -e . -U
 
 clean-pyc:
 	find . -name '*.pyc' -exec rm -f {} +

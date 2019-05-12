@@ -4,7 +4,7 @@ info:
   version: "1.0.0"
   title: "Iris Species Engine"
   contact:
-    email: "marvin@marvin.org"
+    email: "dev@marvin.apache.org"
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -15,7 +15,7 @@ tags:
   description: "Everything about your Prediction"
   externalDocs:
     description: "Find out more"
-    url: "http://marvin-ai.org"
+    url: "https://marvin.apache.org"
 schemes:
 - "http"
 paths:
@@ -35,4 +35,4 @@ paths:
           description: "Invalid input"
 externalDocs:
   description: "Find out more about Marvin "
-  url: "http://marvin-ai.org"
+  url: "https://marvin.apache.org"

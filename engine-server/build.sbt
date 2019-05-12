@@ -1,5 +1,5 @@
 /*
- * Copyright [2017] [B2W Digital]
+ * Copyright [2019] [Apache Software Foundation]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
  */
 name := "marvin-engine-server"
 
-version := "0.0.4"
+version := "0.0.5"
 
 scalaVersion := "2.12.3"
 
-organization := "com.github.marvin-ai"
+organization := "org.apache.marvin"
 
 PB.targets in Compile := Seq(
   scalapb.gen() -> (sourceManaged in Compile).value

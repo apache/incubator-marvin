@@ -5,7 +5,7 @@ info:
   contact:
       name: mantainer {{mantainer.name}}
       email: {{mantainer.email}}
-      url: https://github.com/marvin-ai
+      url: https://marvin.apache.org
   license:
     name: Apache License 2.0
 servers:

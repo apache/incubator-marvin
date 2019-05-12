@@ -1,5 +1,22 @@
 ## Changes log
 
+### 0.0.5
+
+   - Artifact reload bug fix #3 #5
+   - Dependency Links Deprecation & Remove #14
+   - Dependencies version fix for MacOS env #17
+   - General contribution file update #10
+   - CI update
+     - Move Travis CI out from sub-directory #1 #5
+     - Travis CI retry #6
+     - Travis CI sbt batch mode #7 #8
+     - Pytest-Cov Version Requirement Update #9
+   - Readme update
+     - Tutorial book link update #2 #4 #11
+     - Install links update to Apache Website #12
+   - License Update
+     - Move License out for Github #13
+
 ### 0.0.4
 
    - Docs.yaml file update for metrics api
