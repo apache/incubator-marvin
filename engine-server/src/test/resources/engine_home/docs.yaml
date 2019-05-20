@@ -1,0 +1,38 @@
+swagger: "2.0"
+info:
+  description: "This is a sample of Marvin Generic API Documentation"
+  version: "1.0.0"
+  title: "Iris Species Engine"
+  contact:
+    email: "dev@marvin.apache.org"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost"
+basePath: "/v2"
+tags:
+- name: "predictor"
+  description: "Everything about your Prediction"
+  externalDocs:
+    description: "Find out more"
+    url: "https://marvin.apache.org"
+schemes:
+- "http"
+paths:
+  /predictor/health:
+    get:
+      tags:
+      - "predictor"
+      summary: "Add a new pet to the store"
+      description: ""
+      operationId: "addPet"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/xml"
+      responses:
+        405:
+          description: "Invalid input"
+externalDocs:
+  description: "Find out more about Marvin "
+  url: "https://marvin.apache.org"

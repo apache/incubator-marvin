@@ -1,0 +1,69 @@
+{
+  "$schema" : "http://json-schema.org/draft-04/schema" ,
+  "id": "resource:/EngineMetadataSchema.json#",
+  "title": "Metadata Schema",
+  "description": "Schema for Engine Metadata validation",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "Engine name",
+      "type": "string"
+    },
+    "version": {
+      "description": "Engine version",
+      "type": "string"
+    },
+    "engineType": {
+      "description": "Engine type",
+      "type": "string"
+    },
+    "artifactsRemotePath": {
+      "description": "Artifacts remote path",
+      "type": "string"
+    },
+    "artifactManagerType": {
+      "description": "Artifacts manager path",
+      "type": "string"
+    },
+    "s3BucketName": {
+      "description": "Amazon S3 bucket name",
+      "type": "string"
+    },
+    "pipelineActions": {
+      "description": "Pipeline actions",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "additionalItems": false
+    },
+    "onlineActionTimeout": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "healthCheckTimeout": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "reloadTimeout": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "reloadStateTimeout": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "batchActionTimeout": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "hdfsHost": {
+      "description": "HDFS host",
+      "type": "string"
+    },
+    "actions": {
+      "$ref": "EngineActionSchema.json#/actions"
+    }
+  },
+  "required": ["name", "version", "engineType", "artifactsRemotePath", "artifactManagerType", "onlineActionTimeout", "healthCheckTimeout", "reloadTimeout", "batchActionTimeout", "pipelineActions", "actions"]
+}
