@@ -44,7 +44,7 @@ RUN apt-get update -y && \
 ADD python-toolbox.tgz $MARVIN_ENGINE_HOME
 
 # adds the freshly built engine server jar
-ADD marvin-engine-server-assembly.jar $MARVIN_DATA_PATH 
+ADD marvin-engine-executor-assembly.jar $MARVIN_DATA_PATH 
 
 ##############################################################
 # Starts the jupyter http server

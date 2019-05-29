@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-name := "marvin-engine-server"
+name := "marvin-engine-executor"
 
 version := "0.0.5"
 
