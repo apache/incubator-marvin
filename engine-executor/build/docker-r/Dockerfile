@@ -44,11 +44,13 @@ RUN apt install -y r-base && \
 # Copy and Install the marvin engine inside virtualenv
 ##############################################################
 
+### TODO - Uncomment this block once we have the common lib for R tested and we can run engines in R
+
 # adds the package containing the user-generated engine
 #ADD generated-engine $MARVIN_ENGINE_HOME
 
 # adds the freshly built engine server jar
-#ADD marvin-engine-server-assembly.jar $MARVIN_DATA_PATH 
+#ADD marvin-engine-executor-assembly.jar $MARVIN_DATA_PATH 
 
 ##############################################################
 # Starts the jupyter http server
