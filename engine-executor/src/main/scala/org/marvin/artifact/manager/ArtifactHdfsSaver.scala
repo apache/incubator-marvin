@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.marvin.artifact.manager
+package org.apache.marvin.artifact.manager
 
 import java.io.{File, FileInputStream}
 
@@ -22,8 +22,8 @@ import akka.Done
 import akka.actor.{Actor, ActorLogging}
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
-import org.marvin.artifact.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
-import org.marvin.model.EngineMetadata
+import org.apache.marvin.artifact.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
+import org.apache.marvin.model.EngineMetadata
 
 class ArtifactHdfsSaver(metadata: EngineMetadata) extends Actor with ActorLogging {
   var conf: Configuration = _

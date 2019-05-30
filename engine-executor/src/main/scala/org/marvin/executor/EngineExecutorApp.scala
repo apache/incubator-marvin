@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor
+package org.apache.marvin.executor
 
 import java.io.FileNotFoundException
 
@@ -23,13 +23,13 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.github.fge.jsonschema.core.exceptions.ProcessingException
 import com.typesafe.config.{Config, ConfigFactory}
 import grizzled.slf4j.Logger
-import org.marvin.exception.MarvinEExecutorException
-import org.marvin.executor.actions.{BatchAction, OnlineAction, PipelineAction}
-import org.marvin.executor.api.{GenericAPI, GenericAPIFunctions}
-import org.marvin.executor.manager.ExecutorManager
-import org.marvin.executor.statemachine.{PredictorFSM, Reload}
-import org.marvin.model.EngineMetadata
-import org.marvin.util.{ConfigurationContext, JsonUtil}
+import org.apache.marvin.exception.MarvinEExecutorException
+import org.apache.marvin.executor.actions.{BatchAction, OnlineAction, PipelineAction}
+import org.apache.marvin.executor.api.{GenericAPI, GenericAPIFunctions}
+import org.apache.marvin.executor.manager.ExecutorManager
+import org.apache.marvin.executor.statemachine.{PredictorFSM, Reload}
+import org.apache.marvin.model.EngineMetadata
+import org.apache.marvin.util.{ConfigurationContext, JsonUtil}
 
 import scala.io.Source
 import scala.reflect.ClassTag

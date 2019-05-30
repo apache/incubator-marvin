@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.marvin.model
+package org.apache.marvin.model
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

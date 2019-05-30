@@ -14,13 +14,13 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.api
+package org.apache.marvin.executor.api
 
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ExceptionHandler, MissingQueryParamRejection, RejectionHandler}
 import grizzled.slf4j.Logger
-import org.marvin.exception.MarvinEExecutorException
+import org.apache.marvin.exception.MarvinEExecutorException
 import spray.json.DefaultJsonProtocol._
 
 import scala.concurrent.TimeoutException

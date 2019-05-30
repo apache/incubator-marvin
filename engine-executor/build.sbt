@@ -58,8 +58,8 @@ dependencyOverrides ++= Set(
 
 libraryDependencies += "com.github.cb372" %% "scalacache-guava" % "0.22.0"
 
-mainClass in (Compile, run) := Some("org.marvin.executor.EngineExecutorApp")
-mainClass in assembly := Some("org.marvin.executor.EngineExecutorApp")
+mainClass in (Compile, run) := Some("org.apache.marvin.executor.EngineExecutorApp")
+mainClass in assembly := Some("org.apache.marvin.executor.EngineExecutorApp")
 
 assemblyMergeStrategy in assembly := {
   case PathList("org", "apache", xs @_*) => MergeStrategy.first

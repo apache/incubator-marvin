@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.marvin.util
+package org.apache.marvin.util
 
 import org.scalatest.{Matchers, WordSpec}
 

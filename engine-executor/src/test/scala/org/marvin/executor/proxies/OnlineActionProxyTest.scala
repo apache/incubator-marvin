@@ -1,4 +1,4 @@
-package org.marvin.executor.proxies
+package org.apache.marvin.executor.proxies
 
 import actions.OnlineActionHandlerGrpc.{OnlineActionHandler, OnlineActionHandlerBlockingClient}
 import actions._
@@ -7,9 +7,9 @@ import akka.testkit.{ImplicitSender, TestKit}
 import akka.util.Timeout
 import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
-import org.marvin.executor.proxies.EngineProxy.{ExecuteOnline, HealthCheck, Reload}
-import org.marvin.fixtures.MetadataMock
-import org.marvin.model.EngineActionMetadata
+import org.apache.marvin.executor.proxies.EngineProxy.{ExecuteOnline, HealthCheck, Reload}
+import org.apache.marvin.fixtures.MetadataMock
+import org.apache.marvin.model.EngineActionMetadata
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 

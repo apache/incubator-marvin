@@ -77,11 +77,11 @@ REQUIREMENTS_EXTERNAL = [
     'joblib>=0.11',
     'autopep8>=1.3.3',
     'progressbar2>=3.34.3',
-    'urllib3>=1.21.1',
+    'urllib3==1.21.1',
+    'unidecode==1.0.23',
     'idna>=2.5',
     'bleach>=1.5.0',
     'numpy>=1.16.2',
-    'Unidecode==1.0.23',
 ]
 
 # Test dependencies
