@@ -15,13 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# [Apache Marvin AI Platform](https://marvin.apache.org/)
+# [Apache Marvin AI Platform](https://marvin.apache.org)
 
 ![](https://github.com/apache/incubator-marvin-website/blob/master/site/assets/themes/apache/img/logo.png?raw=true)
 
 Branch | Status | CodeCov
 -|-|-
-[master](https://github.com/apache/incubator-marvin) | [![Build Status](https://travis-ci.org/apache/incubator-marvin.svg?branch=master)](https://travis-ci.org/apache/incubator-marvin) | [![Codecov](https://codecov.io/gh/apache/incubator-marvin/branch/master/graph/badge.svg)](https://codecov.io/gh/apache/incubator-marvin)
+[master](https://github.com/apache/incubator-marvin/tree/master) | [![Build Status](https://travis-ci.org/apache/incubator-marvin.svg?branch=master)](https://travis-ci.org/apache/incubator-marvin) | [![Codecov](https://codecov.io/gh/apache/incubator-marvin/branch/master/graph/badge.svg)](https://codecov.io/gh/apache/incubator-marvin)
 [develop](https://github.com/apache/incubator-marvin/tree/develop) | [![Build Status](https://travis-ci.org/apache/incubator-marvin.svg?branch=develop)](https://travis-ci.org/apache/incubator-marvin/branches) | [![Build Status](https://codecov.io/gh/apache/incubator-marvin/branch/develop/graph/badge.svg)](https://codecov.io/gh/apache/incubator-marvin/branch/develop)
 
 **Marvin** is an open-source Artificial Intelligence platform that focuses on helping data scientists deliver meaningful solutions to complex problems. Supported by a standardized large-scale, language-agnostic architecture, Marvin simplifies the process of exploration and modeling.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright [2017] [B2W Digital]
+# Copyright [2019] [Apache Software Foundation]
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,12 +25,12 @@ from setuptools.command.test import test as TestCommand
 
 # Package basic info
 PACKAGE_NAME = 'marvin_python_toolbox'
-PACKAGE_DESCRIPTION = 'Marvin Python Toolbox'
+PACKAGE_DESCRIPTION = 'Apache Marvin Python Toolbox'
 
-URL = 'https://github.com/marvin-ai/marvin-python-toolbox'
+URL = 'https://github.com/apache/incubator-marvin'
 
 AUTHOR_NAME = 'Daniel Takabayashi'
-AUTHOR_EMAIL = 'daniel.takabayashi@gmail.com'
+AUTHOR_EMAIL = 'dev@marvin.apache.org'
 
 PYTHON_2 = True
 PYTHON_3 = True
@@ -77,7 +77,8 @@ REQUIREMENTS_EXTERNAL = [
     'joblib>=0.11',
     'autopep8>=1.3.3',
     'progressbar2>=3.34.3',
-    'urllib3>=1.21.1',
+    'urllib3==1.21.1',
+    'unidecode==1.0.23',
     'idna>=2.5',
     'bleach>=1.5.0',
     'numpy>=1.16.2',
