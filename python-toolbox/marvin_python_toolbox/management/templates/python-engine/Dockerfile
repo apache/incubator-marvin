@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 MAINTAINER {{mantainer.email}}
 
@@ -19,7 +19,10 @@ ENV SPARK_HOME=/opt/spark
 ENV SPARK_CONF_DIR=$SPARK_HOME/conf
 ENV HADOOP_CONF_DIR=$SPARK_CONF_DIR
 ENV YARN_CONF_DIR=$SPARK_CONF_DIR
-
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/Sao_Paulo
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
 
 ##############################################################
 # Create all folders needed 
@@ -36,23 +39,23 @@ RUN mkdir -p $MARVIN_HOME && \
 # Install the system dependencies for default installation 
 ##############################################################
 
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update -y && \
     apt-get install -y build-essential && \
     apt-get install -y maven git python cmake software-properties-common curl libstdc++6 && \
     apt-get install -y git && \
     apt-get install -y wget && \
-    apt-get install -y python2.7-dev && \
+    apt-get install -y python3.6-dev && \
     apt-get install -y python-pip && \
     apt-get install -y ipython && \
     apt-get install -y libffi-dev && \
     apt-get install -y libssl-dev && \
     apt-get install -y libxml2-dev && \
     apt-get install -y libxslt1-dev && \
-    apt-get install -y libpng12-dev && \
+    apt-get install -y libpng-dev && \
     apt-get install -y libfreetype6-dev && \
     apt-get install -y python-tk && \
     apt-get install -y libsasl2-dev && \
-    apt-get install -y python-pip && \
     apt-get install -y graphviz && \
     pip install --upgrade pip && \
     apt-get clean
@@ -82,7 +85,7 @@ RUN mkdir -p $SPARK_CONF_DIR
 
 RUN /bin/bash -c "cd $MARVIN_ENGINE_HOME && \
     source /usr/local/bin/virtualenvwrapper.sh && \
-    mkvirtualenv $MARVIN_ENGINE_ENV"
+    mkvirtualenv -p python3 $MARVIN_ENGINE_ENV"
 
 
 ##############################################################
