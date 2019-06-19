@@ -97,7 +97,7 @@ ADD build/marvin-engine-executor-assembly.jar $MARVIN_DATA_PATH
 RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh && \
     workon $MARVIN_ENGINE_ENV && \
     cd $MARVIN_ENGINE_HOME && \
-    pip install . --process-dependency-links"
+    pip install . "
 
 
 ##############################################################
