@@ -14,10 +14,10 @@
  * limitations under the License.
  *
  */
-package org.marvin.util
+package org.apache.marvin.util
 
 import io.jvm.uuid.UUID
-import org.marvin.model.EngineMetadata
+import org.apache.marvin.model.EngineMetadata
 
 import scala.collection.immutable.HashMap
 

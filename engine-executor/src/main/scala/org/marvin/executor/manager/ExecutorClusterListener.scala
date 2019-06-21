@@ -1,4 +1,4 @@
-package org.marvin.executor.manager
+package org.apache.marvin.executor.manager
 
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._

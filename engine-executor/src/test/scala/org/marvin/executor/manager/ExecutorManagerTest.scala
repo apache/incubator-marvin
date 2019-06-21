@@ -14,16 +14,16 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.manager
+package org.apache.marvin.executor.manager
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
 import akka.pattern.ask
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import org.marvin.executor.api.GenericAPIFunctions
-import org.marvin.executor.manager.ExecutorManager.{GetMetadata, StopActor}
-import org.marvin.fixtures.MetadataMock
+import org.apache.marvin.executor.api.GenericAPIFunctions
+import org.apache.marvin.executor.manager.ExecutorManager.{GetMetadata, StopActor}
+import org.apache.marvin.fixtures.MetadataMock
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 

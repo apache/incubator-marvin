@@ -1,4 +1,4 @@
-package org.marvin.executor.proxies
+package org.apache.marvin.executor.proxies
 
 import actions.BatchActionHandlerGrpc.BatchActionHandlerBlockingClient
 import actions._
@@ -6,9 +6,9 @@ import akka.Done
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestKit}
 import com.typesafe.config.ConfigFactory
-import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
-import org.marvin.fixtures.MetadataMock
-import org.marvin.model.EngineActionMetadata
+import org.apache.marvin.executor.proxies.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
+import org.apache.marvin.fixtures.MetadataMock
+import org.apache.marvin.model.EngineActionMetadata
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 

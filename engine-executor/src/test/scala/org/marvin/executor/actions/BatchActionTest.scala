@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.actions
+package org.apache.marvin.executor.actions
 
 import java.time.LocalDateTime
 
@@ -22,13 +22,13 @@ import akka.Done
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.testkit.{EventFilter, ImplicitSender, TestActorRef, TestKit, TestProbe}
 import com.typesafe.config.ConfigFactory
-import org.marvin.artifact.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
-import org.marvin.exception.MarvinEExecutorException
-import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchExecutionStatus, BatchHealthCheck, BatchReload}
-import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
-import org.marvin.fixtures.MetadataMock
-import org.marvin.model._
-import org.marvin.util.{JsonUtil, LocalCache}
+import org.apache.marvin.artifact.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
+import org.apache.marvin.exception.MarvinEExecutorException
+import org.apache.marvin.executor.actions.BatchAction.{BatchExecute, BatchExecutionStatus, BatchHealthCheck, BatchReload}
+import org.apache.marvin.executor.proxies.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
+import org.apache.marvin.fixtures.MetadataMock
+import org.apache.marvin.model._
+import org.apache.marvin.util.{JsonUtil, LocalCache}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 

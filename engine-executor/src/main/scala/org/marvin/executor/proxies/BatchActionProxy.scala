@@ -14,14 +14,14 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.proxies
+package org.apache.marvin.executor.proxies
 
 import actions.BatchActionHandlerGrpc.BatchActionHandlerBlockingClient
 import actions.{BatchActionHandlerGrpc, BatchActionRequest, HealthCheckRequest, ReloadRequest}
 import akka.Done
 import io.grpc.ManagedChannelBuilder
-import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
-import org.marvin.model.EngineActionMetadata
+import org.apache.marvin.executor.proxies.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
+import org.apache.marvin.model.EngineActionMetadata
 
 class BatchActionProxy(metadata: EngineActionMetadata) extends EngineProxy (metadata)  {
   var engineClient:BatchActionHandlerBlockingClient = _

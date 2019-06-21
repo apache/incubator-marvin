@@ -14,14 +14,14 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor
+package org.apache.marvin.executor
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit}
 import com.typesafe.config.ConfigFactory
-import org.marvin.exception.MarvinEExecutorException
-import org.marvin.executor.api.GenericAPIFunctions
-import org.marvin.fixtures.MetadataMock
+import org.apache.marvin.exception.MarvinEExecutorException
+import org.apache.marvin.executor.api.GenericAPIFunctions
+import org.apache.marvin.fixtures.MetadataMock
 import org.scalamock.scalatest.MockFactory
 import org.scalatest._
 
