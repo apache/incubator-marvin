@@ -14,10 +14,10 @@
  * limitations under the License.
  *
  */
-package org.marvin.util
+package org.apache.marvin.util
 
-import org.marvin.fixtures.MetadataMock
-import org.marvin.model.{EngineActionMetadata, EngineMetadata}
+import org.apache.marvin.fixtures.MetadataMock
+import org.apache.marvin.model.{EngineActionMetadata, EngineMetadata}
 import org.scalatest.{Matchers, WordSpec}
 
 class ProtocolUtilTest extends WordSpec with Matchers {

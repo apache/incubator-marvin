@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.api
+package org.apache.marvin.executor.api
 
 import actions.HealthCheckResponse.Status
 import akka.actor.ActorRef
@@ -23,13 +23,13 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCode, StatusCod
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.testkit.TestProbe
-import org.marvin.exception.MarvinEExecutorException
-import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchExecutionStatus, BatchHealthCheck, BatchReload}
-import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck}
-import org.marvin.executor.actions.PipelineAction.{PipelineExecute, PipelineExecutionStatus}
-import org.marvin.executor.statemachine.Reload
-import org.marvin.fixtures.MetadataMock
-import org.marvin.model.EngineMetadata
+import org.apache.marvin.exception.MarvinEExecutorException
+import org.apache.marvin.executor.actions.BatchAction.{BatchExecute, BatchExecutionStatus, BatchHealthCheck, BatchReload}
+import org.apache.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck}
+import org.apache.marvin.executor.actions.PipelineAction.{PipelineExecute, PipelineExecutionStatus}
+import org.apache.marvin.executor.statemachine.Reload
+import org.apache.marvin.fixtures.MetadataMock
+import org.apache.marvin.model.EngineMetadata
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Inside, Matchers, WordSpec}
 import spray.json.{JsValue, _}

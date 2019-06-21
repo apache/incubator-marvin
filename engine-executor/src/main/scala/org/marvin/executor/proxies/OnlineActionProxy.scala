@@ -14,14 +14,14 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.proxies
+package org.apache.marvin.executor.proxies
 
 import actions.OnlineActionHandlerGrpc.{OnlineActionHandler, OnlineActionHandlerBlockingClient, OnlineActionHandlerBlockingStub, OnlineActionHandlerStub}
 import actions._
 import akka.pattern.pipe
 import io.grpc.ManagedChannelBuilder
-import org.marvin.executor.proxies.EngineProxy.{ExecuteOnline, HealthCheck, Reload}
-import org.marvin.model.EngineActionMetadata
+import org.apache.marvin.executor.proxies.EngineProxy.{ExecuteOnline, HealthCheck, Reload}
+import org.apache.marvin.model.EngineActionMetadata
 
 //Reload messages
 final case class Reloaded(protocol: String)
