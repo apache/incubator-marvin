@@ -2,7 +2,7 @@ import xerial.sbt.Sonatype._
 
 publishMavenStyle := true
 
-sonatypeProfileName := "com.github.apache"
+sonatypeProfileName := "org.apache.marvin"
 
 sonatypeProjectHosting := Some(GitHubHosting("incubator-marvin", "dev@marvin.apache.org", "marvin-engine-executor"))
 

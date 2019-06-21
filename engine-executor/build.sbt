@@ -71,13 +71,16 @@ assemblyMergeStrategy in assembly := {
   }
 }
 
+credentials += Credentials(file("/home/user/.sbt/0.13/apache.credentials"))
+
 publishTo := {
-  val nexus = "https://oss.sonatype.org/"
+  val nexus = "https://repository.apache.org/"
   if (isSnapshot.value)
     Some("snapshots" at nexus + "content/repositories/snapshots")
   else
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
+
 
 publishArtifact in Test := false
 
