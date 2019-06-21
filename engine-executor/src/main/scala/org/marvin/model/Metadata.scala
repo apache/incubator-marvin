@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.marvin.model
+package org.apache.marvin.model
 
 import scala.collection.mutable.Map
 

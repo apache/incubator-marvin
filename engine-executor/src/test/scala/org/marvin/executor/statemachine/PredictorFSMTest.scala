@@ -14,17 +14,17 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.statemachine
+package org.apache.marvin.executor.statemachine
 
 import actions.HealthCheckResponse.Status
 import actions.OnlineActionResponse
 import akka.actor.ActorSystem
 import akka.testkit.{EventFilter, ImplicitSender, TestFSMRef, TestKit, TestProbe}
 import com.typesafe.config.ConfigFactory
-import org.marvin.exception.MarvinEExecutorException
-import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
-import org.marvin.executor.proxies.Reloaded
-import org.marvin.fixtures.MetadataMock
+import org.apache.marvin.exception.MarvinEExecutorException
+import org.apache.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
+import org.apache.marvin.executor.proxies.Reloaded
+import org.apache.marvin.fixtures.MetadataMock
 import org.scalatest.{Matchers, WordSpecLike}
 
 class PredictorFSMTest extends TestKit(

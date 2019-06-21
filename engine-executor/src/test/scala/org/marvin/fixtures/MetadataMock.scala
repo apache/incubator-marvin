@@ -14,9 +14,9 @@
  * limitations under the License.
  *
  */
-package org.marvin.fixtures
+package org.apache.marvin.fixtures
 
-import org.marvin.model.{EngineActionMetadata, EngineMetadata}
+import org.apache.marvin.model.{EngineActionMetadata, EngineMetadata}
 
 object MetadataMock {
 

@@ -14,12 +14,12 @@
  * limitations under the License.
  *
  */
-package org.marvin.util
+package org.apache.marvin.util
 
 import java.io.File
 
 import com.github.fge.jsonschema.core.exceptions.ProcessingException
-import org.marvin.model.EngineMetadata
+import org.apache.marvin.model.EngineMetadata
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.io.Source
