@@ -37,8 +37,8 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq (
-  "io.grpc" % "grpc-netty" % com.trueaccord.scalapb.compiler.Version.grpcJavaVersion,
-  "com.trueaccord.scalapb" %% "scalapb-runtime-grpc" % com.trueaccord.scalapb.compiler.Version.scalapbVersion
+  "io.grpc" % "grpc-netty" % scalapb.compiler.Version.grpcJavaVersion,
+  "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion
 )
 
 libraryDependencies += "org.apache.hadoop" % "hadoop-client" % "2.7.4"
@@ -50,7 +50,7 @@ libraryDependencies += "com.github.java-json-tools" % "json-schema-validator" % 
 libraryDependencies += "io.jvm.uuid" %% "scala-uuid" % "0.2.3"
 libraryDependencies += "com.amazonaws" % "aws-java-sdk-s3" % "1.11.232"
 
-dependencyOverrides ++= Set(
+dependencyOverrides ++= Seq(
   "io.netty" %% "netty" % "3.7.0",
   "io.netty" %% "netty-handler-proxy" % "4.1.12",
   "com.google.guava" %% "guava" % "19.0"
@@ -82,3 +82,7 @@ publishTo := {
 publishArtifact in Test := false
 
 useGpg := true
+
+PB.targets in Compile := Seq(
+  scalapb.gen() -> (sourceManaged in Compile).value
+)
