@@ -14,9 +14,9 @@
  * limitations under the License.
  *
  */
-package org.marvin.artifact.manager
+package org.apache.marvin.artifact.manager
 
-import org.marvin.model.EngineMetadata
+import org.apache.marvin.model.EngineMetadata
 import org.scalatest.{Matchers, WordSpec}
 
 class ArtifactSaverTest extends WordSpec with Matchers {
@@ -26,7 +26,7 @@ class ArtifactSaverTest extends WordSpec with Matchers {
       val props = ArtifactSaver.build(new EngineMetadata("name",
         "version", "engineType", null, "artifactsRemotePath", "HDFS", "marvin-artifact-bucket", List("acquisitor"),
         3000, 3000, 3000, 3000, Option(3000), 3000, "testHost"))
-      assert(props.actorClass().toString == "class org.marvin.artifact.manager.ArtifactHdfsSaver")
+      assert(props.actorClass().toString == "class org.apache.marvin.artifact.manager.ArtifactHdfsSaver")
     }
   }
 
@@ -35,7 +35,7 @@ class ArtifactSaverTest extends WordSpec with Matchers {
       val props = ArtifactSaver.build(new EngineMetadata("name",
         "version", "engineType", null, "artifactsRemotePath", "S3", "marvin-artifact-bucket", List("acquisitor"),
         3000, 3000, 3000, 3000, Option(3000), 3000, "testHost"))
-      assert(props.actorClass().toString == "class org.marvin.artifact.manager.ArtifactS3Saver")
+      assert(props.actorClass().toString == "class org.apache.marvin.artifact.manager.ArtifactS3Saver")
     }
   }
 
@@ -44,7 +44,7 @@ class ArtifactSaverTest extends WordSpec with Matchers {
       val props = ArtifactSaver.build(new EngineMetadata("name",
         "version", "engineType", null, "artifactsRemotePath", "fs", "marvin-artifact-bucket", List("acquisitor"),
         3000, 3000, 3000, 3000, Option(3000), 3000, "testHost"))
-      assert(props.actorClass().toString == "class org.marvin.artifact.manager.ArtifactFSSaver")
+      assert(props.actorClass().toString == "class org.apache.marvin.artifact.manager.ArtifactFSSaver")
     }
   }
 }

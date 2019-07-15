@@ -62,12 +62,8 @@ RUN apt-get update -y && \
 
 RUN pip install virtualenvwrapper
 
-# Install Oracle JDK
-RUN add-apt-repository ppa:webupd8team/java -y && \
-    apt-get -qq update && \
-    echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
-    echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \
-    apt-get install -y oracle-java8-installer    
+# Install Open JDK
+RUN apt-get update && apt-get install -y openjdk-8-jdk
 
 
 ##############################################################
@@ -104,7 +100,7 @@ ADD build/marvin-engine-executor-assembly.jar $MARVIN_DATA_PATH
 RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh && \
     workon $MARVIN_ENGINE_ENV && \
     cd $MARVIN_ENGINE_HOME && \
-    pip install . --process-dependency-links"
+    pip install . "
 
 
 ##############################################################

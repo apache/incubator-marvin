@@ -1,4 +1,4 @@
-package org.marvin.artifact.manager
+package org.apache.marvin.artifact.manager
 
 import java.io.File
 
@@ -9,9 +9,9 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.GetObjectRequest
 import com.typesafe.config.ConfigFactory
 import org.apache.hadoop.fs.Path
-import org.marvin.artifact.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
-import org.marvin.fixtures.MetadataMock
-import org.marvin.model.EngineMetadata
+import org.apache.marvin.artifact.manager.ArtifactSaver.{SaveToLocal, SaveToRemote}
+import org.apache.marvin.fixtures.MetadataMock
+import org.apache.marvin.model.EngineMetadata
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 

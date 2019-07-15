@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.marvin.util
+package org.apache.marvin.util
 
 import com.typesafe.config.ConfigFactory
 

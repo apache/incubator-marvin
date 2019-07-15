@@ -14,12 +14,12 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.manager
+package org.apache.marvin.executor.manager
 
 import akka.actor.{Actor, ActorLogging}
 import akka.util.Timeout
-import org.marvin.executor.api.{GenericAPI, GenericAPIFunctions}
-import org.marvin.executor.manager.ExecutorManager.{GetMetadata, StopActor}
+import org.apache.marvin.executor.api.{GenericAPI, GenericAPIFunctions}
+import org.apache.marvin.executor.manager.ExecutorManager.{GetMetadata, StopActor}
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._

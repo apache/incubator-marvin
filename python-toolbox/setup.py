@@ -82,7 +82,6 @@ REQUIREMENTS_EXTERNAL = [
     'idna>=2.5',
     'bleach>=1.5.0',
     'numpy>=1.16.2',
-    'Unidecode==1.0.23',
 ]
 
 # Test dependencies
