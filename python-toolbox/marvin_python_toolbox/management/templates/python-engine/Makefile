@@ -1,4 +1,4 @@
-.PHONY: help marvin marvin-prod update clean-pyc clean-build clean-reports clean-deps clean docker-build docker-push docker-run
+.PHONY: help marvin marvin-automl marvin-prod update clean-pyc clean-build clean-reports clean-deps clean docker-build docker-push docker-run
 
 DOCKER_VERSION?=0.00.01
 DOCKER_REGISTRY_ADRESS?=docker.registry.io
@@ -11,6 +11,8 @@ help:
 	@echo "        Prepare project to be used as a marvin package."
 	@echo "    marvin-prod"
 	@echo "        Prepare project to be used in production environment."
+	@echo "    marvin-automl"
+	@echo "        Prepare project to be used as a marvin-automl package."
 	@echo "    update"
 	@echo "        Reinstall requirements and setup.py dependencies."
 	@echo "    clean"
@@ -33,7 +35,10 @@ help:
 marvin:
 	pip install -e ".[testing]"
 	marvin --help
-
+marvin-automl:
+	pip install -e ".[testing]"
+	bash install_automl.sh
+	marvin --help
 marvin-prod:
 	pip install .
 	marvin --help
