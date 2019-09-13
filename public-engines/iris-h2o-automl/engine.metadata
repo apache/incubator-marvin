@@ -1,0 +1,62 @@
+{
+	"name": "iris_h2o_automl",
+	"version": "v0.0.1",
+	"engineType": "python",
+	"artifactsRemotePath": "/tmp/marvin",
+	"artifactManagerType": "FS",
+	"onlineActionTimeout": 1000,
+	"metricsTimeout": 10000,
+    "healthCheckTimeout": 2000,
+	"reloadTimeout": 600000,
+	"batchActionTimeout": 600000,
+	"pipelineActions": ["acquisitor", "tpreparator", "trainer", "evaluator"],
+	"actions": [{
+		"name": "acquisitor",
+		"actionType": "batch",
+		"port": 50051,
+		"host": "localhost",
+		"artifactsToPersist": ["initialdataset"],
+		"artifactsToLoad": [],
+		"pipeline": []
+	}, {
+		"name": "tpreparator",
+		"actionType": "batch",
+		"port": 50052,
+		"host": "localhost",
+		"artifactsToPersist": ["dataset"],
+		"artifactsToLoad": ["initialdataset"],
+		"pipeline": []
+	}, {
+		"name": "trainer",
+		"actionType": "batch",
+		"port": 50053,
+		"host": "localhost",
+		"artifactsToPersist": ["model"],
+		"artifactsToLoad": ["dataset"],
+		"pipeline": []
+	}, {
+		"name": "evaluator",
+		"actionType": "batch",
+		"port": 50054,
+		"host": "localhost",
+		"artifactsToPersist": ["metrics"],
+		"artifactsToLoad": ["dataset", "model"],
+		"pipeline": []
+	}, {
+		"name": "predictor",
+		"actionType": "online",
+		"port": 50055,
+		"host": "localhost",
+		"artifactsToPersist": [],
+		"artifactsToLoad": ["model", "metrics"],
+		"pipeline": ["ppreparator"]
+	}, {
+		"name": "feedback",
+		"actionType": "online",
+		"port": 50056,
+		"host": "localhost",
+		"artifactsToPersist": [],
+		"artifactsToLoad": [],
+		"pipeline": []
+	}]
+}

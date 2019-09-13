@@ -357,7 +357,7 @@ _orig_type = type
 @click.argument('engine-path', type=click.Path(exists=True))
 @click.option('--python', '-p', default='python', help='The Python interpreter to use to create the new environment')
 def generate_env(engine_path, python):
-    engine_type = load_conf_from_file(engine_path + 'marvin.ini').get('type')
+    engine_type = load_conf_from_file(engine_path + '/marvin.ini').get('type')
     dir_ = os.path.basename(os.path.abspath(engine_path))
     venv_name = _create_virtual_env(dir_, engine_path, python)
     _call_make_env(venv_name, engine_type)
@@ -468,6 +468,7 @@ def generate(name, description, mantainer, email, package, dest, no_env, no_git,
 
     except Exception as e:
         logger.info(e)
+        print("\nAlready exists a engine project with this name!")
         # remove project if created
         if os.path.exists(dest) and folder_created:
             shutil.rmtree(dest)
