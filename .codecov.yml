@@ -1,0 +1,19 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 70%
+        threshold: null
+      engine-executor:
+        flags: engine-executor
+        target: 50%
+      python-toolbox:
+        target: 70%
+        flags: python-toolbox
+flags:
+  projectA:
+    paths:
+    - engine-executor/src
+  projectB:
+    paths:
+    - python-toolbox/marvin_python_toolbox
