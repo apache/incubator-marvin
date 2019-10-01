@@ -11,9 +11,9 @@ coverage:
         target: 70%
         flags: python-toolbox
 flags:
-  projectA:
+  engine-executor:
     paths:
     - engine-executor/src
-  projectB:
+  python-toolbox:
     paths:
     - python-toolbox/marvin_python_toolbox
