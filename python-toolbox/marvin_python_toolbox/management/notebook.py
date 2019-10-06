@@ -29,7 +29,7 @@ def cli():
 
 @cli.command('notebook', help='Start the Jupyter notebook server.')
 @click.option('--port', '-p', default=8888, help='Jupyter server port')
-@click.option('--base-url', '-p', default='/', help='Jupyter server base url')
+@click.option('--base-url', default='/', help='Jupyter server base url')
 @click.option('--enable-security', is_flag=True, help='Enable jupyter notebook token security.')
 @click.option('--spark-conf', '-c', envvar='SPARK_CONF_DIR', type=click.Path(exists=True), help='Spark configuration folder path to be used in this session')
 @click.option('--allow-root', is_flag=True, help='Run notebook from root user.')
@@ -59,7 +59,7 @@ def notebook(ctx, port, base_url, enable_security, spark_conf, allow_root):
 
 @cli.command('lab', help='Start the JupyterLab server.')
 @click.option('--port', '-p', default=8888, help='JupyterLab server port')
-@click.option('--base-url', '-p', default='/', help='Jupyter server base url')
+@click.option('--base-url', default='/', help='Jupyter server base url')
 @click.option('--enable-security', is_flag=True, help='Enable jupyterlab token security.')
 @click.option('--spark-conf', '-c', envvar='SPARK_CONF_DIR', type=click.Path(exists=True), help='Spark configuration folder path to be used in this session')
 @click.pass_context
