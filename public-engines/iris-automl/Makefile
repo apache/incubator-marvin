@@ -3,8 +3,8 @@
 DOCKER_VERSION?=0.00.01
 DOCKER_REGISTRY_ADRESS?=docker.registry.io
 MARVIN_DATA_PATH?=$(HOME)/marvin/data
-MARVIN_ENGINE_NAME?={{project.name}}
-MARVIN_TOOLBOX_VERSION?={{project.toolbox_version}}
+MARVIN_ENGINE_NAME?=marvin_iris_automl
+MARVIN_TOOLBOX_VERSION?=0.0.5
 
 help:
 	@echo "    marvin"

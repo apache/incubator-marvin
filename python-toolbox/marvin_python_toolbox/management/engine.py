@@ -32,7 +32,7 @@ from unidecode import unidecode
 import multiprocessing
 from marvin_python_toolbox.common.profiling import profiling
 from marvin_python_toolbox.common.data import MarvinData
-from marvin_python_toolbox.common.config import Config
+from marvin_python_toolbox.common.config import Config, load_conf_from_file
 from .._compatibility import iteritems
 from .._logging import get_logger
 
@@ -336,7 +336,8 @@ def engine_server(ctx, action, params_file, metadata_file, initial_dataset, data
 
 
 TEMPLATE_BASES = {
-    'python-engine': os.path.join(os.path.dirname(__file__), 'templates', 'python-engine')
+    'python-engine': os.path.join(os.path.dirname(__file__), 'templates', 'python-engine'),
+    'automl-engine': os.path.join(os.path.dirname(__file__), 'templates', 'python-engine'),
 }
 
 RENAME_DIRS = [
@@ -356,9 +357,10 @@ _orig_type = type
 @click.argument('engine-path', type=click.Path(exists=True))
 @click.option('--python', '-p', default='python', help='The Python interpreter to use to create the new environment')
 def generate_env(engine_path, python):
+    engine_type = load_conf_from_file(engine_path + '/marvin.ini').get('type')
     dir_ = os.path.basename(os.path.abspath(engine_path))
     venv_name = _create_virtual_env(dir_, engine_path, python)
-    _call_make_env(venv_name)
+    _call_make_env(venv_name, engine_type)
 
     print('\nDone!!!!')
     print('Now to workon in the new engine project use: workon {}'.format(venv_name))
@@ -373,13 +375,18 @@ def generate_env(engine_path, python):
 @click.option('--dest', '-d', envvar='MARVIN_HOME', type=click.Path(exists=True), help='Root folder path for the creation')
 @click.option('--no-env', is_flag=True, default=False, help='Don\'t create the virtual enviroment')
 @click.option('--no-git', is_flag=True, default=False, help='Don\'t initialize the git repository')
+@click.option('--automl', '-aml', default='n' ,prompt='Use AutoML?: ', type=click.Choice(['y','n']))
 @click.option('--python', '-py', default='python', help='The Python interpreter to use to create the new environment')
-def generate(name, description, mantainer, email, package, dest, no_env, no_git, python):
+def generate(name, description, mantainer, email, package, dest, no_env, no_git, automl, python):
     type_ = 'python-engine'
     type = _orig_type
 
-    # Process package name
 
+    # Check if package should be automl
+    if automl == 'y':
+        type_ = 'automl-engine'
+        
+    # Process package name
     package = _slugify(package or name)
 
     # Make sure package name starts with "marvin"
@@ -394,7 +401,7 @@ def generate(name, description, mantainer, email, package, dest, no_env, no_git,
 
     # Append project type to services
 
-    if type_ == 'python-engine' and not package.endswith('engine'):
+    if type_ in TEMPLATE_BASES and not package.endswith('engine'):
         package = '{}_engine'.format(package)
 
     # Process directory/virtualenv name
@@ -449,7 +456,7 @@ def generate(name, description, mantainer, email, package, dest, no_env, no_git,
         venv_name = None
         if not no_env:
             venv_name = _create_virtual_env(dir_, dest, python)
-            _call_make_env(venv_name)
+            _call_make_env(venv_name, type_)
 
         if not no_git:
             _call_git_init(dest)
@@ -461,6 +468,7 @@ def generate(name, description, mantainer, email, package, dest, no_env, no_git,
 
     except Exception as e:
         logger.info(e)
+        print("\nAlready exists a engine project with this name!")
         # remove project if created
         if os.path.exists(dest) and folder_created:
             shutil.rmtree(dest)
@@ -552,8 +560,11 @@ def _create_virtual_env(name, dest, python):
     return venv_name
 
 
-def _call_make_env(venv_name):
-    command = ['bash', '-c', '. virtualenvwrapper.sh; workon {}; make marvin'.format(venv_name)]
+def _call_make_env(venv_name, engine):
+    if engine == 'automl-engine':
+        command = ['bash', '-c', '. virtualenvwrapper.sh; workon {}; make marvin-automl'.format(venv_name)]
+    else:
+        command = ['bash', '-c', '. virtualenvwrapper.sh; workon {}; make marvin'.format(venv_name)]
 
     try:
         subprocess.Popen(command, env=os.environ).wait()
