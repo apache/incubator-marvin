@@ -82,6 +82,7 @@ REQUIREMENTS_EXTERNAL = [
     'idna>=2.5',
     'bleach>=1.5.0',
     'numpy>=1.16.2',
+    'google-cloud-bigquery>=1.21',
 ]
 
 # Test dependencies
