@@ -83,6 +83,7 @@ REQUIREMENTS_EXTERNAL = [
     'bleach>=1.5.0',
     'numpy>=1.16.2',
     'google-cloud-bigquery>=1.21',
+    'pandas>=0.24'
 ]
 
 # Test dependencies
@@ -92,9 +93,9 @@ REQUIREMENTS_TESTS = [
     'pytest>=2.9.2',
     'pytest-cov>=1.8.1,<2.6',
     'pytest-watch>=4.1.0',
-    'pytest-testmon>=0.8.2',
+    'pytest-testmon==0.8.2',
     'Keras>=2.2.0',
-    'tensorflow>=1.8.0',
+    'tensorflow==2.0',
 ]
 # This is normally an empty list
 DEPENDENCY_LINKS_EXTERNAL = []
