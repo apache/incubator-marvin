@@ -5,7 +5,8 @@
 cmd=(dialog --title "Marvin AutoML" --separate-output --checklist "Select tools:" 22 76 16)
 options=(1 "auto-sklearn" off    # any option can be set to default to "on"
          2 "h2o AutoML" off
-         3 "TPOT" off)
+         3 "TPOT" off
+         4 "Autokeras" off)
 choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
 clear
 for choice in $choices
@@ -30,6 +31,10 @@ do
         3)
             echo "Installing TPOT..."
             pip install tpot
+            ;;
+        4)
+            echo "Installing Autokeras..."
+            pip install autokeras
             ;;
     esac
 done
