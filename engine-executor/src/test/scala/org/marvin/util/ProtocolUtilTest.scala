@@ -74,6 +74,8 @@ class ProtocolUtilTest extends WordSpec with Matchers {
           artifactsRemotePath = "",
           artifactManagerType = "HDFS",
           s3BucketName = "marvin-artifact-bucket",
+          azConnectionString = "",
+          azContainerName = "",
           batchActionTimeout = 100,
           engineType = "python",
           hdfsHost = "",

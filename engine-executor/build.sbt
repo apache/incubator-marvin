@@ -49,6 +49,7 @@ libraryDependencies += "org.json4s" %% "json4s-jackson" % "3.5.0"
 libraryDependencies += "com.github.java-json-tools" % "json-schema-validator" % "2.2.8"
 libraryDependencies += "io.jvm.uuid" %% "scala-uuid" % "0.2.3"
 libraryDependencies += "com.amazonaws" % "aws-java-sdk-s3" % "1.11.232"
+libraryDependencies += "com.microsoft.azure" % "azure-storage" % "5.0.0"
 
 dependencyOverrides ++= Seq(
   "io.netty" %% "netty" % "3.7.0",
