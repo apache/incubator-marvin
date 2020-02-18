@@ -46,7 +46,7 @@ TOPIC = 'Topic :: Software Development :: Libraries :: Python Modules',
 # External dependencies
 # More info https://pythonhosted.org/setuptools/setuptools.html#declaring-dependencies
 REQUIREMENTS_EXTERNAL = [
-    'six>=1.10.0',
+    'six>=1.14.0',
     'bumpversion>=0.5.3',
     'click>=3.3',
     'jupyter>=1.0.0',
