@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-MAINTAINER marvin-ai@googlegroups.com
+MAINTAINER dev@marvin.apache.org
 
 ENV SLEEP_MILLIS 0
 
@@ -74,12 +74,6 @@ RUN add-apt-repository ppa:webupd8team/java -y && \
 # spark configuration files to the think works correctly.
 ##############################################################
 
-# RUN curl https://d3kbcqa49mib13.cloudfront.net/spark-2.1.1-bin-hadoop2.6.tgz -o /tmp/spark-2.1.1-bin-hadoop2.6.tgz && \
-#    tar -xf /tmp/spark-2.1.1-bin-hadoop2.6.tgz -C /opt/ && \
-#    ln -s /opt/spark-2.1.1-bin-hadoop2.6 /opt/spark
-
-# Add the b2w datalake config for Spark
-# ADD spark-conf.tar $SPARK_CONF_DIR
 RUN mkdir -p $SPARK_CONF_DIR
 
 ##############################################################

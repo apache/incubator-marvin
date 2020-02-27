@@ -1,4 +1,4 @@
-# Copyright [2018] Apache Marvin-AI
+# Copyright [2018] [Apache Software Foundation]
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ matrix:
     - language: scala
       scala:
         - 2.12.6
-      jdk: oraclejdk8
+      jdk: openjdk8
       cache:
         directories:
         - $HOME/.sbt
@@ -31,6 +31,8 @@ matrix:
         - cd engine-executor
         - unset SBT_OPTS
       script: travis_retry sbt -batch ++$TRAVIS_SCALA_VERSION coverage test coverageReport
+      after_success:
+      - bash <(curl -s https://codecov.io/bash)
     # Python Toolbox
     # Python Toolbox - Linux
     - language: python
@@ -47,10 +49,11 @@ matrix:
         - export MARVIN_HOME=./marvin_home
         - export MARVIN_DATA_PATH=./marvin_data
         - export SPARK_HOME=./spark-2.1.1-bin-hadoop2.6
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update                    ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew unlink python@2           ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install openssl graphviz  ; fi
         - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py  ; fi
         - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo python get-pip.py         ; fi
-        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update                    ; fi
-        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install openssl graphviz  ; fi
         - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz -y    ; fi
         - travis_retry sudo pip install --upgrade pip
         - travis_retry sudo pip install virtualenvwrapper --ignore-installed six
@@ -75,10 +78,11 @@ matrix:
         - export MARVIN_HOME=./marvin_home
         - export MARVIN_DATA_PATH=./marvin_data
         - export SPARK_HOME=./spark-2.1.1-bin-hadoop2.6
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update                    ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew unlink python@2           ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install openssl graphviz  ; fi
         - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py  ; fi
         - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo python get-pip.py         ; fi
-        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update                    ; fi
-        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install openssl graphviz  ; fi
         - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz -y    ; fi
         - travis_retry sudo pip install --upgrade pip
         - travis_retry sudo pip install virtualenvwrapper --ignore-installed six

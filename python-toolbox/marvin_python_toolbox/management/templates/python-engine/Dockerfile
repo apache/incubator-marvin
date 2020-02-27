@@ -1,4 +1,9 @@
-FROM ubuntu:16.04
+############################################################
+FROM python:2-alpine3.10
+# To use python3 comment the line above and uncomment 
+# the line bellow.
+#FROM python:3-alpine3.10
+############################################################
 
 MAINTAINER {{mantainer.email}}
 
@@ -21,6 +26,7 @@ ENV HADOOP_CONF_DIR=$SPARK_CONF_DIR
 ENV YARN_CONF_DIR=$SPARK_CONF_DIR
 
 
+
 ##############################################################
 # Create all folders needed 
 ##############################################################
@@ -29,67 +35,35 @@ RUN mkdir -p $MARVIN_HOME && \
     mkdir -p $MARVIN_DATA_PATH && \
     mkdir -p $MARVIN_ENGINE_HOME && \
     mkdir -p /var/log/marvin/engines && \
-    mkdir -p /var/run/marvin/engines
-
-
+    mkdir -p /var/run/marvin/engines && \
 ##############################################################
 # Install the system dependencies for default installation 
 ##############################################################
-
-RUN apt-get update -y && \
-    apt-get install -y build-essential && \
-    apt-get install -y maven git python cmake software-properties-common curl libstdc++6 && \
-    apt-get install -y git && \
-    apt-get install -y wget && \
-    apt-get install -y python2.7-dev && \
-    apt-get install -y python-pip && \
-    apt-get install -y ipython && \
-    apt-get install -y libffi-dev && \
-    apt-get install -y libssl-dev && \
-    apt-get install -y libxml2-dev && \
-    apt-get install -y libxslt1-dev && \
-    apt-get install -y libpng12-dev && \
-    apt-get install -y libfreetype6-dev && \
-    apt-get install -y python-tk && \
-    apt-get install -y libsasl2-dev && \
-    apt-get install -y python-pip && \
-    apt-get install -y graphviz && \
-    pip install --upgrade pip && \
-    apt-get clean
-
-RUN pip install virtualenvwrapper
-
-# Install Oracle JDK
-RUN add-apt-repository ppa:webupd8team/java -y && \
-    apt-get -qq update && \
-    echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
-    echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \
-    apt-get install -y oracle-java8-installer    
-
-
+    apk add --no-cache g++ openssl-dev openjdk11-jre-headless bash && \
+    apk add --no-cache --virtual .build-deps make \
+    git \
+    wget \
+    libsass-dev \
+    openblas-dev \
+    libffi-dev \
+    libxml2-dev \
+    libxslt-dev \
+    libpng-dev \
+    freetype-dev \
+    cyrus-sasl-dev
 ##############################################################
 # Install Apache Spark
 #
 # Uncomment if you are using spark, note that is needed the 
 # spark configuration files to the think works correctly.
 ##############################################################
-
-# RUN curl https://d3kbcqa49mib13.cloudfront.net/spark-2.1.1-bin-hadoop2.6.tgz -o /tmp/spark-2.1.1-bin-hadoop2.6.tgz && \
+#
+# RUN wget -O /tmp/spark-2.1.1-bin-hadoop2.6.tgz https://d3kbcqa49mib13.cloudfront.net/spark-2.1.1-bin-hadoop2.6.tgz && \
 #    tar -xf /tmp/spark-2.1.1-bin-hadoop2.6.tgz -C /opt/ && \
 #    ln -s /opt/spark-2.1.1-bin-hadoop2.6 /opt/spark
+##############################################################
 
-# Add the b2w datalake config for Spark
-# ADD spark-conf.tar $SPARK_CONF_DIR
 RUN mkdir -p $SPARK_CONF_DIR
-
-##############################################################
-# Create the virtualenv configuration
-##############################################################
-
-RUN /bin/bash -c "cd $MARVIN_ENGINE_HOME && \
-    source /usr/local/bin/virtualenvwrapper.sh && \
-    mkvirtualenv $MARVIN_ENGINE_ENV"
-
 
 ##############################################################
 #        <CUSTOM ENGINE INSTALLATION PROCEDURE HERE>         #
@@ -97,8 +71,13 @@ RUN /bin/bash -c "cd $MARVIN_ENGINE_HOME && \
 
 
 ##############################################################
-# Copy and Install the marvin engine inside virtualenv
+# Copy and Install the marvin engine
 ##############################################################
+
+RUN /bin/bash -c "pip install virtualenvwrapper && \
+    cd $MARVIN_ENGINE_HOME && \
+    source /usr/local/bin/virtualenvwrapper.sh && \
+    mkvirtualenv $MARVIN_ENGINE_ENV"
 
 ADD build/engine.tar $MARVIN_ENGINE_HOME
 
@@ -107,8 +86,20 @@ ADD build/marvin-engine-executor-assembly.jar $MARVIN_DATA_PATH
 RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh && \
     workon $MARVIN_ENGINE_ENV && \
     cd $MARVIN_ENGINE_HOME && \
-    pip install . --process-dependency-links"
-
+    pip install --no-cache numpy && \
+    pip install --no-cache scipy && \
+    pip install --no-cache pandas && \
+    pip install --no-cache matplotlib && \
+    pip install --no-cache cython && \
+    pip install --no-cache scikit-learn && \
+    pip install --no-cache Fabric && \
+    pip install --no-cache marvin-python-toolbox && \
+    pip install . "
+##############################################################
+# Uninstalling unnecessary software and cleaning cache
+##############################################################
+RUN rm -rf /root/.cache && \
+    apk del .build-deps
 
 ##############################################################
 # Starts the engine http server

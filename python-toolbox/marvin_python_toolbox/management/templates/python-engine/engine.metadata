@@ -58,5 +58,8 @@
 		"artifactsToPersist": [],
 		"artifactsToLoad": [],
 		"pipeline": []
-	}]
+	}],
+	"bigquery_project": "xxx-project",
+	"bigquery_queries": [],
+	"bigquery_csvfiles": []
 }

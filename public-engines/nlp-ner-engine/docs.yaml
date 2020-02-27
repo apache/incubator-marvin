@@ -4,8 +4,8 @@ info:
   title: marvin_nlp_ner_engine API Doc
   contact:
       name: mantainer Marvin AI Community
-      email: marvin-ai@googlegroups.com
-      url: https://github.com/marvin-ai
+      email: dev@marvin.apache.org
+      url: https://marvin.apache.org
   license:
     name: Apache License 2.0
 servers:

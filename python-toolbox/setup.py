@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright [2017] [B2W Digital]
+# Copyright [2019] [Apache Software Foundation]
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ PACKAGE_DESCRIPTION = 'Apache Marvin Python Toolbox'
 URL = 'https://github.com/apache/incubator-marvin'
 
 AUTHOR_NAME = 'Daniel Takabayashi'
-AUTHOR_EMAIL = 'taka@apache.org'
+AUTHOR_EMAIL = 'dev@marvin.apache.org'
 
 PYTHON_2 = True
 PYTHON_3 = True
@@ -46,7 +46,7 @@ TOPIC = 'Topic :: Software Development :: Libraries :: Python Modules',
 # External dependencies
 # More info https://pythonhosted.org/setuptools/setuptools.html#declaring-dependencies
 REQUIREMENTS_EXTERNAL = [
-    'six>=1.10.0',
+    'six>=1.14.0',
     'bumpversion>=0.5.3',
     'click>=3.3',
     'jupyter>=1.0.0',
@@ -77,11 +77,13 @@ REQUIREMENTS_EXTERNAL = [
     'joblib>=0.11',
     'autopep8>=1.3.3',
     'progressbar2>=3.34.3',
-    'urllib3>=1.21.1',
+    'urllib3==1.21.1',
+    'unidecode==1.0.23',
     'idna>=2.5',
     'bleach>=1.5.0',
     'numpy>=1.16.2',
-    'Unidecode==1.0.23',
+    'google-cloud-bigquery>=1.21',
+    'pandas>=0.24'
 ]
 
 # Test dependencies
@@ -91,9 +93,9 @@ REQUIREMENTS_TESTS = [
     'pytest>=2.9.2',
     'pytest-cov>=1.8.1,<2.6',
     'pytest-watch>=4.1.0',
-    'pytest-testmon>=0.8.2',
+    'pytest-testmon==0.8.2',
     'Keras>=2.2.0',
-    'tensorflow>=1.8.0',
+    'tensorflow==2.0',
 ]
 # This is normally an empty list
 DEPENDENCY_LINKS_EXTERNAL = []

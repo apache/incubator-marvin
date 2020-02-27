@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-# Copyright [2017] [B2W Digital]
+# Copyright [2019] [Apache Software Foundation]
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ from .test import cli as cli_test
 from .notebook import cli as cli_notebook
 from .hive import cli as cli_hive
 from .engine import cli as cli_engine
+from .bigquery import cli as cli_bigquery
 
 from ..config import parse_ini
 from ..loader import load_commands_from_file
@@ -38,7 +39,7 @@ __all__ = ['create_cli']
 
 logger = get_logger('management')
 
-TOOL_EXCLUDE = ['engine-server', 'engine-dryrun', 'engine-httpserver', 'engine-grpcserver', 'engine-deploy', 'engine-httpserver-remote', 'pkg-showversion']
+TOOL_EXCLUDE = ['engine-server', 'engine-dryrun', 'engine-httpserver', 'engine-grpcserver', 'engine-deploy', 'engine-httpserver-remote', 'pkg-showversion', 'bigquery-dataimport']
 PROD_EXCLUDE = ['test', 'test-tdd', 'test-tox', 'test-checkpep8', 'lab', 'notebook', 'pkg-bumpversion', 'pkg-createtag', 'pkg-showchanges', 'pkg-showinfo', 'pkg-updatedeps']
 
 EXCLUDE_BY_TYPE = {
@@ -108,6 +109,7 @@ def create_cli(package_name, package_path, type_=None, exclude=None, config=None
 
     # Load internal commands
     commands = {}
+    commands.update(cli_bigquery.commands)
     commands.update(cli_pkg.commands)
     commands.update(cli_test.commands)
     commands.update(cli_notebook.commands)

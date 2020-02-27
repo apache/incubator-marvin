@@ -42,4 +42,5 @@ marvin engine-dryrun
 
 ### Contact
 
-danilo.nunes@b2wdigital.com
+name: danilo.nunes
+email: dev@marvin.apache.org
