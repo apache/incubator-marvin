@@ -1,5 +1,5 @@
 /*
- * Copyright [2017] [B2W Digital]
+ * Copyright [2019] [Apache Software Foundation]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  *
  */
-package org.marvin.artifact.manager
+package org.apache.marvin.artifact.manager
 
-import org.marvin.model.EngineMetadata
+import org.apache.marvin.model.EngineMetadata
 import org.scalatest.{Matchers, WordSpec}
 
 class ArtifactSaverTest extends WordSpec with Matchers {
@@ -24,27 +24,30 @@ class ArtifactSaverTest extends WordSpec with Matchers {
   "A engineMetadata with artifactsSaverType as HDFS" should {
     "return Props with actorClass ArtifactHdfsSaver" in {
       val props = ArtifactSaver.build(new EngineMetadata("name",
-        "version", "engineType", null, "artifactsRemotePath", "HDFS", "marvin-artifact-bucket", List("acquisitor"),
+        "version", "engineType", null, "artifactsRemotePath", "HDFS", "marvin-artifact-bucket","",
+        "",List("acquisitor"),
         3000, 3000, 3000, 3000, Option(3000), 3000, "testHost"))
-      assert(props.actorClass().toString == "class org.marvin.artifact.manager.ArtifactHdfsSaver")
+      assert(props.actorClass().toString == "class org.apache.marvin.artifact.manager.ArtifactHdfsSaver")
     }
   }
 
   "A engineMetadata with artifactsSaverType as S3" should {
     "return Props with actorClass ArtifactS3Saver" in {
       val props = ArtifactSaver.build(new EngineMetadata("name",
-        "version", "engineType", null, "artifactsRemotePath", "S3", "marvin-artifact-bucket", List("acquisitor"),
+        "version", "engineType", null, "artifactsRemotePath", "S3", "marvin-artifact-bucket", "",
+        "",List("acquisitor"),
         3000, 3000, 3000, 3000, Option(3000), 3000, "testHost"))
-      assert(props.actorClass().toString == "class org.marvin.artifact.manager.ArtifactS3Saver")
+      assert(props.actorClass().toString == "class org.apache.marvin.artifact.manager.ArtifactS3Saver")
     }
   }
 
   "A engineMetadata with artifactsSaverType as FS" should {
     "return Props with actorClass ArtifactFSSaver" in {
       val props = ArtifactSaver.build(new EngineMetadata("name",
-        "version", "engineType", null, "artifactsRemotePath", "fs", "marvin-artifact-bucket", List("acquisitor"),
+        "version", "engineType", null, "artifactsRemotePath", "fs", "marvin-artifact-bucket", "",
+        "",List("acquisitor"),
         3000, 3000, 3000, 3000, Option(3000), 3000, "testHost"))
-      assert(props.actorClass().toString == "class org.marvin.artifact.manager.ArtifactFSSaver")
+      assert(props.actorClass().toString == "class org.apache.marvin.artifact.manager.ArtifactFSSaver")
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright [2017] [B2W Digital]
+ * Copyright [2019] [Apache Software Foundation]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  *
  */
-package org.marvin.fixtures
+package org.apache.marvin.fixtures
 
-import org.marvin.model.{EngineActionMetadata, EngineMetadata}
+import org.apache.marvin.model.{EngineActionMetadata, EngineMetadata}
 
 object MetadataMock {
 
@@ -34,6 +34,8 @@ object MetadataMock {
       artifactsRemotePath = "",
       artifactManagerType = "HDFS",
       s3BucketName = "marvin-artifact-bucket",
+      azConnectionString = "",
+      azContainerName = "",
       batchActionTimeout = 2000,
       engineType = "python",
       hdfsHost = "",

@@ -1,5 +1,5 @@
 /*
- * Copyright [2017] [B2W Digital]
+ * Copyright [2019] [Apache Software Foundation]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.api
+package org.apache.marvin.executor.api
 
 import java.util.concurrent.Executors
 
@@ -29,13 +29,13 @@ import akka.http.scaladsl.server.{HttpApp, Route, StandardRoute}
 import akka.pattern.ask
 import akka.util.Timeout
 import com.github.fge.jsonschema.core.exceptions.ProcessingException
-import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchExecutionStatus, BatchMetrics, BatchHealthCheck, BatchReload}
-import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck}
-import org.marvin.executor.actions.PipelineAction.{PipelineExecute, PipelineExecutionStatus}
-import org.marvin.executor.api.GenericAPI._
-import org.marvin.executor.statemachine.Reload
-import org.marvin.model.EngineMetadata
-import org.marvin.util.{JsonUtil, ProtocolUtil}
+import org.apache.marvin.executor.actions.BatchAction.{BatchExecute, BatchExecutionStatus, BatchMetrics, BatchHealthCheck, BatchReload}
+import org.apache.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck}
+import org.apache.marvin.executor.actions.PipelineAction.{PipelineExecute, PipelineExecutionStatus}
+import org.apache.marvin.executor.api.GenericAPI._
+import org.apache.marvin.executor.statemachine.Reload
+import org.apache.marvin.model.EngineMetadata
+import org.apache.marvin.util.{JsonUtil, ProtocolUtil}
 import spray.json.{DefaultJsonProtocol, RootJsonFormat, _}
 
 import scala.concurrent._

@@ -1,5 +1,5 @@
 /*
- * Copyright [2017] [B2W Digital]
+ * Copyright [2019] [Apache Software Foundation]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
  * limitations under the License.
  *
  */
-package org.marvin.util
+package org.apache.marvin.util
 
-import org.marvin.fixtures.MetadataMock
-import org.marvin.model.{EngineActionMetadata, EngineMetadata}
+import org.apache.marvin.fixtures.MetadataMock
+import org.apache.marvin.model.{EngineActionMetadata, EngineMetadata}
 import org.scalatest.{Matchers, WordSpec}
 
 class ProtocolUtilTest extends WordSpec with Matchers {
@@ -74,6 +74,8 @@ class ProtocolUtilTest extends WordSpec with Matchers {
           artifactsRemotePath = "",
           artifactManagerType = "HDFS",
           s3BucketName = "marvin-artifact-bucket",
+          azConnectionString = "",
+          azContainerName = "",
           batchActionTimeout = 100,
           engineType = "python",
           hdfsHost = "",

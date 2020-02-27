@@ -1,5 +1,5 @@
 /*
- * Copyright [2017] [B2W Digital]
+ * Copyright [2019] [Apache Software Foundation]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.actions
+package org.apache.marvin.executor.actions
 
 import akka.Done
 import akka.actor.SupervisorStrategy._
@@ -22,13 +22,13 @@ import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, Props, Stat
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
 import io.grpc.StatusRuntimeException
-import org.marvin.artifact.manager.ArtifactSaver
-import org.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
-import org.marvin.executor.proxies.EngineProxy.{ExecuteOnline, HealthCheck, Reload}
-import org.marvin.executor.proxies.OnlineActionProxy
-import org.marvin.artifact.manager.ArtifactSaver.SaveToLocal
-import org.marvin.model.{EngineActionMetadata, EngineMetadata}
-import org.marvin.util.ProtocolUtil
+import org.apache.marvin.artifact.manager.ArtifactSaver
+import org.apache.marvin.executor.actions.OnlineAction.{OnlineExecute, OnlineHealthCheck, OnlineReload}
+import org.apache.marvin.executor.proxies.EngineProxy.{ExecuteOnline, HealthCheck, Reload}
+import org.apache.marvin.executor.proxies.OnlineActionProxy
+import org.apache.marvin.artifact.manager.ArtifactSaver.SaveToLocal
+import org.apache.marvin.model.{EngineActionMetadata, EngineMetadata}
+import org.apache.marvin.util.ProtocolUtil
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future

@@ -1,5 +1,5 @@
 /*
- * Copyright [2017] [B2W Digital]
+ * Copyright [2019] [Apache Software Foundation]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.proxies
+package org.apache.marvin.executor.proxies
 
 import actions.OnlineActionHandlerGrpc.{OnlineActionHandler, OnlineActionHandlerBlockingClient, OnlineActionHandlerBlockingStub, OnlineActionHandlerStub}
 import actions._
 import akka.pattern.pipe
 import io.grpc.ManagedChannelBuilder
-import org.marvin.executor.proxies.EngineProxy.{ExecuteOnline, HealthCheck, Reload}
-import org.marvin.model.EngineActionMetadata
+import org.apache.marvin.executor.proxies.EngineProxy.{ExecuteOnline, HealthCheck, Reload}
+import org.apache.marvin.model.EngineActionMetadata
 
 //Reload messages
 final case class Reloaded(protocol: String)

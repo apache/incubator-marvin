@@ -1,5 +1,5 @@
 /*
- * Copyright [2017] [B2W Digital]
+ * Copyright [2019] [Apache Software Foundation]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.statemachine
+package org.apache.marvin.executor.statemachine
 
 import akka.actor.{ActorRef, FSM, Props}
-import org.marvin.exception.MarvinEExecutorException
-import org.marvin.executor.actions.OnlineAction
-import org.marvin.executor.actions.OnlineAction._
-import org.marvin.executor.proxies.{FailedToReload, Reloaded}
-import org.marvin.model.EngineMetadata
+import org.apache.marvin.exception.MarvinEExecutorException
+import org.apache.marvin.executor.actions.OnlineAction
+import org.apache.marvin.executor.actions.OnlineAction._
+import org.apache.marvin.executor.proxies.{FailedToReload, Reloaded}
+import org.apache.marvin.model.EngineMetadata
 
 import scala.concurrent.duration._
 

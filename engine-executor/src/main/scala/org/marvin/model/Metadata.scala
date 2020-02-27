@@ -1,5 +1,5 @@
 /*
- * Copyright [2017] [B2W Digital]
+ * Copyright [2019] [Apache Software Foundation]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.marvin.model
+package org.apache.marvin.model
 
 import scala.collection.mutable.Map
 
@@ -25,6 +25,8 @@ case class EngineMetadata(name:String,
                           artifactsRemotePath:String,
                           artifactManagerType:String,
                           s3BucketName:String,
+                          azConnectionString:String,
+                          azContainerName:String,
                           pipelineActions: List[String],
                           onlineActionTimeout:Double,
                           metricsTimeout:Double=10000,

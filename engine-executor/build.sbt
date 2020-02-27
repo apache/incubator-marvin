@@ -1,5 +1,5 @@
 /*
- * Copyright [2017] [B2W Digital]
+ * Copyright [2019] [Apache Software Foundation]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,8 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq (
-  "io.grpc" % "grpc-netty" % com.trueaccord.scalapb.compiler.Version.grpcJavaVersion,
-  "com.trueaccord.scalapb" %% "scalapb-runtime-grpc" % com.trueaccord.scalapb.compiler.Version.scalapbVersion
+  "io.grpc" % "grpc-netty" % scalapb.compiler.Version.grpcJavaVersion,
+  "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion
 )
 
 libraryDependencies += "org.apache.hadoop" % "hadoop-client" % "2.7.4"
@@ -49,8 +49,9 @@ libraryDependencies += "org.json4s" %% "json4s-jackson" % "3.5.0"
 libraryDependencies += "com.github.java-json-tools" % "json-schema-validator" % "2.2.8"
 libraryDependencies += "io.jvm.uuid" %% "scala-uuid" % "0.2.3"
 libraryDependencies += "com.amazonaws" % "aws-java-sdk-s3" % "1.11.232"
+libraryDependencies += "com.microsoft.azure" % "azure-storage" % "5.0.0"
 
-dependencyOverrides ++= Set(
+dependencyOverrides ++= Seq(
   "io.netty" %% "netty" % "3.7.0",
   "io.netty" %% "netty-handler-proxy" % "4.1.12",
   "com.google.guava" %% "guava" % "19.0"
@@ -58,8 +59,8 @@ dependencyOverrides ++= Set(
 
 libraryDependencies += "com.github.cb372" %% "scalacache-guava" % "0.22.0"
 
-mainClass in (Compile, run) := Some("org.marvin.executor.EngineExecutorApp")
-mainClass in assembly := Some("org.marvin.executor.EngineExecutorApp")
+mainClass in (Compile, run) := Some("org.apache.marvin.executor.EngineExecutorApp")
+mainClass in assembly := Some("org.apache.marvin.executor.EngineExecutorApp")
 
 assemblyMergeStrategy in assembly := {
   case PathList("org", "apache", xs @_*) => MergeStrategy.first
@@ -71,14 +72,21 @@ assemblyMergeStrategy in assembly := {
   }
 }
 
+credentials += Credentials(file("/home/user/.sbt/0.13/apache.credentials"))
+
 publishTo := {
-  val nexus = "https://oss.sonatype.org/"
+  val nexus = "https://repository.apache.org/"
   if (isSnapshot.value)
     Some("snapshots" at nexus + "content/repositories/snapshots")
   else
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
 
+
 publishArtifact in Test := false
 
 useGpg := true
+
+PB.targets in Compile := Seq(
+  scalapb.gen() -> (sourceManaged in Compile).value
+)

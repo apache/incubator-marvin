@@ -1,5 +1,5 @@
 /*
- * Copyright [2017] [B2W Digital]
+ * Copyright [2019] [Apache Software Foundation]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.proxies
+package org.apache.marvin.executor.proxies
 
 import akka.actor.{Actor, ActorLogging}
-import org.marvin.model.EngineActionMetadata
+import org.apache.marvin.model.EngineActionMetadata
 
 object EngineProxy {
   case class ExecuteBatch(protocol:String, params:String)

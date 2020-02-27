@@ -1,5 +1,5 @@
 /*
- * Copyright [2017] [B2W Digital]
+ * Copyright [2019] [Apache Software Foundation]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.actions
+package org.apache.marvin.executor.actions
 
 import java.time.LocalDateTime
 import java.util.NoSuchElementException
@@ -23,14 +23,14 @@ import akka.Done
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import org.marvin.artifact.manager.ArtifactSaver
-import org.marvin.artifact.manager.ArtifactSaver.{GetArtifact, SaveToLocal, SaveToRemote}
-import org.marvin.exception.MarvinEExecutorException
-import org.marvin.executor.actions.BatchAction.{BatchExecute, BatchExecutionStatus, BatchHealthCheck, BatchReload, BatchMetrics}
-import org.marvin.executor.proxies.BatchActionProxy
-import org.marvin.executor.proxies.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
-import org.marvin.model._
-import org.marvin.util.{JsonUtil, LocalCache, ProtocolUtil}
+import org.apache.marvin.artifact.manager.ArtifactSaver
+import org.apache.marvin.artifact.manager.ArtifactSaver.{GetArtifact, SaveToLocal, SaveToRemote}
+import org.apache.marvin.exception.MarvinEExecutorException
+import org.apache.marvin.executor.actions.BatchAction.{BatchExecute, BatchExecutionStatus, BatchHealthCheck, BatchReload, BatchMetrics}
+import org.apache.marvin.executor.proxies.BatchActionProxy
+import org.apache.marvin.executor.proxies.EngineProxy.{ExecuteBatch, HealthCheck, Reload}
+import org.apache.marvin.model._
+import org.apache.marvin.util.{JsonUtil, LocalCache, ProtocolUtil}
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future

@@ -1,5 +1,5 @@
 /*
- * Copyright [2017] [B2W Digital]
+ * Copyright [2019] [Apache Software Foundation]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor
+package org.apache.marvin.executor
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit}
 import com.typesafe.config.ConfigFactory
-import org.marvin.exception.MarvinEExecutorException
-import org.marvin.executor.api.GenericAPIFunctions
-import org.marvin.fixtures.MetadataMock
+import org.apache.marvin.exception.MarvinEExecutorException
+import org.apache.marvin.executor.api.GenericAPIFunctions
+import org.apache.marvin.fixtures.MetadataMock
 import org.scalamock.scalatest.MockFactory
 import org.scalatest._
 

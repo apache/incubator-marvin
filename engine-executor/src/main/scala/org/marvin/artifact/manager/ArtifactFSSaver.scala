@@ -1,5 +1,5 @@
 /*
- * Copyright [2017] [B2W Digital]
+ * Copyright [2019] [Apache Software Foundation]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License.
  *
  */
-package org.marvin.artifact.manager
+package org.apache.marvin.artifact.manager
 
 import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 
 import akka.Done
 import akka.actor.{Actor, ActorLogging}
-import org.marvin.artifact.manager.ArtifactSaver.{GetArtifact, SaveToLocal, SaveToRemote}
-import org.marvin.model.EngineMetadata
+import org.apache.marvin.artifact.manager.ArtifactSaver.{GetArtifact, SaveToLocal, SaveToRemote}
+import org.apache.marvin.model.EngineMetadata
 
 class ArtifactFSSaver(metadata: EngineMetadata) extends Actor with ActorLogging {
   override def preStart() = {

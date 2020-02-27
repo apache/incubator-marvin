@@ -1,5 +1,5 @@
 /*
- * Copyright [2017] [B2W Digital]
+ * Copyright [2019] [Apache Software Foundation]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  *
  */
-package org.marvin.artifact.manager
+package org.apache.marvin.artifact.manager
 
 import akka.actor.Props
-import org.marvin.exception.MarvinEExecutorException
-import org.marvin.model.EngineMetadata
+import org.apache.marvin.exception.MarvinEExecutorException
+import org.apache.marvin.model.EngineMetadata
 
 object ArtifactSaver {
   case class SaveToLocal(artifactName: String, protocol:String)
@@ -30,6 +30,7 @@ object ArtifactSaver {
       case "FS" => return Props(new ArtifactFSSaver(metadata))
       case "HDFS" => return Props(new ArtifactHdfsSaver(metadata))
       case "S3" => return Props(new ArtifactS3Saver(metadata))
+      case "AZ" => return Props(new ArtifactAZSaver(metadata))
       case _ => throw new MarvinEExecutorException(s"Can not recognize ArtifactManagerType from EngineMetadata")
     }
   }

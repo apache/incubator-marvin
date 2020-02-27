@@ -1,5 +1,5 @@
 /*
- * Copyright [2017] [B2W Digital]
+ * Copyright [2019] [Apache Software Foundation]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  *
  */
-package org.marvin.executor.api
+package org.apache.marvin.executor.api
 
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ExceptionHandler, MissingQueryParamRejection, RejectionHandler}
 import grizzled.slf4j.Logger
-import org.marvin.exception.MarvinEExecutorException
+import org.apache.marvin.exception.MarvinEExecutorException
 import spray.json.DefaultJsonProtocol._
 
 import scala.concurrent.TimeoutException
