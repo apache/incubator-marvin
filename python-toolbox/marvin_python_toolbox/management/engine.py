@@ -474,6 +474,56 @@ def generate(name, description, mantainer, email, package, dest, no_env, no_git,
             shutil.rmtree(dest)
 
 
+
+@cli.command('engine-delete', help='Delete an existing marvin engine project.')
+@click.option('--name', '-n', prompt='Project name', help='Project name')
+@click.option('--dest', '-d', envvar='MARVIN_HOME', type=click.Path(exists=True), help='Root folder path for the creation')
+def delete_engine(name,dest):
+    type_ = 'python-engine'
+    # Process package name
+    package = _slugify(name)
+
+    # Make sure package name starts with "marvin"
+    if not package.startswith('marvin'):
+        package = 'marvin_{}'.format(package)
+
+    # Remove "lib" prefix from package name
+    if type_ == 'lib' and package.endswith('lib'):
+        package = package[:-3]
+    # Custom strip to remove underscores
+    package = package.strip('_')
+
+    # Append project type to services
+
+    if type_ in TEMPLATE_BASES and not package.endswith('engine'):
+        package = '{}_engine'.format(package)
+
+    # Process directory/virtualenv name
+
+    # Directory name should use '-' instead of '_'
+    dir_ = package.replace('_', '-')
+
+    # Remove "marvin" prefix from directory
+    if dir_.startswith('marvin'):
+        dir_ = dir_[6:]
+    dir_ = dir_.strip('-')
+
+    # Append "lib" to directory name if creating a lib
+    if type_ == 'lib' and not dir_.endswith('lib'):
+        dir_ = '{}-lib'.format(dir_)
+
+    dest = os.path.join(dest, dir_)
+    venv_name = _delete_virtual_env(dir_, dest)
+
+    try:
+        shutil.rmtree(dest)
+        print('\nDone!!!!')
+    except Exception as e:
+        logger.info(e)
+        print("\nCan't find an existing engine project with this name!")
+
+    
+
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
 
@@ -555,6 +605,25 @@ def _create_virtual_env(name, dest, python):
 
     except:
         logger.exception('Could not create the virtualenv!')
+        sys.exit(1)
+
+    return venv_name
+
+
+def _delete_virtual_env(name, dest):
+    venv_name = '{}-env'.format(name).replace('_', '-')
+    print('Deleting virtualenv: {0}...'.format(venv_name))
+
+    command = ['bash', '-c', '. virtualenvwrapper.sh; rmvirtualenv {0};'.format(venv_name)]
+
+    try:
+        result = subprocess.Popen(command, env=os.environ).wait()
+
+        if result > 0:
+            sys.exit(1)
+
+    except:
+        logger.exception('Could not delete the virtualenv!')
         sys.exit(1)
 
     return venv_name
