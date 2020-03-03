@@ -30,6 +30,7 @@ object ArtifactSaver {
       case "FS" => return Props(new ArtifactFSSaver(metadata))
       case "HDFS" => return Props(new ArtifactHdfsSaver(metadata))
       case "S3" => return Props(new ArtifactS3Saver(metadata))
+      case "AZ" => return Props(new ArtifactAZSaver(metadata))
       case _ => throw new MarvinEExecutorException(s"Can not recognize ArtifactManagerType from EngineMetadata")
     }
   }

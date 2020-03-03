@@ -34,6 +34,8 @@ object MetadataMock {
       artifactsRemotePath = "",
       artifactManagerType = "HDFS",
       s3BucketName = "marvin-artifact-bucket",
+      azConnectionString = "",
+      azContainerName = "",
       batchActionTimeout = 2000,
       engineType = "python",
       hdfsHost = "",
