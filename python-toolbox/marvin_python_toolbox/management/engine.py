@@ -352,6 +352,40 @@ IGNORE_DIRS = [
 
 _orig_type = type
 
+def _get_package_name(package,type_):
+    # Make sure package name starts with "marvin"
+    if not package.startswith('marvin'):
+        package = 'marvin_{}'.format(package)
+
+    # Remove "lib" prefix from package name
+    if type_ == 'lib' and package.endswith('lib'):
+        package = package[:-3]
+    # Custom strip to remove underscores
+    package = package.strip('_')
+
+    # Append project type to services
+
+    if type_ in TEMPLATE_BASES and not package.endswith('engine'):
+        package = '{}_engine'.format(package)
+
+    return package
+
+def _get_dir(name,package,type_):
+     # Process directory/virtualenv name
+
+    # Directory name should use '-' instead of '_'
+    dir_ = package.replace('_', '-')
+
+    # Remove "marvin" prefix from directory
+    if dir_.startswith('marvin'):
+        dir_ = dir_[6:]
+    dir_ = dir_.strip('-')
+
+    # Append "lib" to directory name if creating a lib
+    if type_ == 'lib' and not dir_.endswith('lib'):
+        dir_ = '{}-lib'.format(dir_)
+    
+    return dir_
 
 @cli.command('engine-generateenv', help='Generate a new marvin engine environment and install default requirements.')
 @click.argument('engine-path', type=click.Path(exists=True))
@@ -388,36 +422,12 @@ def generate(name, description, mantainer, email, package, dest, no_env, no_git,
         
     # Process package name
     package = _slugify(package or name)
+    package = _get_package_name(package,type_)
 
-    # Make sure package name starts with "marvin"
-    if not package.startswith('marvin'):
-        package = 'marvin_{}'.format(package)
+    # Process dir name
+    dir_ = _get_dir(name,package,type_)
 
-    # Remove "lib" prefix from package name
-    if type_ == 'lib' and package.endswith('lib'):
-        package = package[:-3]
-    # Custom strip to remove underscores
-    package = package.strip('_')
-
-    # Append project type to services
-
-    if type_ in TEMPLATE_BASES and not package.endswith('engine'):
-        package = '{}_engine'.format(package)
-
-    # Process directory/virtualenv name
-
-    # Directory name should use '-' instead of '_'
-    dir_ = package.replace('_', '-')
-
-    # Remove "marvin" prefix from directory
-    if dir_.startswith('marvin'):
-        dir_ = dir_[6:]
-    dir_ = dir_.strip('-')
-
-    # Append "lib" to directory name if creating a lib
-    if type_ == 'lib' and not dir_.endswith('lib'):
-        dir_ = '{}-lib'.format(dir_)
-
+    # Get dest name
     dest = os.path.join(dest, dir_)
 
     if type_ not in TEMPLATE_BASES:
@@ -477,43 +487,22 @@ def generate(name, description, mantainer, email, package, dest, no_env, no_git,
 
 @cli.command('engine-delete', help='Delete an existing marvin engine project.')
 @click.option('--name', '-n', prompt='Project name', help='Project name')
+@click.option('--package', '-p', default='', help='Package name')
 @click.option('--dest', '-d', envvar='MARVIN_HOME', type=click.Path(exists=True), help='Root folder path for the creation')
-def delete_engine(name,dest):
+def delete(name,dest,package):
     type_ = 'python-engine'
+   
     # Process package name
-    package = _slugify(name)
+    package = _slugify(package or name)
+    package = _get_package_name(package,type_)
 
-    # Make sure package name starts with "marvin"
-    if not package.startswith('marvin'):
-        package = 'marvin_{}'.format(package)
+    # Process dir name
+    dir_ = _get_dir(name,package,type_)
 
-    # Remove "lib" prefix from package name
-    if type_ == 'lib' and package.endswith('lib'):
-        package = package[:-3]
-    # Custom strip to remove underscores
-    package = package.strip('_')
-
-    # Append project type to services
-
-    if type_ in TEMPLATE_BASES and not package.endswith('engine'):
-        package = '{}_engine'.format(package)
-
-    # Process directory/virtualenv name
-
-    # Directory name should use '-' instead of '_'
-    dir_ = package.replace('_', '-')
-
-    # Remove "marvin" prefix from directory
-    if dir_.startswith('marvin'):
-        dir_ = dir_[6:]
-    dir_ = dir_.strip('-')
-
-    # Append "lib" to directory name if creating a lib
-    if type_ == 'lib' and not dir_.endswith('lib'):
-        dir_ = '{}-lib'.format(dir_)
-
+    # Get dest name
     dest = os.path.join(dest, dir_)
-    venv_name = _delete_virtual_env(dir_, dest)
+
+    venv_name = _delete_virtual_env(dir_)
 
     try:
         shutil.rmtree(dest)
@@ -610,7 +599,7 @@ def _create_virtual_env(name, dest, python):
     return venv_name
 
 
-def _delete_virtual_env(name, dest):
+def _delete_virtual_env(name):
     venv_name = '{}-env'.format(name).replace('_', '-')
     print('Deleting virtualenv: {0}...'.format(venv_name))
 
