@@ -58,7 +58,7 @@ REQUIREMENTS_EXTERNAL = [
     'paramiko>=2.1.2',
     'PyHive>=0.3.0',
     'thrift>=0.10.0',
-    'thrift-sasl>=0.2.1',
+    'thrift-sasl==0.3.0',
     'virtualenvwrapper>=4.7.1',
     'requests>=2.19.1',
     'python-dateutil>=2.7.3',
