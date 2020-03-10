@@ -54,23 +54,23 @@ RUN mkdir -p $MARVIN_HOME && \
 ##############################################################
 
 RUN apt-get update -y && \
-    apt-get install -y build-essential && \
-    apt-get install -y maven git cmake software-properties-common curl libstdc++6 && \
-    apt-get install -y wget && \
-    apt-get install -y libffi-dev && \
-    apt-get install -y libssl-dev && \
-    apt-get install -y libxml2-dev && \
-    apt-get install -y libxslt1-dev && \
-    apt-get install -y libpng12-dev && \
-    apt-get install -y libfreetype6-dev && \
-    apt-get install -y libsasl2-dev && \
-    apt-get install -y graphviz && \
+    apt-get --no-install-recommends install -y build-essential && \
+    apt-get --no-install-recommends install -y maven git cmake software-properties-common curl libstdc++6 && \
+    apt-get --no-install-recommends install -y wget && \
+    apt-get --no-install-recommends install -y libffi-dev && \
+    apt-get --no-install-recommends install -y libssl-dev && \
+    apt-get --no-install-recommends install -y libxml2-dev && \
+    apt-get --no-install-recommends install -y libxslt1-dev && \
+    apt-get --no-install-recommends install -y libpng12-dev && \
+    apt-get --no-install-recommends install -y libfreetype6-dev && \
+    apt-get --no-install-recommends install -y libsasl2-dev && \
+    apt-get --no-install-recommends install -y graphviz && \
     apt-get clean
 
 ### Installs Open JDK 8
 RUN add-apt-repository ppa:openjdk-r/ppa && \
     apt-get update && \
-    apt-get install -y openjdk-8-jdk
+    apt-get --no-install-recommends install -y openjdk-8-jdk
 
 ## TODO - Think in a good way to make Spark an option as soon we implement docker supporting it
 ##############################################################

@@ -38,23 +38,23 @@ RUN mkdir -p $MARVIN_HOME && \
 ##############################################################
 
 RUN apt-get update -y && \
-    apt-get install -y build-essential && \
-    apt-get install -y maven git python cmake software-properties-common curl libstdc++6 && \
-    apt-get install -y git && \
-    apt-get install -y wget && \
-    apt-get install -y python2.7-dev && \
-    apt-get install -y python-pip && \
-    apt-get install -y ipython && \
-    apt-get install -y libffi-dev && \
-    apt-get install -y libssl-dev && \
-    apt-get install -y libxml2-dev && \
-    apt-get install -y libxslt1-dev && \
-    apt-get install -y libpng12-dev && \
-    apt-get install -y libfreetype6-dev && \
-    apt-get install -y python-tk && \
-    apt-get install -y libsasl2-dev && \
-    apt-get install -y python-pip && \
-    apt-get install -y graphviz && \
+    apt-get --no-install-recommends install -y build-essential && \
+    apt-get --no-install-recommends install -y maven git python cmake software-properties-common curl libstdc++6 && \
+    apt-get --no-install-recommends install -y git && \
+    apt-get --no-install-recommends install -y wget && \
+    apt-get --no-install-recommends install -y python2.7-dev && \
+    apt-get --no-install-recommends install -y python-pip && \
+    apt-get --no-install-recommends install -y ipython && \
+    apt-get --no-install-recommends install -y libffi-dev && \
+    apt-get --no-install-recommends install -y libssl-dev && \
+    apt-get --no-install-recommends install -y libxml2-dev && \
+    apt-get --no-install-recommends install -y libxslt1-dev && \
+    apt-get --no-install-recommends install -y libpng12-dev && \
+    apt-get --no-install-recommends install -y libfreetype6-dev && \
+    apt-get --no-install-recommends install -y python-tk && \
+    apt-get --no-install-recommends install -y libsasl2-dev && \
+    apt-get --no-install-recommends install -y python-pip && \
+    apt-get --no-install-recommends install -y graphviz && \
     pip install --upgrade pip && \
     apt-get clean
 
@@ -65,7 +65,7 @@ RUN add-apt-repository ppa:webupd8team/java -y && \
     apt-get -qq update && \
     echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
     echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \
-    apt-get install -y oracle-java8-installer    
+    apt-get --no-install-recommends install -y oracle-java8-installer    
 
 
 ##############################################################

@@ -25,17 +25,17 @@ FROM marvin-base:${BASE_TAG}
 # Install the system dependencies for default R installation 
 ##############################################################
 
-RUN apt install -y apt-transport-https &&\
+RUN apt-get --no-install-recommends install -y apt-transport-https &&\
     apt update && \
-    apt install -y python2.7-dev && \
-    apt install -y python-pip && \
-    apt install -y ipython && \
+    apt-get --no-install-recommends install -y python2.7-dev && \
+    apt-get --no-install-recommends install -y python-pip && \
+    apt-get --no-install-recommends install -y ipython && \
     pip install --upgrade pip==9.0.1 && \
-    apt install -y libzmq3-dev libcurl4-openssl-dev libssl-dev && \
+    apt-get --no-install-recommends install -y libzmq3-dev libcurl4-openssl-dev libssl-dev && \
     pip install jupyter
     
 
-RUN apt install -y r-base && \
+RUN apt-get --no-install-recommends install -y r-base && \
     su -c "R -e \"install.packages(c('repr', 'IRdisplay', 'IRkernel'), type = 'source', repos='http://cran.rstudio.com/')\"" && \
     su -c "R -e \"IRkernel::installspec(user = FALSE)\""
 

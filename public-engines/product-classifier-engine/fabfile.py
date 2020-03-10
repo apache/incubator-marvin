@@ -34,7 +34,7 @@ def install_oracle_jdk():
     sudo("apt-get -qq update")
     run("echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections")
     run("echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections")
-    sudo("apt-get install -y oracle-java8-installer")
+    sudo("apt-get --no-install-recommends install -y oracle-java8-installer")
 
 
 def install_virtualenvwrapper():
@@ -52,21 +52,21 @@ def install_apache_spark():
 
 def install_required_packages():
     sudo("apt-get update -y")
-    sudo("apt-get install -y git")
-    sudo("apt-get install -y wget")
-    sudo("apt-get install -y python2.7-dev")
-    sudo("apt-get install -y python-pip")
-    sudo("apt-get install -y ipython")
-    sudo("apt-get install -y libffi-dev")
-    sudo("apt-get install -y libssl-dev")
-    sudo("apt-get install -y libxml2-dev")
-    sudo("apt-get install -y libxslt1-dev")
-    sudo("apt-get install -y libpng12-dev")
-    sudo("apt-get install -y libfreetype6-dev")
-    sudo("apt-get install -y python-tk")
-    sudo("apt-get install -y libsasl2-dev")
-    sudo("apt-get install -y python-pip")
-    sudo("apt-get install -y graphviz")
+    sudo("apt-get --no-install-recommends install -y git")
+    sudo("apt-get --no-install-recommends install -y wget")
+    sudo("apt-get --no-install-recommends install -y python2.7-dev")
+    sudo("apt-get --no-install-recommends install -y python-pip")
+    sudo("apt-get --no-install-recommends install -y ipython")
+    sudo("apt-get --no-install-recommends install -y libffi-dev")
+    sudo("apt-get --no-install-recommends install -y libssl-dev")
+    sudo("apt-get --no-install-recommends install -y libxml2-dev")
+    sudo("apt-get --no-install-recommends install -y libxslt1-dev")
+    sudo("apt-get --no-install-recommends install -y libpng12-dev")
+    sudo("apt-get --no-install-recommends install -y libfreetype6-dev")
+    sudo("apt-get --no-install-recommends install -y python-tk")
+    sudo("apt-get --no-install-recommends install -y libsasl2-dev")
+    sudo("apt-get --no-install-recommends install -y python-pip")
+    sudo("apt-get --no-install-recommends install -y graphviz")
     sudo("pip install --upgrade pip")
 
 

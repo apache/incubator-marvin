@@ -26,13 +26,13 @@ ENV WORKON_HOME=$MARVIN_HOME/.virtualenvs
 ##############################################################
 
 RUN apt-get update -y && \
-    apt-get install -y python && \
-    apt-get install -y python2.7-dev && \
-    apt-get install -y python-pip && \
-    apt-get install -y ipython && \
-    # ??? apt-get install -y python-tk && \ ??? #
+    apt-get --no-install-recommends install -y python && \
+    apt-get --no-install-recommends install -y python2.7-dev && \
+    apt-get --no-install-recommends install -y python-pip && \
+    apt-get --no-install-recommends install -y ipython && \
+    # ??? apt-get --no-install-recommends install -y python-tk && \ ??? #
     pip install --upgrade pip==9.0.1 && \
-    apt install -y libzmq3-dev libcurl4-openssl-dev libssl-dev && \
+    apt-get --no-install-recommends install -y libzmq3-dev libcurl4-openssl-dev libssl-dev && \
     pip install jupyter && \
     apt-get clean
 
