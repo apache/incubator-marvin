@@ -371,7 +371,7 @@ def _get_package_name(package,type_):
     return package
 
 def _get_dir(name,package,type_):
-     # Process directory/virtualenv name
+    # Process directory/virtualenv name
 
     # Directory name should use '-' instead of '_'
     dir_ = package.replace('_', '-')
@@ -502,6 +502,7 @@ def delete(name,dest,package):
     # Get dest name
     dest = os.path.join(dest, dir_)
 
+    # Delete virtualenv 
     venv_name = _delete_virtual_env(dir_)
 
     try:
