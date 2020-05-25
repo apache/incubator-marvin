@@ -71,7 +71,7 @@ clean: clean-build clean-pyc clean-reports clean-deps
 docker-build: clean-build
 	mkdir -p build
 	tar -cf build/engine.tar --exclude=*.log --exclude=*.pkl --exclude='build' --exclude='notebooks' --exclude=*.tar *
-	cp -f $(MARVIN_DATA_PATH)/marvin-engine-executor-assembly-$(MARVIN_TOOLBOX_VERSION).jar build/marvin-engine-executor-assembly.jar
+	cp -f $(MARVIN_DATA_PATH)/marvin-engine-executor-assembly-$(MARVIN_TOOLBOX_VERSION).jar build/
 	sudo docker build -t $(DOCKER_REGISTRY_ADRESS)/$(MARVIN_ENGINE_NAME):$(DOCKER_VERSION) .
 
 docker-run:

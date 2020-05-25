@@ -81,7 +81,7 @@ RUN /bin/bash -c "pip install virtualenvwrapper && \
 
 ADD build/engine.tar $MARVIN_ENGINE_HOME
 
-ADD build/marvin-engine-executor-assembly.jar $MARVIN_DATA_PATH 
+ADD build/*.jar $MARVIN_DATA_PATH 
 
 RUN /bin/bash -c "source /usr/local/bin/virtualenvwrapper.sh && \
     workon $MARVIN_ENGINE_ENV && \
