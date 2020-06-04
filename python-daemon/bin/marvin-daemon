@@ -1,0 +1,76 @@
+#!/usr/bin/env python
+# coding=utf-8
+
+# Copyright [2020] [Apache Software Foundation]
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import copy
+import configparser
+import os.path
+import sys
+import os
+import grpc
+from marvin_python_daemon.common.utils import find_inidir, parse_ini
+import marvin_python_daemon as daemon
+from marvin_python_daemon import __version__ as DAEMON_VERSION
+from marvin_python_daemon.daemon_base.command_server import init_server
+
+# Find the ini directory
+inifilename = 'marvin.ini'
+inidir = find_inidir(inifilename)
+
+if not inidir:
+    default_ini_path = os.path.dirname(__file__)
+    if os.path.exists(os.path.join(default_ini_path, inifilename)):
+        inidir = default_ini_path
+
+if not inidir:
+    print("ERROR: marvinini file '{}' not found".format(inifilename))
+    sys.exit(1)
+
+# Load the ini file
+inipath = os.path.join(inidir, inifilename)
+
+os.environ["DEFAULT_CONFIG_PATH"] = inipath
+os.environ["MARVIN_ENGINE_PATH"] = inidir
+os.environ["MARVIN_DAEMON_PATH"] = daemon.__path__[0]
+os.environ["DAEMON_VERSION"] = DAEMON_VERSION
+
+if not os.getenv("LOG_LEVEL"):
+    os.environ["LOG_LEVEL"] = 'INFO'
+
+config_defaults = {
+    'inidir': inidir,
+    'marvin_packagedir': '{inidir}/{marvin_package}',
+}
+
+config = parse_ini(inipath, config_defaults)
+
+home = os.environ['HOME']
+os.environ.setdefault('SPARK_HOME', '/opt/spark')
+os.environ.setdefault('MARVIN_HOME', os.path.join(home, 'marvin'))
+os.environ.setdefault('MARVIN_DATA_PATH', os.path.join(home, 'marvin/data'))
+os.environ.setdefault('MARVIN_LOG', os.path.join(home, 'marvin/logs'))
+
+marvin_data = os.environ['MARVIN_DATA_PATH']
+if not os.path.exists(marvin_data):
+    os.makedirs(marvin_data)
+
+marvin_logs = os.environ['MARVIN_LOG']
+if not os.path.exists(marvin_logs):
+    os.makedirs(marvin_logs)
+
+config['base_path'] = os.getcwd()
+
+init_server(config)

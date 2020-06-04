@@ -1,0 +1,6 @@
+include README.md
+include marvin_python_daemon/VERSION
+include tests/fixtures/config.sample
+include marvin_python_daemon/daemon_base/protos/*
+include marvin_python_daemon/engine_base/protos/*
+include marvin_python_daemon/extras/notebook_extensions/*
