@@ -54,7 +54,7 @@ matrix:
         - travis_retry sudo pip install virtualenvwrapper --ignore-installed six
         - source virtualenvwrapper.sh
       install:
-        - travis_retry pip install --user codecov
+        - travis_retry pip install codecov
         - travis_retry pip install unidecode
         - travis_retry pip install tox
         - make install
