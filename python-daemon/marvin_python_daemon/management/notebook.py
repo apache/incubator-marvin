@@ -56,10 +56,11 @@ def lab(config, enable_security, port):
         '--notebook-dir', notebookdir,
         '--ip', '0.0.0.0',
         '--port', port,
-        '--no-browser',
+        '--no-browser'
     ]
 
     command.append("--NotebookApp.token=") if not enable_security else None
+    command.append("--allow-root")
 
     return_code = os.system(' '.join(command))
     logger.info("Lab call returned {0}".format(str(return_code)))

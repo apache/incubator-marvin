@@ -44,7 +44,7 @@ def load_conf_from_file(path=None, section='marvin'):
             'MARVIN_CONFIG_FILE') or os.getenv('CONFIG_FILE')
     if not config_path:  # use default file
         config_path = os.getenv("DEFAULT_CONFIG_PATH")
-    logger.info(
+    logger.debug(
         'Loading configuration values from "{path}"...'.format(path=config_path))
     config_parser = ConfigObj(config_path)
     try:

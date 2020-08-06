@@ -323,7 +323,7 @@ def parse_ini(inipath, defaults=None):
     if defaults is None:
         defaults = {}
 
-    logger.info(
+    logger.debug(
         "Parsing marvinini '{}' with defaults '{}'".format(inipath, defaults))
 
     config_raw = configparser.ConfigParser()
@@ -346,6 +346,6 @@ def parse_ini(inipath, defaults=None):
             processed_value = processed_value.split(',')
         config[key] = processed_value
 
-    logger.info('marvinini loaded: {}'.format(config))
+    logger.debug('marvinini loaded: {}'.format(config))
 
     return config

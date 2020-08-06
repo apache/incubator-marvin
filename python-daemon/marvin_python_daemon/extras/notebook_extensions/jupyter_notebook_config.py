@@ -21,7 +21,7 @@ def marvin_code_export(model, **kwargs):
     import autopep8
     import inspect
     import re
-    from ..common.config import Config
+    from marvin_python_daemon.common.config import Config
 
     print("Executing the marvin export hook script...")
 

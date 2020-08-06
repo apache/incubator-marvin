@@ -63,7 +63,7 @@ def test(config, cov, no_capture, pdb, args):
                      '--cov-report', 'term-missing',
                      ]
 
-    command = ['py.test'] + cov_args + args
+    command = ['python', '-m', 'pytest'] + cov_args + args
     print(' '.join(command))
     env = os.environ.copy()
     subprocess.call(command, cwd=config['base_path'], env=env)
