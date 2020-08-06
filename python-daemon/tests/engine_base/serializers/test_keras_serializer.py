@@ -15,9 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import mock
 import pytest
 
+from tensorflow import keras
 from marvin_python_daemon.engine_base import EngineBaseTraining
 from marvin_python_daemon.engine_base.serializers.keras_serializer import KerasSerializer
 
@@ -31,13 +33,16 @@ def engine():
 
 
 class TestKerasSerializer(object):
-    @mock.patch('tensorflow.keras.models.load_model')
-    def test__serializer_load_keras(self, mocked_load, engine):
-        mocked_load.return_value = {"me": "here"}
-        mocked_path = "/tmp/engine/model"
+    def test__serializer_load_keras(self, engine):
+        mocked_path = os.path.join(os.environ['MARVIN_DATA_PATH'], 'model')
+        a = keras.layers.Input(shape=(2,))
+        x = keras.layers.Dense(3)(a)
+        b = keras.layers.Dense(1)(x)
+        model = keras.models.Model(a, b)
+        model.save(mocked_path)
+        
         obj = engine._serializer_load(object_file_path=mocked_path)
-        mocked_load.assert_called_once_with(mocked_path)
-        assert obj == {"me": "here"}
+        assert isinstance(obj, keras.models.Model)
 
     @mock.patch('joblib.load')
     def test__serializer_load_not_keras(self, mocked_load, engine):

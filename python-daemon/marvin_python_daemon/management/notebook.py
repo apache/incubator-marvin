@@ -40,7 +40,7 @@ def notebook(config, enable_security, port):
                                  'extras', 'notebook_extensions', 'jupyter_notebook_config.py')
     ]
 
-    command.append("--NotebookApp.token=") if not enable_security else None
+    command.append("--NotebookApp.token=") if enable_security else None
     command.append("--allow-root")
 
     return_code = os.system(' '.join(command))
@@ -59,7 +59,7 @@ def lab(config, enable_security, port):
         '--no-browser'
     ]
 
-    command.append("--NotebookApp.token=") if not enable_security else None
+    command.append("--NotebookApp.token=") if enable_security else None
     command.append("--allow-root")
 
     return_code = os.system(' '.join(command))
