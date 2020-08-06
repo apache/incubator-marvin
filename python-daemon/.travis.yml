@@ -1,0 +1,63 @@
+# Copyright [2020] [Apache Software Foundation]
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+matrix:
+  include:
+    # Engine Executor
+    - language: scala
+      scala:
+        - 2.12.6
+      jdk: openjdk8
+      cache:
+        directories:
+        - $HOME/.sbt
+        - $HOME/.m2
+        - $HOME/.ivy2
+      before_cache:
+        - find $HOME/.ivy2 -name \"ivydata-*.properties\" -delete
+        - find $HOME/.sbt -name \"*.lock\" -delete
+      before_script:
+        - cd engine-executor
+        - unset SBT_OPTS
+      script: travis_retry sbt -batch ++$TRAVIS_SCALA_VERSION coverage test coverageReport
+      after_success:
+      - bash <(curl -s https://codecov.io/bash)
+    # Python Daemon - Linux
+    - language: python
+      os: linux
+      python:
+        - 3.6
+      before_install:
+        - travis_retry curl https://d3kbcqa49mib13.cloudfront.net/spark-2.1.1-bin-hadoop2.6.tgz -o ./spark-2.1.1-bin-hadoop2.6.tgz
+        - sudo tar -xf ./spark-2.1.1-bin-hadoop2.6.tgz
+        - cd python-daemon
+        - mkdir -p marvin_data
+        - mkdir -p marvin_home
+        - mkdir -p marvin_log
+        - export MARVIN_LOG=./marvin_log
+        - export MARVIN_HOME=./marvin_home
+        - export MARVIN_DATA_PATH=./marvin_data
+        - export SPARK_HOME=../spark-2.1.1-bin-hadoop2.6
+        - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz -y    ; fi
+        - travis_retry sudo pip install --upgrade pip
+        - travis_retry sudo pip install virtualenvwrapper --ignore-installed six
+        - source virtualenvwrapper.sh
+      install:
+        - travis_retry pip install --user codecov
+        - travis_retry pip install unidecode
+        - travis_retry pip install tox
+        - make install
+      script:
+        - tox
+        - codecov
