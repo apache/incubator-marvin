@@ -1,0 +1,10 @@
+{
+    "project_name": "hello",
+    "project_package": "marvin_hello",
+    "project_description": "Marvin project",
+    "project_url": "marvin.apache.org",
+    "maintainer_name": "marvin",
+    "maintainer_email": "marvin@apache.org",
+    "daemon_version": "0.0.5",
+    "project_type": "python"
+}

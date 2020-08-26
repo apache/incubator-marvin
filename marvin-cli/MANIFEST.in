@@ -1,0 +1,3 @@
+include README.md
+include marvin_cli/VERSION
+graft marvin_cli/management/template
