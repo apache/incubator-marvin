@@ -61,3 +61,32 @@ matrix:
       script:
         - tox
         - codecov
+    # Python CLI - Linux
+    - language: python
+      os: linux
+      python:
+        - 3.6
+      before_install:
+        - travis_retry curl https://d3kbcqa49mib13.cloudfront.net/spark-2.1.1-bin-hadoop2.6.tgz -o ./spark-2.1.1-bin-hadoop2.6.tgz
+        - sudo tar -xf ./spark-2.1.1-bin-hadoop2.6.tgz
+        - cd marvin-cli
+        - mkdir -p marvin_data
+        - mkdir -p marvin_home
+        - mkdir -p marvin_log
+        - export MARVIN_LOG=./marvin_log
+        - export MARVIN_HOME=./marvin_home
+        - export MARVIN_DATA_PATH=./marvin_data
+        - export SPARK_HOME=../spark-2.1.1-bin-hadoop2.6
+        - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz -y    ; fi
+        - travis_retry sudo pip install --upgrade pip
+        - travis_retry sudo pip install virtualenvwrapper --ignore-installed six
+        - source virtualenvwrapper.sh
+      install:
+        - travis_retry pip install codecov
+        - travis_retry pip install unidecode
+        - travis_retry pip install tox
+        - make install
+        - marvin
+      script:
+        - travis_wait 30 tox
+        - codecov
