@@ -28,11 +28,11 @@ logger = get_logger('engine_base_data_handler')
 class EngineBaseDataHandler(EngineBaseBatchAction):
     __metaclass__ = ABCMeta
 
-    _initial_dataset = None
+    _initialdataset = None
     _dataset = None
 
     def __init__(self, **kwargs):
-        self._initial_dataset = self._get_arg(
+        self._initialdataset = self._get_arg(
             kwargs=kwargs, arg='initial_dataset')
         self._dataset = self._get_arg(kwargs=kwargs, arg='dataset')
         super(EngineBaseDataHandler, self).__init__(**kwargs)
@@ -40,12 +40,12 @@ class EngineBaseDataHandler(EngineBaseBatchAction):
     @property
     def marvin_initial_dataset(self):
         logger.info("initial_dataset loaded.")
-        return self._load_obj(object_reference='_initial_dataset')
+        return self._load_obj(object_reference='_initialdataset')
 
     @marvin_initial_dataset.setter
     def marvin_initial_dataset(self, initial_dataset):
         logger.info("initial_dataset saved.")
-        self._save_obj(object_reference='_initial_dataset',
+        self._save_obj(object_reference='_initialdataset',
                        obj=initial_dataset)
 
     @property

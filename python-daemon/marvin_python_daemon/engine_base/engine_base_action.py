@@ -155,7 +155,7 @@ class EngineBaseAction():
         try:
             if request.artifacts:
                 for artifact in request.artifacts.split(","):
-                    if getattr(self, artifact) is None:
+                    if getattr(self, '_{0}'.format(artifact)) is None:
                         return HealthCheckResponse(status=HealthCheckResponse.NOK)
             return HealthCheckResponse(status=HealthCheckResponse.OK)
 

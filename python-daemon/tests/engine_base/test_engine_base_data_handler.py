@@ -33,7 +33,7 @@ class TestEngineBaseDataHandler:
 
     def test_initial_dataset(self, engine_action):
         engine_action.marvin_initial_dataset = [1]
-        assert engine_action.marvin_initial_dataset == engine_action._initial_dataset == [
+        assert engine_action.marvin_initial_dataset == engine_action._initialdataset == [
             1]
 
     def test_dataset(self, engine_action):

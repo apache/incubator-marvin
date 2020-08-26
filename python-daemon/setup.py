@@ -27,10 +27,10 @@ from setuptools.command.test import test as TestCommand
 PACKAGE_NAME = 'marvin_python_daemon'
 PACKAGE_DESCRIPTION = 'Marvin Python Daemon'
 
-URL = ''
+URL = 'marvin.apache.org'
 
-AUTHOR_NAME = 'Lucas Cardoso'
-AUTHOR_EMAIL = ''
+AUTHOR_NAME = 'Apache Marvin-AI Community'
+AUTHOR_EMAIL = 'dev@marvin.apache.org'
 
 PYTHON_2 = False
 PYTHON_3 = True

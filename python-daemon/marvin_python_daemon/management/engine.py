@@ -45,7 +45,7 @@ ARTIFACTS = {
     "AcquisitorAndCleaner": [],
     "TrainingPreparator": ["initialdataset"],
     "Trainer": ["dataset"],
-    "MetricsEvaluator": ["model"],
+    "MetricsEvaluator": ["dataset", "model"],
     "PredictionPreparator": ["model", "metrics"],
     "Predictor": ["model", "metrics"],
     "Feedback": []

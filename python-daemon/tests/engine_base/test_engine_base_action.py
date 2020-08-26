@@ -139,21 +139,24 @@ class TestEngineBaseAction:
         assert [1] == engine_action2._params
 
     def test_health_check_ok(self, engine_action):
-        obj1_key = "obj1"
-        engine_action._save_obj(obj1_key, "check")
-        request = HealthCheckRequest(artifacts=obj1_key)
+        obj = "obj1"
+        obj_key = '_{0}'.format(obj)
+        engine_action._save_obj(obj_key, "check")
+        request = HealthCheckRequest(artifacts=obj)
         expected_response = HealthCheckResponse(status=HealthCheckResponse.OK)
         response = engine_action._health_check(request=request, context=None)
 
         assert expected_response.status == response.status
 
     def test_health_check_ok_multiple(self, engine_action):
-        obj1_key = "obj1"
+        obj1 = "obj1"
+        obj1_key = '_{0}'.format(obj1)
         engine_action._save_obj(obj1_key, "check")
-        obj2_key = "obj2"
+        obj2 = "obj2"
+        obj2_key = '_{0}'.format(obj2)
         engine_action._save_obj(obj2_key, "check")
 
-        request = HealthCheckRequest(artifacts=obj1_key + "," + obj2_key)
+        request = HealthCheckRequest(artifacts=obj1 + "," + obj2)
         expected_response = HealthCheckResponse(status=HealthCheckResponse.OK)
         response = engine_action._health_check(request=request, context=None)
 
