@@ -46,7 +46,7 @@ class ImageLoader(MarvinData):
         :return: list - array with class names
         """
 
-        path = os.path.join(cls.data_path, relpath)
+        path = os.path.join(cls.get_data_path(), relpath)
         path = os.path.join(path, "train")
         names = [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
         names.sort()
@@ -68,7 +68,7 @@ class ImageLoader(MarvinData):
         return str(path.split('/')[-2])
 
     @classmethod
-    def fill_dict(cls,paths, some_dict,shape):
+    def fill_dict(cls,paths, data_dict,shape):
         text = ''
         if 'train' in paths[0]:
             text = 'Start fill train_dict'
@@ -78,12 +78,12 @@ class ImageLoader(MarvinData):
         for p in tqdm(paths, ascii=True, ncols=85, desc=text):
             img = imageio.imread(p)
             img = cls.img_reshape(img,shape)
-            some_dict['image'].append(img)
-            some_dict['label'].append(cls.img_label(p))
+            somdata_dicte_dict['image'].append(img)
+            data_dict['label'].append(cls.img_label(p))
             if 'train' in paths[0]:
-                some_dict['class'].append(cls.img_class(p))
+                data_dict['class'].append(cls.img_class(p))
 
-        return some_dict
+        return data_dict
 
 
     @classmethod
