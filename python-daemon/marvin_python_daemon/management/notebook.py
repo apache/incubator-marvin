@@ -46,7 +46,7 @@ def notebook(config, port):
     logger.info("Notebook call returned {0}".format(str(return_code)))
 
 
-def lab(config, enable_security, port):
+def lab(config, port):
     notebookdir = os.path.join(config['base_path'], 'notebooks')
     command = [
         "SPARK_CONF_DIR={0} YARN_CONF_DIR={0}".format(
@@ -58,7 +58,6 @@ def lab(config, enable_security, port):
         '--no-browser'
     ]
 
-    command.append("--NotebookApp.token=") if enable_security else None
     command.append("--allow-root")
 
     return_code = os.system(' '.join(command))

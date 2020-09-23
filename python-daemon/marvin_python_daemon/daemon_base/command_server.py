@@ -53,9 +53,8 @@ def call_notebook(config, parameters):
 
 
 def call_lab(config, parameters):
-    security = strtobool(parameters['enable_security'])
 
-    lab(config, bool(security), parameters['port'])
+    lab(config, parameters['port'])
 
 
 def call_test(config, parameters):
