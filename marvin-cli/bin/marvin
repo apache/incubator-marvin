@@ -33,7 +33,7 @@ from marvin_cli.management.test import cli as cli_test
 EXCLUDE_BY_TYPE = {
     'toolbox': ['engine-dryrun', 'engine-grpcserver', 'engine-httpserver', 'notebook',
                 'lab', 'project-export', 'engine-logs', 'edit-metadata', 'test', 'test-tdd',
-                'test-tox', 'engine-bumpversion'],
+                'test-tox', 'engine-bumpversion', 'benchmark', 'benchmark-plot'],
     'engine': ['project-import']
 }
 
