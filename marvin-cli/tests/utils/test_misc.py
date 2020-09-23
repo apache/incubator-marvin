@@ -59,10 +59,10 @@ def test_extract_folder(open_mocked):
 
 @mock.patch('marvin_cli.utils.misc.subprocess.Popen')
 def test_call_logs(popen_mocked):
-    call_logs(mocked_package)
-    popen_mocked.assert_called_with(['xterm', '-e', 'docker', 'logs', '-f', 'marvin-cont-mocked'])
+    call_logs(mocked_package, True, 0)
+    popen_mocked.assert_called_with(['docker', 'logs', '--follow', 'marvin-cont-mocked'], stdout=-1)
 
-@mock.patch('marvin_cli.utils.misc.wget')
+@mock.patch('marvin_cli.utils.misc.wget.download')
 def test_get_executor_path_or_download(wget_mocked):
     get_executor_path_or_download(mocked_url)
     wget_mocked.assert_called_with(mocked_url, out=os.path.join(os.environ['MARVIN_DATA_PATH'], 'marvin.jar'))

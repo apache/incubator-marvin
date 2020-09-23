@@ -41,6 +41,7 @@ clean-build:
 	rm -rf .cache
 	rm -rf .eggs
 	rm -rf dist
+	rm -rf benchmarks
 
 clean-reports:
 	rm -rf coverage_report/

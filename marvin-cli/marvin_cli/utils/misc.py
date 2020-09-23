@@ -19,6 +19,12 @@ import os
 import subprocess
 import tarfile
 import wget
+import glob
+import pickle
+import datetime
+from .log import get_logger
+
+logger = get_logger('misc')
 
 def make_tarfile(output_filename, source_dir):
     with tarfile.open(output_filename, "w:gz") as tar:
@@ -48,10 +54,44 @@ def extract_folder(input, output):
     tf = tarfile.open(input)
     tf.extractall(output)
 
-def call_logs(package):
+def call_logs(package, follow, buffer):
     container_name = 'marvin-cont-' + package_to_name(package)
-    subprocess.Popen(['xterm', '-e', 'docker', 'logs', '-f', container_name])
-    
+    p_return = None
+    if follow:
+        p_return = subprocess.Popen(['docker', 'logs', '--follow', container_name], stdout=subprocess.PIPE)
+    else:
+        p_return = subprocess.Popen(['docker', 'logs', '--tail', str(buffer), container_name], stdout=subprocess.PIPE)
+
+    return p_return
+
+def create_or_return_tmp_dir():
+    tmp_path = '/tmp/marvin'
+    if not os.path.exists(tmp_path):
+        os.makedirs(tmp_path)
+    return tmp_path
+
+def kill_persisted_process():
+    base_path = create_or_return_tmp_dir()
+    for obj_file in glob.glob('{0}/*.mproc'.format(base_path)):
+        pid = int(
+            obj_file[(len(base_path) + 1):(len('.mproc') * -1)]
+        )
+        try:
+            os.kill(pid, 9)
+            logger.info("PID {0} now killed!".format(pid))
+        except ProcessLookupError:
+            logger.info("PID {0} already killed!".format(pid))
+        os.remove(obj_file)
+        
+
+def persist_process(obj):
+    filepath = os.path.join(create_or_return_tmp_dir(), 
+                            '{0}.mproc'.format(obj.pid))
+    logger.info("Creating {0}...".format(filepath))
+    with open(filepath, 'w'):
+        pass
+
+
 def get_executor_path_or_download(executor_url):
     #get filename from url
     _executor_name = executor_url.split('/').pop(-1)
@@ -59,6 +99,10 @@ def get_executor_path_or_download(executor_url):
     executor_path = os.path.join(os.environ['MARVIN_DATA_PATH'], _executor_name)
 
     if not os.path.exists(executor_path):
-        wget(executor_url, out=executor_path)
+        logger.info("Downloading engine executor in {0}...".format(executor_path))
+        wget.download(executor_url, out=executor_path)
 
     return executor_path
+
+def generate_timestamp():
+    return datetime.datetime.now().timestamp()

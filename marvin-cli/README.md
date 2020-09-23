@@ -61,6 +61,8 @@ Commands:
   test                Run tests.
   test-tdd            Watch for changes to run tests automatically.
   test-tox            Run tests using Tox environment.
+  system-kill         Kill all marvin cli background process.
+
 ```
 
 > Marvin is a project started at B2W Digital offices and released open source on September 2017.

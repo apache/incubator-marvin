@@ -52,7 +52,6 @@ ARTIFACTS = {
 }
 
 def dryrun(config, action, profiling):
-
     # setting spark configuration directory
     os.environ["SPARK_CONF_DIR"] = os.path.join(
         os.environ["SPARK_HOME"], "conf")
@@ -87,17 +86,15 @@ class MarvinDryRun(object):
         self.feedback_messages = messages[1]
         self.pmessages = []
         self.package_name = config['marvin_package']
-        self.kwargs = None
 
     def execute(self, clazz, params, profiling_enabled=False):
         self.print_start_step(clazz)
 
         _Step = dynamic_import("{}.{}".format(self.package_name, clazz))
 
-        if not self.kwargs:
-            self.kwargs = generate_kwargs(self.package_name, _Step, params)
+        kwargs = generate_kwargs(self.package_name, _Step, params)
 
-        step = _Step(**self.kwargs)
+        step = _Step(**kwargs)
 
         def call_online_actions(step, msg, msg_idx):
             if profiling_enabled:
@@ -186,7 +183,7 @@ def generate_kwargs(package_name, clazz, params=None, initial_dataset='initialda
     _artifact_folder = package_name.replace(
             'marvin_', '').replace('_engine', '')
     _artifacts_to_load = ARTIFACTS[clazz.__name__]
-
+    logger.debug("clazz: {0}, artifacts to load: {1}".format(clazz, str(_artifacts_to_load)))
     if params:
         kwargs["params"] = params
     if dataset in _artifacts_to_load:

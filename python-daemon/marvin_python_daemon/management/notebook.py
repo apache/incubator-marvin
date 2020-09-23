@@ -25,8 +25,9 @@ from ..common.log import get_logger
 
 logger = get_logger('management.notebook')
 
-
-def notebook(config, enable_security, port):
+def notebook(config, port):
+    logger.info(os.path.join(os.environ["MARVIN_DAEMON_PATH"],
+                                 'extras', 'notebook_extensions', 'jupyter_notebook_config.py'))
     notebookdir = os.path.join(config['base_path'], 'notebooks')
     command = [
         "SPARK_CONF_DIR={0} YARN_CONF_DIR={0}".format(
@@ -39,8 +40,6 @@ def notebook(config, enable_security, port):
         '--config', os.path.join(os.environ["MARVIN_DAEMON_PATH"],
                                  'extras', 'notebook_extensions', 'jupyter_notebook_config.py')
     ]
-
-    command.append("--NotebookApp.token=") if enable_security else None
     command.append("--allow-root")
 
     return_code = os.system(' '.join(command))

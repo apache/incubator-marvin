@@ -15,17 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
 import os
 import sys
+import json
 import time
 import wget
-import subprocess
+import click
+import pickle
 import pathlib
+import subprocess
 from cookiecutter.main import cookiecutter
+from shutil import which
 from ..communication.remote_calls import RemoteCalls
 from ..utils.misc import package_folder, extract_folder, get_version
 from ..utils.misc import call_logs, package_to_name, get_executor_path_or_download
+from ..utils.misc import generate_timestamp, persist_process
 from ..utils.git import git_init, bump_version
 from ..utils.log import get_logger
 
@@ -84,8 +88,8 @@ def import_project(file, dest):
     extract_folder(file, dest)
 
 @cli.command("engine-dryrun", help="Run engines in a standalone way.")
-@click.option('--host', '-h', prompt='gRPC host', help='gRPC Host Address', default='localhost')
-@click.option('--port', '-p', prompt='gRPC port', help='gRPC Port', default='50057')
+@click.option('--host', '-gh', help='gRPC Host Address', default='localhost')
+@click.option('--port', '-gp', help='gRPC Port', default='50057')
 @click.option(
     '--action',
     '-a',
@@ -98,8 +102,8 @@ def dryrun(host, port, action, profiling):
     rc.run_dryrun(action, profiling)
 
 @cli.command("engine-grpcserver", help="Run gRPC of given actions.")
-@click.option('--host', '-h', prompt='gRPC host', help='gRPC Host Address', default='localhost')
-@click.option('--port', '-p', prompt='gRPC port', help='gRPC Port', default='50057')
+@click.option('--host', '-gh', help='gRPC Host Address', default='localhost')
+@click.option('--port', '-gp', help='gRPC Port', default='50057')
 @click.option(
     '--action',
     '-a',
@@ -119,13 +123,18 @@ def grpc(host, port, action, max_workers, max_rpc_workers):
         logger.info("gRPC server terminated!")
 
 @cli.command("engine-logs", help="Show daemon execution.")
+@click.option('--follow', '-f', is_flag=True)
+@click.option('--tail', '-t', default=True, is_flag=True)
+@click.option('--buffer', '-b', default=20)
 @click.pass_context
-def docker_logs(ctx):
-    call_logs(ctx.obj['package_name'])
+def docker_logs(ctx, follow, tail, buffer):
+    p_logs = call_logs(ctx.obj['package_name'], follow, buffer)
+    if follow:
+        persist_process(p_logs)
 
 @cli.command("engine-httpserver", help="Run executor HTTP server.")
-@click.option('--grpchost', '-gh', prompt='gRPC host', help='gRPC Host Address', default='localhost')
-@click.option('--grpcport', '-gp', prompt='gRPC port', help='gRPC Port', default='50057')
+@click.option('--grpchost', '-gh', help='gRPC Host Address', default='localhost')
+@click.option('--grpcport', '-gp', help='gRPC Port', default='50057')
 @click.option('--host', '-h', prompt='API host', help='REST API Host', default='localhost')
 @click.option('--port', '-p', prompt='API port', help='REST API Port', default='8000')
 @click.option('--protocol', '-pr', help='Marvin protocol to be loaded during initialization.', default='')
@@ -139,9 +148,10 @@ def docker_logs(ctx):
 @click.option('--max-rpc-workers', '-rw', help='Max gRPC Workers', default=None)
 @click.option('--executor-path', '-e', help='Marvin engine executor jar path', type=click.Path(exists=True))
 @click.option('--extra-executor-parameters', '-jvm', help='Use to send extra JVM parameters to engine executor process')
+@click.option('--benchmark', '-b', default=False, is_flag=True, help='Run benchmark.')
 @click.pass_context
 def http(ctx, grpchost, grpcport, host, port, protocol, action, max_workers, 
-            max_rpc_workers, executor_path, extra_executor_parameters):
+            max_rpc_workers, executor_path, extra_executor_parameters, benchmark):
 
     rc = RemoteCalls(grpchost, grpcport)
 
@@ -151,6 +161,8 @@ def http(ctx, grpchost, grpcport, host, port, protocol, action, max_workers,
     except:
         print("Could not start grpc server!")
         sys.exit(1)
+
+    bench_thread = None
 
     try:
         if not executor_path:
@@ -168,13 +180,19 @@ def http(ctx, grpchost, grpcport, host, port, protocol, action, max_workers,
         command_list.append('-jar')
         command_list.append(executor_path)
 
-        print(command_list)
+        if benchmark:
+            logger.info("Init benchmark...")
+            timestamp = generate_timestamp()
+            bench_thread = benchmark_thread(ctx.obj['package_name'], timestamp) 
+            bench_thread.start()
 
         httpserver = subprocess.Popen(command_list)
 
     except:
-        print("Could not start http server!")
+        logger.error("Could not start http server!")
         rc.stop_grpc()
+        if benchmark:
+            bench_thread.terminate()
         sys.exit(1)
 
     try:
@@ -186,6 +204,9 @@ def http(ctx, grpchost, grpcport, host, port, protocol, action, max_workers,
         rc.stop_grpc()
         httpserver.terminate() if httpserver else None
         logger.info("Http and grpc servers terminated!")
+        if benchmark:
+            bench_thread.terminate()
+        logger.info("Benchmark terminated!")
         sys.exit(0)
 
 

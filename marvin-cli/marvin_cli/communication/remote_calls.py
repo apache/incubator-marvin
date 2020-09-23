@@ -77,10 +77,9 @@ class RemoteCalls:
     def stop_grpc(self):
         self.stop_command('GRPC')
 
-    def run_notebook(self, port, enable_security):
+    def run_notebook(self, port):
         parameters = {
-            'port': port,
-            'enable_security': str(enable_security)
+            'port': port
         }
         self.call_command('NOTEBOOK', parameters)
 

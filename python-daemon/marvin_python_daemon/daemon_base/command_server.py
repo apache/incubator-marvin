@@ -48,9 +48,8 @@ def call_grpc(config, parameters):
 
 
 def call_notebook(config, parameters):
-    security = strtobool(parameters['enable_security'])
 
-    notebook(config, bool(security), parameters['port'])
+    notebook(config, parameters['port'])
 
 
 def call_lab(config, parameters):
