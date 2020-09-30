@@ -37,9 +37,9 @@ EXCLUDE_BY_TYPE = {
 }
 
 ENVIRONMENT_VARIABLES = {
-    'MARVIN_HOME': "/home/{0}/marvin".format(os.environ['USER']),
-    'MARVIN_DATA_PATH': "/home/{0}/marvin/data".format(os.environ['USER']),
-    'MARVIN_LOG': "/home/{0}/marvin/data/.logs".format(os.environ['USER'])
+    'MARVIN_HOME': "{0}/marvin".format(os.environ['HOME']),
+    'MARVIN_DATA_PATH': "{0}/marvin/data".format(os.environ['HOME']),
+    'MARVIN_LOG': "{0}/marvin/data/.logs".format(os.environ['HOME'])
 }
 
 def _define_environ():
