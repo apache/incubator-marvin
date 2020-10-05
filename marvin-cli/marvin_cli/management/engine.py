@@ -89,8 +89,8 @@ def import_project(file, dest):
     extract_folder(file, dest)
 
 @cli.command("engine-dryrun", help="Run engines in a standalone way.")
-@click.option('--host', '-gh', help='gRPC Host Address', default='localhost')
-@click.option('--port', '-gp', help='gRPC Port', default='50057')
+@click.option('--grpchost', '-gh', help='gRPC Host Address', default='localhost')
+@click.option('--grpcport', '-gp', help='gRPC Port', default='50057')
 @click.option(
     '--action',
     '-a',
@@ -103,8 +103,8 @@ def dryrun(host, port, action, profiling):
     rc.run_dryrun(action, profiling)
 
 @cli.command("engine-grpcserver", help="Run gRPC of given actions.")
-@click.option('--host', '-gh', help='gRPC Host Address', default='localhost')
-@click.option('--port', '-gp', help='gRPC Port', default='50057')
+@click.option('--grpchost', '-gh', help='gRPC Host Address', default='localhost')
+@click.option('--grpcport', '-gp', help='gRPC Port', default='50057')
 @click.option(
     '--action',
     '-a',
@@ -235,8 +235,8 @@ def _sleep(sec):
     time.sleep(5)
 
 @cli.command("benchmark", help="Collect engine benchmark stats.")
-@click.option('--host', '-gh', help='gRPC Host Address', default='localhost')
-@click.option('--port', '-gp', help='gRPC Port', default='50057')
+@click.option('--grpchost', '-gh', help='gRPC Host Address', default='localhost')
+@click.option('--grpcport', '-gp', help='gRPC Port', default='50057')
 @click.option('--profiling', '-p', default=False, is_flag=True, help='Deterministic profiling of user code.')
 @click.option('--delay', '-d', default=False, is_flag=True, help='Delay the benchmark for 5 seconds.')
 @click.pass_context
