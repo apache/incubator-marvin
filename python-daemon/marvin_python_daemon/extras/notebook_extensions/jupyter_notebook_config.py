@@ -18,12 +18,16 @@
 
 def marvin_code_export(model, **kwargs):
 
-    import autopep8
-    import inspect
+    import os
     import re
+    import inspect
+    import autopep8
+    from marvin_python_daemon.common.log import get_logger
     from marvin_python_daemon.common.config import Config
 
-    print("Executing the marvin export hook script...")
+    logger = get_logger('marvin.savehook')
+
+    logger.info("Executing the marvin export hook script...")
 
     if model['type'] != 'notebook':
         return
@@ -39,11 +43,16 @@ def marvin_code_export(model, **kwargs):
         'marvin_metrics': re.compile(r"(\bmarvin_metrics\b)")
     }
 
-    batch_exec_pattern = re.compile(
-        "(def\s+execute\s*\(\s*self\s*,\s*params\s*,\s*\*\*kwargs\s*\)\s*:)")
-    online_exec_pattern = re.compile(
-        "(def\s+execute\s*\(\s*self\s*,\s*input_message\s*,\s*params\s*,\s*\*\*kwargs\s*\)\s*:)")
-
+    class_path = {
+        "acquisitor": "data_handler{0}acquisitor_and_cleaner.py".format(os.path.sep),
+        "tpreparator": "data_handler{0}training_preparator.py".format(os.path.sep),
+        "trainer": "training{0}trainer.py".format(os.path.sep),
+        "evaluator": "training{0}metrics_evaluator.py".format(os.path.sep),
+        "ppreparator": "prediction{0}prediction_preparator.py".format(os.path.sep),
+        "predictor": "prediction{0}predictor.py".format(os.path.sep),
+        "feedback": "prediction{0}feedback.py".format(os.path.sep),
+    }
+    
     CLAZZES = {
         "acquisitor": "AcquisitorAndCleaner",
         "tpreparator": "TrainingPreparator",
@@ -54,6 +63,11 @@ def marvin_code_export(model, **kwargs):
         "feedback": "Feedback"
     }
 
+    batch_exec_pattern = re.compile(
+        "(def\s+execute\s*\(\s*self\s*,\s*params\s*,\s*\*\*kwargs\s*\)\s*:)")
+    online_exec_pattern = re.compile(
+        "(def\s+execute\s*\(\s*self\s*,\s*input_message\s*,\s*params\s*,\s*\*\*kwargs\s*\)\s*:)")
+
     for cell in cells:
         if cell['cell_type'] == 'code' and cell["metadata"].get("marvin_cell", False):
             source = cell["source"]
@@ -61,9 +75,14 @@ def marvin_code_export(model, **kwargs):
                 source, options={'max_line_length': 160})
 
             marvin_action = cell["metadata"]["marvin_cell"]
-            marvin_action_clazz = getattr(__import__(
-                Config.get("package")), CLAZZES[marvin_action])
-            source_path = inspect.getsourcefile(marvin_action_clazz)
+            source_path_list = []
+            site_package_clazz = getattr(__import__(Config.get("package")),
+                                            CLAZZES[marvin_action])
+            
+            #append paths of instaled and source engine package code
+            source_path_list.append(inspect.getsourcefile(site_package_clazz))
+            source_path_list.append(os.path.join(os.getcwd(), 
+                                    Config.get("package"), class_path[marvin_action]))
 
             fnew_source_lines = []
             for new_line in new_source.split("\n"):
@@ -93,23 +112,24 @@ def marvin_code_export(model, **kwargs):
                 exec_pattern = batch_exec_pattern
 
             fnew_source = "".join(fnew_source_lines)
+        
+            for source_path in source_path_list:
+                with open(source_path, 'r+') as fp:
+                    lines = fp.readlines()
+                    fp.seek(0)
+                    for line in lines:
+                        if re.findall(exec_pattern, line):
+                            fp.write(line)
+                            fp.write(fnew_source)
+                            fp.truncate()
 
-            with open(source_path, 'r+') as fp:
-                lines = fp.readlines()
-                fp.seek(0)
-                for line in lines:
-                    if re.findall(exec_pattern, line):
-                        fp.write(line)
-                        fp.write(fnew_source)
-                        fp.truncate()
+                            break
+                        else:
+                            fp.write(line)
 
-                        break
-                    else:
-                        fp.write(line)
+                logger.info("File {0} updated!".format(source_path))
 
-            print("File {} updated!".format(source_path))
-
-    print("Finished the marvin export hook script...")
+    logger.info("Finished the marvin export hook script...")
 
 
 c.FileContentsManager.pre_save_hook = marvin_code_export

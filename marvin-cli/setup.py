@@ -53,7 +53,9 @@ REQUIREMENTS_EXTERNAL = [
     'grpcio',
     'grpcio-tools',
     'click',
-    'cookiecutter'
+    'cookiecutter',
+    'docker-compose',
+    'matplotlib'
 ]
 
 # This is normally an empty list

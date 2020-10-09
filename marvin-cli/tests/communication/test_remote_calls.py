@@ -72,7 +72,7 @@ def test_run_dryrun(call_mocked):
 @mock.patch('marvin_cli.communication.remote_calls.RemoteCalls.call_command')
 def test_run_notebook(call_mocked):
     rc = RemoteCalls()
-    rc.run_notebook(True, True)
+    rc.run_notebook(True)
     call_mocked.assert_called()
 
 @mock.patch('marvin_cli.communication.remote_calls.RemoteCalls.call_command')

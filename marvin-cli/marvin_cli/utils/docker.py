@@ -99,3 +99,13 @@ def create_daemon_container(engine_package, engine_name):
     )
 
     logger.info("Creating engine docker container ... Done!")
+
+def get_stats(engine_package):
+    client = _get_client()
+    if search_engine_container(engine_package):
+        container_name = "marvin-cont-" + package_to_name(engine_package)
+        container = client.containers.get(container_name)
+        return container.stats(stream=False)
+    else:
+        logger.error("Engine container was not found!")
+        return None

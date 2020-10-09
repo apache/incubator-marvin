@@ -42,24 +42,10 @@ def test_notebook(system_mocked, sys_mocked):
     spark_conf = '/opt/spark/conf'
     system_mocked.return_value = 1
 
-    notebook(config, enable_security, port)
+    notebook(config, port)
 
     system_mocked.assert_called_once_with("SPARK_CONF_DIR={0} YARN_CONF_DIR={0} jupyter notebook --notebook-dir /tmp/notebooks --ip 0.0.0.0 --port 8888 --no-browser --config ".format(os.path.join(os.environ["SPARK_HOME"], "conf")) +
                                           os.environ["MARVIN_ENGINE_PATH"] + '/marvin_python_daemon/extras/notebook_extensions/jupyter_notebook_config.py --allow-root')
-
-
-@mock.patch('marvin_python_daemon.management.notebook.sys')
-@mock.patch('marvin_python_daemon.management.notebook.os.system')
-def test_notebook_with_security(system_mocked, sys_mocked):
-    config = mocked_config
-    port = '8888'
-    enable_security = True
-    system_mocked.return_value = 1
-
-    notebook(config, enable_security, port)
-
-    system_mocked.assert_called_once_with("SPARK_CONF_DIR={0} YARN_CONF_DIR={0} jupyter notebook --notebook-dir /tmp/notebooks --ip 0.0.0.0 --port 8888 --no-browser --config ".format(os.path.join(os.environ["SPARK_HOME"], "conf")) +
-                                          os.environ["MARVIN_ENGINE_PATH"] + '/marvin_python_daemon/extras/notebook_extensions/jupyter_notebook_config.py --NotebookApp.token= --allow-root')
 
 
 @mock.patch('marvin_python_daemon.management.notebook.sys')
@@ -71,21 +57,7 @@ def test_jupyter_lab(system_mocked, sys_mocked):
     spark_conf = '/opt/spark/conf'
     system_mocked.return_value = 1
 
-    lab(config, enable_security, port)
+    lab(config, port)
 
     system_mocked.assert_called_once_with(
         "SPARK_CONF_DIR={0} YARN_CONF_DIR={0} jupyter-lab --notebook-dir /tmp/notebooks --ip 0.0.0.0 --port 8888 --no-browser --allow-root".format(os.path.join(os.environ["SPARK_HOME"], "conf")))
-
-
-@mock.patch('marvin_python_daemon.management.notebook.sys')
-@mock.patch('marvin_python_daemon.management.notebook.os.system')
-def test_jupyter_lab_with_security(system_mocked, sys_mocked):
-    config = mocked_config
-    port = '8888'
-    enable_security = True
-    system_mocked.return_value = 1
-
-    lab(config, enable_security, port)
-
-    system_mocked.assert_called_once_with(
-        "SPARK_CONF_DIR={0} YARN_CONF_DIR={0} jupyter-lab --notebook-dir /tmp/notebooks --ip 0.0.0.0 --port 8888 --no-browser --NotebookApp.token= --allow-root".format(os.path.join(os.environ["SPARK_HOME"], "conf")))
