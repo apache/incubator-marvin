@@ -76,7 +76,6 @@ def _read_config(engine_package):
         conf = read_cli_conf()
     return conf
 
-
 sigh = """___  ___                 _         _____  _     _____ 
 |  \/  |                (_)       /  __ \| |   |_   _|
 | .  . | __ _ _ ____   ___ _ __   | /  \/| |     | |  

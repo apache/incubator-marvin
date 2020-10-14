@@ -61,7 +61,7 @@ REQUIREMENTS_EXTERNAL = [
 # This is normally an empty list
 DEPENDENCY_LINKS_EXTERNAL = []
 # script to be used
-SCRIPTS = ['bin/marvin']
+SCRIPTS = ['bin/marvin', 'bin/marvin_complete']
 
 
 def _get_version():
