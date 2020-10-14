@@ -31,10 +31,9 @@ def notebook(grpchost, grpcport, notebook_port):
     rc.run_notebook(notebook_port)
 
 @cli.command("lab", help="Run custom engine Jupyter Lab.")
-@click.option('--host', '-gh', prompt='gRPC host', help='gRPC Host Address', default='localhost')
-@click.option('--port', '-gp', prompt='gRPC port', help='gRPC Port', default='50057')
+@click.option('--grpchost', '-gh', prompt='gRPC host', help='gRPC Host Address', default='localhost')
+@click.option('--grpcport', '-gp', prompt='gRPC port', help='gRPC Port', default='50057')
 @click.option('--notebook-port', '-np', prompt='Notebook port', help='Notebook port', default='8888')
-@click.option('--enable-security', '-s', default=False, is_flag=True, help='Enable notebook security.')
-def lab(grpchost, grpcport, notebook_port, enable_security):
+def lab(grpchost, grpcport, notebook_port):
     rc = RemoteCalls(grpchost, grpcport)
-    rc.run_lab(notebook_port, enable_security)
+    rc.run_lab(notebook_port)

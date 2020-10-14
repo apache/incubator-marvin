@@ -83,10 +83,9 @@ class RemoteCalls:
         }
         self.call_command('NOTEBOOK', parameters)
 
-    def run_lab(self, port, enable_security):
+    def run_lab(self, port):
         parameters = {
-            'port': port,
-            'enable_security': str(enable_security)
+            'port': port
         }
         self.call_command('LAB', parameters)
 
