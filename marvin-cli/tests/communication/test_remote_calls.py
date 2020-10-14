@@ -78,7 +78,7 @@ def test_run_notebook(call_mocked):
 @mock.patch('marvin_cli.communication.remote_calls.RemoteCalls.call_command')
 def test_run_lab(call_mocked):
     rc = RemoteCalls()
-    rc.run_lab(True, True)
+    rc.run_lab(mocked_port)
     call_mocked.assert_called()
 
 @mock.patch('marvin_cli.communication.remote_calls.RemoteCalls.call_command')
