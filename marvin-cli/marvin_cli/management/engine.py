@@ -98,7 +98,7 @@ def import_project(file, dest):
     type=click.Choice(['all', 'acquisitor', 'tpreparator', 'trainer', 'evaluator', 'ppreparator', 'predictor', 'feedback']),
     help='Marvin engine action name')
 @click.option('--profiling', '-p', default=False, is_flag=True, help='Deterministic profiling of user code.')
-def dryrun(host, port, action, profiling):
+def dryrun(grpchost, grpcport, action, profiling):
     rc = RemoteCalls(host, port)
     rc.run_dryrun(action, profiling)
 
@@ -113,8 +113,8 @@ def dryrun(host, port, action, profiling):
     help='Marvin engine action name')
 @click.option('--max-workers', '-w', help='Max Workers', default=None)
 @click.option('--max-rpc-workers', '-rw', help='Max gRPC Workers', default=None)
-def grpc(host, port, action, max_workers, max_rpc_workers):
-    rc = RemoteCalls(host, port)
+def grpc(grpchost, grpcport, action, max_workers, max_rpc_workers):
+    rc = RemoteCalls(grpchost, grpcport)
     rc.run_grpc(action, max_workers, max_rpc_workers)
     try:
         while(True):
@@ -240,12 +240,12 @@ def _sleep(sec):
 @click.option('--profiling', '-p', default=False, is_flag=True, help='Deterministic profiling of user code.')
 @click.option('--delay', '-d', default=False, is_flag=True, help='Delay the benchmark for 5 seconds.')
 @click.pass_context
-def btest(ctx, host, port, profiling, delay):
+def btest(ctx, grpchost, grpcport, profiling, delay):
     timestamp = generate_timestamp()
     b_thread = benchmark_thread(ctx.obj['package_name'], timestamp)
     actions = ['acquisitor', 'tpreparator', 'trainer',
                 'evaluator']
-    rc = RemoteCalls(host, port)
+    rc = RemoteCalls(grpchost, grpcport)
     initial_time = time.time()
     b_thread.start()
     if delay:
