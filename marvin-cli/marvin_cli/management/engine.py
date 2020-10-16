@@ -99,7 +99,7 @@ def import_project(file, dest):
     help='Marvin engine action name')
 @click.option('--profiling', '-p', default=False, is_flag=True, help='Deterministic profiling of user code.')
 def dryrun(grpchost, grpcport, action, profiling):
-    rc = RemoteCalls(host, port)
+    rc = RemoteCalls(grpchost, grpcport)
     rc.run_dryrun(action, profiling)
 
 @cli.command("engine-grpcserver", help="Run gRPC of given actions.")

@@ -30,7 +30,7 @@ def cli():
 @click.option('--pdb', is_flag=True)
 @click.argument('args', default='')
 def test(grpchost, grpcport, cov, no_capture, pdb, args):
-    rc = RemoteCalls(host, port)
+    rc = RemoteCalls(grpchost, grpcport)
     rc.run_test(cov, no_capture, pdb, args)
 
 @cli.command('test-tox', help='Run tests using Tox environment.')
@@ -38,7 +38,7 @@ def test(grpchost, grpcport, cov, no_capture, pdb, args):
 @click.option('--grpcport', '-gp', prompt='gRPC port', help='gRPC Port', default='50057')
 @click.argument('args', default='--current-env')
 def tox(grpchost, grpcport, args):
-    rc = RemoteCalls(host, port)
+    rc = RemoteCalls(grpchost, grpcport)
     rc.run_tox(args)
 
 @cli.command('test-tdd', help='Watch for changes to run tests automatically.')
@@ -50,5 +50,5 @@ def tox(grpchost, grpcport, args):
 @click.option('--partial', is_flag=True)
 @click.argument('args', default='')
 def tdd(grpchost, grpcport, cov, no_capture, pdb, partial, args):
-    rc = RemoteCalls(host, port)
+    rc = RemoteCalls(grpchost, grpcport)
     rc.run_tdd(cov, no_capture, pdb, partial, args)
