@@ -64,6 +64,7 @@ trait GenericAPIFunctions {
 object GenericAPI {
   case class HealthStatus(status: String, additionalMessage: String)
   case class DefaultHttpResponse(result: String)
+  case class DefaultJsHttpResponse(result: JsValue)
   case class DefaultOnlineRequest(params: Option[JsValue] = Option.empty, message: Option[JsValue] = Option.empty)
   case class DefaultBatchRequest(params: Option[JsValue] = Option.empty)
 }
@@ -85,6 +86,7 @@ class GenericAPI(system: ActorSystem,
   val log: LoggingAdapter = Logging.getLogger(system, this)
 
   implicit val defaultHttpResponseFormat: RootJsonFormat[DefaultHttpResponse] = jsonFormat1(DefaultHttpResponse)
+  implicit val defaultJsHttpResponseFormat: RootJsonFormat[DefaultJsHttpResponse] = jsonFormat1(DefaultJsHttpResponse)
   implicit val defaultOnlineRequestFormat: RootJsonFormat[DefaultOnlineRequest] = jsonFormat2(DefaultOnlineRequest)
   implicit val defaultBatchRequestFormat: RootJsonFormat[DefaultBatchRequest] = jsonFormat1(DefaultBatchRequest)
   implicit val healthStatusFormat: RootJsonFormat[HealthStatus] = jsonFormat2(HealthStatus)
@@ -101,7 +103,14 @@ class GenericAPI(system: ActorSystem,
             val responseFuture = onlineExecute("predictor", request.params.getOrElse(engineParams).toString, request.message.get.toString)
 
             onComplete(responseFuture) {
-              case Success(response) => complete(DefaultHttpResponse(response))
+              case Success(response: String) => {
+                complete {
+                  Try(response.parseJson) match {
+                    case Success(parsed) => DefaultJsHttpResponse(parsed)
+                    case Failure(e) => DefaultHttpResponse(response)
+                  }
+                }
+              }
               case Failure(e) =>
                 log.info("RECEIVE FAILURE!!! " + e.getMessage + e.getClass)
                 failWith(e)

@@ -65,6 +65,29 @@ class GenericAPITest extends WordSpec with ScalatestRouteTest with Matchers with
       }(result)
     }
 
+    "interpret the input message and respond with a complete json body" in {
+
+      val message = "{\"msg\":\"testQuery\"}"
+      val params = "{\"p1\":\"testParams\"}"
+      val response = """
+        {"numberForTest": 1,
+         "listOfResult": ["a","b"]
+        }
+        """
+
+      val result = Post("/predictor", HttpEntity(`application/json`, s"""{"params":$params,"message":$message}""")) ~> api.routes ~> runRoute
+
+      val expectedMessage = OnlineExecute(message, params)
+      actor.expectMsg(expectedMessage)
+      actor.reply(response)
+
+      check {
+        status shouldEqual StatusCode.int2StatusCode(200)
+        contentType shouldEqual ContentTypes.`application/json`
+        responseAs[String] shouldEqual s"""{"result":{"numberForTest":1,"listOfResult":["a","b"]}}"""
+      }(result)
+    }
+
     "gracefully fail when message is not informed" in {
       Post("/predictor", HttpEntity(`application/json`, s"""{"params":"testParams"}""")) ~> api.routes ~> check {
         status shouldEqual StatusCodes.BadRequest
