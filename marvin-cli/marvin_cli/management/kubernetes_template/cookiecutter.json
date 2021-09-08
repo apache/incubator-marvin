@@ -1,0 +1,9 @@
+{
+    "engine_name": "hello",
+    "n_reps": "1",
+    "image_name": "marvin_deployment",
+    "service_name": "marvin_service",
+    "deployment_name": "marvin_deployment",
+    "target_port": "9736",
+    "container_port": "8000"
+}

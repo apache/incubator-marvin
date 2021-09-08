@@ -42,8 +42,8 @@ def notebook(config, port):
     ]
     command.append("--allow-root")
 
-    return_code = os.system(' '.join(command))
-    logger.info("Notebook call returned {0}".format(str(return_code)))
+    subprocess.Popen(' '.join(command), shell=True)
+    logger.info("Notebook called!")
 
 
 def lab(config, port):

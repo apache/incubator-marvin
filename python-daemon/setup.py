@@ -75,6 +75,8 @@ REQUIREMENTS_EXTERNAL = [
     'idna>=2.5',
     'bleach>=1.5.0',
     'pyspark',
+    'tensorflow==2.3',
+    'tfx',
 ]
 
 # This is normally an empty list

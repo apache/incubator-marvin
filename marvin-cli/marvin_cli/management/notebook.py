@@ -15,25 +15,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import click
+import time
+from ..utils.log import get_logger
 from ..communication.remote_calls import RemoteCalls
+from ..utils.misc import init_port_forwarding
+
+logger = get_logger('management.notebook')
 
 @click.group("notebook")
 def cli():
     pass
 
 @cli.command("notebook", help="Run custom engine Jupyter Notebook.")
-@click.option('--grpchost', '-gh', prompt='gRPC host', help='gRPC Host Address', default='localhost')
-@click.option('--grpcport', '-gp', prompt='gRPC port', help='gRPC Port', default='50057')
-@click.option('--notebook-port', '-np', prompt='Notebook port', help='Notebook port', default='8888')
-def notebook(grpchost, grpcport, notebook_port):
+@click.option('--grpchost', '-gh', help='gRPC Host Address', default=None)
+@click.option('--grpcport', '-gp', help='gRPC Port', default='50057')
+@click.option('--notebook-port', '-np', help='Notebook port', default='8888')
+@click.option('--no-port-forwarding', '-npf', is_flag=True, default=False, 
+                help='Connect ports between this system and remote host with SSH tunnel')
+@click.pass_context
+def notebook(ctx, grpchost, grpcport, notebook_port, no_port_forwarding):
+    if not grpchost:
+        grpchost = 'localhost'
+
     rc = RemoteCalls(grpchost, grpcport)
     rc.run_notebook(notebook_port)
-
-@cli.command("lab", help="Run custom engine Jupyter Lab.")
-@click.option('--grpchost', '-gh', prompt='gRPC host', help='gRPC Host Address', default='localhost')
-@click.option('--grpcport', '-gp', prompt='gRPC port', help='gRPC Port', default='50057')
-@click.option('--notebook-port', '-np', prompt='Notebook port', help='Notebook port', default='8888')
-def lab(grpchost, grpcport, notebook_port):
-    rc = RemoteCalls(grpchost, grpcport)
-    rc.run_lab(notebook_port)
+    if not no_port_forwarding:
+        time.sleep(5)
+        logger.info("Enabling port forwarding {0}:{0}...".format(notebook_port))
+        init_port_forwarding(ctx.obj['engine_name'], ctx.obj['default_host'], 
+                                ports_list=[int(notebook_port)])
+    sys.exit(0)

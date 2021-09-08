@@ -7,3 +7,4 @@ include {{cookiecutter.project_package}}/VERSION
 recursive-include notebooks *
 prune notebooks/build
 recursive-include tests *
+include docker/deploy/daemon/deps/start.sh

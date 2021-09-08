@@ -17,8 +17,8 @@
 
 import os
 import click
-from marvin_cli.utils.misc import package_to_name
-from marvin_cli.utils.misc import kill_persisted_process
+from marvin_cli.utils.misc import package_to_name, create_tmp_marvin_folder
+from marvin_cli.utils.misc import retrieve_tmp_info
 from marvin_cli.utils.config import parse_ini
 from marvin_cli.utils.config import read_cli_conf, generate_default_conf
 from marvin_cli.utils.docker import search_engine_container
@@ -29,18 +29,19 @@ from marvin_cli.management.engine import cli as cli_engine
 from marvin_cli.management.notebook import cli as cli_notebook
 from marvin_cli.management.edit import cli as cli_edit
 from marvin_cli.management.test import cli as cli_test
+from marvin_cli.management.generate import cli as cli_generate
 
 EXCLUDE_BY_TYPE = {
     'toolbox': ['engine-dryrun', 'engine-grpcserver', 'engine-httpserver', 'notebook',
                 'lab', 'project-export', 'engine-logs', 'edit-metadata', 'test', 'test-tdd',
-                'test-tox', 'engine-bumpversion', 'benchmark', 'benchmark-plot'],
-    'engine': ['project-import']
+                'test-tox', 'engine-bumpversion', 'benchmark', 'benchmark-plot', 'engine', 
+                'data', 'push', 'stop', 'clone', 'kube-deployment'],
+    'engine': ['project-import', 'setup']
 }
 
 ENVIRONMENT_VARIABLES = {
     'MARVIN_HOME': "{0}/marvin".format(os.environ['HOME']),
-    'MARVIN_DATA_PATH': "{0}/marvin/data".format(os.environ['HOME']),
-    'MARVIN_LOG': "{0}/marvin/data/.logs".format(os.environ['HOME'])
+    'MARVIN_DATA_PATH': "{0}/marvin/data".format(os.environ['HOME'])
 }
 
 def _define_environ():
@@ -49,26 +50,18 @@ def _define_environ():
             os.environ[var] = ENVIRONMENT_VARIABLES[var]
 
 def _create_folders():
-    _exports_folder = os.path.join(os.environ['MARVIN_DATA_PATH'], 'exports')
     _conf_folder = os.path.join(os.environ['MARVIN_DATA_PATH'], '.conf')
     _artifacts_folder = os.path.join(os.environ['MARVIN_DATA_PATH'], '.artifacts')
+    _exports_folder = os.path.join(os.environ['MARVIN_DATA_PATH'], 'exports')
 
     _paths_list = [os.environ['MARVIN_HOME'], os.environ['MARVIN_DATA_PATH'],
-                os.environ['MARVIN_LOG'], _exports_folder, _conf_folder, _artifacts_folder]
+                    _exports_folder, _conf_folder, _artifacts_folder]
 
     for path in _paths_list:
         if not os.path.exists(path):
             os.makedirs(path)
 
-def _initial_check_engine_mode(engine_package):
-    if not search_engine_images(engine_package):
-        if click.confirm('Do you want to create the engine docker image?', default=True):
-            create_engine_image(engine_package)
-    if not search_engine_container(engine_package):
-        if click.confirm('Do you want to create the engine docker container?', default=True):
-            create_daemon_container(engine_package, package_to_name(engine_package))
-
-def _read_config(engine_package):
+def _read_config():
     filepath = os.path.join(os.environ['MARVIN_DATA_PATH'], '.conf', 'cli_conf.json')
     if not os.path.isfile(filepath):
         conf = generate_default_conf()
@@ -83,50 +76,44 @@ sigh = """___  ___                 _         _____  _     _____
 | |  | | (_| | |   \ V /| | | | | | \__/\| |_____| |_ 
 \_|  |_/\__,_|_|    \_/ |_|_| |_|  \____/\_____/\___/\n\n"""
 
-ini_path = os.path.join(os.getcwd(), 'marvin.ini')
 
-config = None
-package_name = None
+engine_name = None
 exclude = None
 
 print(sigh)
 
 _define_environ()
 _create_folders()
+create_tmp_marvin_folder()
 
-if os.path.exists(ini_path):
-    config = parse_ini(ini_path)
-    package_name = config['marvin_package']
+engine = retrieve_tmp_info('engine')
+if engine is not None:
     exclude = EXCLUDE_BY_TYPE['engine']
-    print("[+] engine mode - {}".format(package_name))
-    _initial_check_engine_mode(package_name)
+    engine_name = engine
+    print("[+] engine mode - {}".format(engine_name))
     print("\n")
 else:
     exclude = EXCLUDE_BY_TYPE['toolbox']
     print("[+] toolbox mode\n")
 
-config = _read_config(package_name)
+config = _read_config()
 
 @click.group('main')
 @click.pass_context
 def cli(ctx):
     ctx.obj = {
-        'package_name': package_name,
+        'engine_name': engine_name,
         'editor': config['editor'],
         'default_host': config['default_host'],
         'executor_url': config['executor_url']
     }
-
-@cli.command("system-kill", help="Kill all marvin cli background process.")
-def kill():
-    kill_persisted_process()
-
 
 commands = {}
 commands.update(cli_engine.commands)
 commands.update(cli_notebook.commands)
 commands.update(cli_edit.commands)
 commands.update(cli_test.commands)
+commands.update(cli_generate.commands)
 
 for name, command in commands.items():
         if name not in exclude:
@@ -134,9 +121,3 @@ for name, command in commands.items():
 
 
 cli()
-
-
-
-
-
-

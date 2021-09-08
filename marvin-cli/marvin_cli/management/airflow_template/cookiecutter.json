@@ -1,0 +1,8 @@
+{
+    "dag_name": "marvin-dag",
+    "host": "http://localhost:8000",
+    "owner": "marvin",
+    "interval_days": "1",
+    "timeout": "60",
+    "retries": "3"
+}

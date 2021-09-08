@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{cookiecutter.deployment_name}}
+  labels:
+    app: {{cookiecutter.deployment_name}}
+spec:
+  replicas: {{cookiecutter.n_reps}}
+  selector:
+    matchLabels:
+      app: {{cookiecutter.deployment_name}}
+  template:
+    metadata:
+      labels:
+        app: {{cookiecutter.deployment_name}}
+    spec:
+      containers:
+      - name: {{cookiecutter.deployment_name}}
+        image: {{cookiecutter.image_name}}
+        ports:
+        - containerPort: {{cookiecutter.container_port}}

@@ -28,6 +28,7 @@ from ..common.profiling import profiling
 from ..common.data import MarvinData
 from ..common.log import get_logger
 from ..common.config import Config, load_conf_from_file
+from ..common.dynamic_import import RollbackImporter
 
 logger = get_logger('management.engine')
 
@@ -90,10 +91,10 @@ class MarvinDryRun(object):
     def execute(self, clazz, params, profiling_enabled=False):
         self.print_start_step(clazz)
 
-        _Step = dynamic_import("{}.{}".format(self.package_name, clazz))
+        _importer = RollbackImporter()
+        _Step = _importer.dynamic_import(self.package_name, clazz)
 
         kwargs = generate_kwargs(self.package_name, _Step, params)
-
         step = _Step(**kwargs)
 
         def call_online_actions(step, msg, msg_idx):
@@ -141,6 +142,7 @@ class MarvinDryRun(object):
                 step.execute(params=params)
 
         self.print_finish_step()
+        _importer.uninstall()
 
     def print_finish_step(self):
         logger.info("STEP TAKES {:.4f} (seconds) ".format(
@@ -149,15 +151,6 @@ class MarvinDryRun(object):
     def print_start_step(self, name):
         logger.info("MARVIN DRYRUN - STEP [{}]".format(name))
         self.start_time = time.time()
-
-
-def dynamic_import(clazz):
-    components = clazz.split('.')
-    mod = __import__(components[0])
-    for comp in components[1:]:
-        mod = getattr(mod, comp)
-    return mod
-
 
 def read_file(filename):
     fname = os.path.join("", filename)
@@ -209,7 +202,8 @@ class MarvinEngineServer(object):
 
         def create_object(act):
             clazz = CLAZZES[act]
-            _Action = dynamic_import("{}.{}".format(package_name, clazz))
+            rb_imp = RollbackImporter()
+            _Action = rb_imp.dynamic_import(package_name, clazz)
             kwargs = generate_kwargs(package_name, _Action, params)
             return _Action(**kwargs)
 
