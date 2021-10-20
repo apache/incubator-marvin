@@ -16,12 +16,18 @@
 # limitations under the License.
 
 import os
+import sys
 import subprocess
 import tarfile
 import wget
 import glob
 import pickle
 import datetime
+import time
+import shutil
+from cryptography.hazmat.primitives import serialization as crypto_serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.backends import default_backend as crypto_default_backend
 from .log import get_logger
 
 logger = get_logger('misc')
@@ -34,15 +40,23 @@ def package_to_name(package):
     #remove marvin_ substring
     return package[len("marvin_"):]
 
-def generate_engine_package(package):
-    subprocess.run(['python', 'setup.py', 'sdist'])
-    filename = package + "-" + get_version(package) + ".tar.gz"
-    origin = os.path.join(os.getcwd(), "dist", filename)
-    dest = os.path.join(os.getcwd(), "docker", "develop" ,"daemon", filename)
-    os.rename(origin, dest)
+def name_to_package(name):
+    return "marvin_{}".format(name)
 
-def get_version(package):
-    with open(os.path.join(os.getcwd(), package ,"VERSION"), 'rb') as f:
+def generate_engine_package(package, path, dest=None):
+    filename = package + "-" + get_version(package, path) + ".tar.gz"
+    output = os.path.join('/tmp/marvin', filename)
+    make_tarfile(output, path)
+
+    if dest is not None:
+        move_dest = os.path.join(dest, filename)
+    else:
+        move_dest = os.path.join(path, "docker", "develop" ,"daemon", filename)
+
+    shutil.move(output, move_dest)
+
+def get_version(package, path):
+    with open(os.path.join(path, package ,"VERSION"), 'rb') as f:
         version = f.read().decode('ascii').strip()
     return version
 
@@ -54,14 +68,9 @@ def extract_folder(input, output):
     tf = tarfile.open(input)
     tf.extractall(output)
 
-def call_logs(package, follow, buffer):
-    container_name = 'marvin-cont-' + package_to_name(package)
-    p_return = None
-    if follow:
-        p_return = subprocess.Popen(['docker', 'logs', '--follow', container_name], stdout=subprocess.PIPE)
-    else:
-        p_return = subprocess.Popen(['docker', 'logs', '--tail', str(buffer), container_name], stdout=subprocess.PIPE)
-
+def call_logs(engine):
+    container_name = 'marvin-cont-' + engine
+    p_return = subprocess.Popen(['docker', 'logs', '--follow', container_name], stdout=subprocess.PIPE)
     return p_return
 
 def create_or_return_tmp_dir():
@@ -70,27 +79,21 @@ def create_or_return_tmp_dir():
         os.makedirs(tmp_path)
     return tmp_path
 
-def kill_persisted_process():
-    base_path = create_or_return_tmp_dir()
-    for obj_file in glob.glob('{0}/*.mproc'.format(base_path)):
-        pid = int(
-            obj_file[(len(base_path) + 1):(len('.mproc') * -1)]
-        )
-        try:
-            os.kill(pid, 9)
-            logger.info("PID {0} now killed!".format(pid))
-        except ProcessLookupError:
-            logger.info("PID {0} already killed!".format(pid))
-        os.remove(obj_file)
-        
+def write_tmp_info(key, info):
+    _filepath = os.path.join(create_or_return_tmp_dir(), key)
+    logger.info("Creating {0}...".format(key))
+    with open(_filepath, 'w') as f:
+        f.write(info)
 
-def persist_process(obj):
-    filepath = os.path.join(create_or_return_tmp_dir(), 
-                            '{0}.mproc'.format(obj.pid))
-    logger.info("Creating {0}...".format(filepath))
-    with open(filepath, 'w'):
-        pass
-
+def retrieve_tmp_info(key):
+    _filepath = os.path.join(create_or_return_tmp_dir(), key)
+    logger.info("Retriving {0}...".format(key))
+    try:
+        with open(_filepath, 'r') as f:
+            info = f.read()
+        return info
+    except:
+        return None
 
 def get_executor_path_or_download(executor_url):
     #get filename from url
@@ -106,3 +109,97 @@ def get_executor_path_or_download(executor_url):
 
 def generate_timestamp():
     return datetime.datetime.now().timestamp()
+
+def create_tmp_marvin_folder():
+    _dir = '/tmp/marvin'
+    if not os.path.exists(_dir):
+        os.makedirs(_dir)
+
+def get_chunk_and_untar(bits, output_path):
+    _dir = '/tmp/marvin'
+    _tmp_path = os.path.join(_dir, 'tmp_data')
+    #save tar in tmp file
+    with open(_tmp_path, 'wb') as f:
+        for chunk in bits:
+            f.write(chunk)
+        f.close()
+    #extract files
+    with tarfile.open(_tmp_path) as tf:
+        tf.extractall(output_path)
+        tf.close()
+    #remove tmp_data
+    os.remove(_tmp_path)
+
+def get_tar_data(source, folder, compress):
+    _dir = '/tmp/marvin'
+    tmp_path = os.path.join(_dir, 'tmp_data')
+    _tar_mode = "w:gz" if compress else "w"
+    #save tar in tmp file
+    with tarfile.open(tmp_path, _tar_mode) as tf:
+        if folder:
+            tf.add(source, arcname='.')
+        else:
+            tf.add(source, arcname=os.path.basename(source))
+    
+    #get bytes from file
+    with open(tmp_path, 'rb') as bf:
+        temp_bytes = bf.read()
+        return (temp_bytes, tmp_path)
+
+def generate_keys(engine_name):
+    _key_path = os.path.join(os.environ['MARVIN_DATA_PATH'],
+                            '.keys',
+                            engine_name)
+
+    os.makedirs(_key_path)
+
+    pvk_path = os.path.join(_key_path, 'id_rsa')
+    pubk_path = os.path.join(_key_path, 'id_rsa.pub')
+
+    key = rsa.generate_private_key(
+        backend=crypto_default_backend(),
+        public_exponent=65537,
+        key_size=2048
+    )
+
+    private_key = key.private_bytes(
+        crypto_serialization.Encoding.PEM,
+        crypto_serialization.PrivateFormat.PKCS8,
+        crypto_serialization.NoEncryption()
+    )
+
+    public_key = key.public_key().public_bytes(
+        crypto_serialization.Encoding.OpenSSH,
+        crypto_serialization.PublicFormat.OpenSSH
+    )
+
+    open(pubk_path ,"w").write(public_key.decode("utf-8"))
+    open(pvk_path ,"w").write(private_key.decode("utf-8"))
+    os.chmod(pvk_path, 0o500)
+
+    return pubk_path
+    
+def init_port_forwarding(engine_name, remote_host, ports_list, background=True):
+    if remote_host != 'localhost' and remote_host != '127.0.0.1':
+        pkey_path = os.path.join(os.environ['MARVIN_DATA_PATH'], '.keys', engine_name, 'id_rsa')
+        command_list = ["ssh"]
+        command_list.append("-o")
+        command_list.append("StrictHostKeyChecking=no")
+        command_list.append("-N")
+
+        if background:
+            command_list.append('-f')
+
+        for remote_port in ports_list:
+            command_list.append("-L")
+            command_list.append("localhost:{0}:localhost:{0}".format(remote_port))
+
+        command_list.append("-i")
+        command_list.append("{0}".format(pkey_path))
+        command_list.append("marvin@{0}".format(remote_host))
+        command_list.append("-p")
+        command_list.append("2022")
+        if not background:
+            logger.info("Press Ctrl+C to disable port forwarding")
+            
+        os.system(" ".join(command_list))

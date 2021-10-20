@@ -21,8 +21,8 @@ def git_init(path):
     os.chdir(path)
     os.system(' '.join(['git', 'init', '.']))
 
-def bump_version(part, verbose, dryrun):
-    command = ['bump2version', part]
+def bump_version(path, part, verbose, dryrun):
+    command = ['bump2version', part, path]
     if verbose:
         command.append('--verbose')
     if dryrun:

@@ -31,7 +31,7 @@ logger = get_logger("benchmark")
 
 #to-do
 def create_or_get_benchmark_folder():
-    _folder_path = os.path.join(os.getcwd(), 'benchmarks')
+    _folder_path = os.path.join(os.environ['MARVIN_DATA_PATH'], 'benchmarks')
     if not os.path.exists(_folder_path):
         os.makedirs(_folder_path)
     return _folder_path
@@ -107,8 +107,8 @@ def filter_data(input_data, initial_time):
             int(_r_net),
             int(_t_net))
 
-def get_and_persist_stats(engine_package, initial_time, timestamp):
-    _stats = get_stats(engine_package)
+def get_and_persist_stats(engine_name, initial_time, timestamp):
+    _stats = get_stats(engine_name)
     _colleted_stats = filter_data(_stats, initial_time)
     _filename = 'benchmark_{0}.csv'.format(timestamp)
     _path = os.path.join(create_or_get_benchmark_folder(), _filename)
@@ -116,14 +116,14 @@ def get_and_persist_stats(engine_package, initial_time, timestamp):
         writer = csv.writer(f)
         writer.writerow(_colleted_stats)
 
-def repeat_stats_call(engine_package, timestamp, initial_time):
+def repeat_stats_call(engine_name, timestamp, initial_time):
     while True:
         getattr(sys.modules[__name__],
-                'get_and_persist_stats')(engine_package, initial_time, timestamp)
+                'get_and_persist_stats')(engine_name, initial_time, timestamp)
 
-def benchmark_thread(engine_package, timestamp, initial_time=time.time()):
+def benchmark_thread(engine_name, timestamp, initial_time=time.time()):
     return multiprocessing.Process(target=repeat_stats_call, 
-                                    args=(engine_package, timestamp, initial_time,))
+                                    args=(engine_name, timestamp, initial_time,))
 
 def create_poi(key, value, timestamp):
     _file_path = create_or_return_poi(timestamp)

@@ -1,0 +1,2 @@
+cd $MARVIN_ENGINE_HOME && nohup marvin-daemon &
+java -DmarvinConfig.engineHome=/home/marvin/engine -DmarvinConfig.ipAddress=0.0.0.0 -DmarvinConfig.port=8000 -DmarvinConfig.protocol=$PROTOCOL -jar $MARVIN_DATA_PATH/executor.jar

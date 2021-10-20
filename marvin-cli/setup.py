@@ -55,13 +55,18 @@ REQUIREMENTS_EXTERNAL = [
     'click',
     'cookiecutter',
     'docker-compose',
-    'matplotlib'
+    'matplotlib',
+    'cryptography',
+    'kubernetes',
+    'requests'
 ]
 
 # This is normally an empty list
 DEPENDENCY_LINKS_EXTERNAL = []
 # script to be used
-SCRIPTS = ['bin/marvin', 'bin/marvin_complete']
+SCRIPTS = ['bin/marvin', 
+            'bin/marvin_complete', 
+            'bin/marvin-api']
 
 
 def _get_version():

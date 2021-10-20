@@ -27,13 +27,13 @@ class RemoteError(Exception):
     pass
 
 COMMANDS = {
-    'DRYRUN': daemon_pb2.Command.CommandType.DRYRUN,
-    'TEST': daemon_pb2.Command.CommandType.TEST,
-    'GRPC': daemon_pb2.Command.CommandType.GRPC,
-    'TDD': daemon_pb2.Command.CommandType.TDD,
-    'TOX': daemon_pb2.Command.CommandType.TOX,
-    'NOTEBOOK': daemon_pb2.Command.CommandType.NOTEBOOK,
-    'LAB': daemon_pb2.Command.CommandType.LAB
+    'DRYRUN': daemon_pb2.Command.CommandType.Value('DRYRUN'),
+    'TEST': daemon_pb2.Command.CommandType.Value('TEST'),
+    'GRPC': daemon_pb2.Command.CommandType.Value('GRPC'),
+    'TDD': daemon_pb2.Command.CommandType.Value('TDD'),
+    'TOX': daemon_pb2.Command.CommandType.Value('TOX'),
+    'NOTEBOOK': daemon_pb2.Command.CommandType.Value('NOTEBOOK'),
+    'LAB': daemon_pb2.Command.CommandType.Value('LAB')
 }
 
 class RemoteCalls:
@@ -47,7 +47,7 @@ class RemoteCalls:
     def call_command(self, name, parameters):
         call = daemon_pb2.Command(command=COMMANDS[name], parameters=parameters)
         response = self.stub.callCommand(call)
-        if response.status == daemon_pb2.Status.NOK:
+        if response.status == daemon_pb2.Status.StatusType.Value('NOK'):
             raise RemoteError("Error during {}.".format(name))
         else:
             logger.info("{} triggered!".format(name))
@@ -55,7 +55,7 @@ class RemoteCalls:
     def stop_command(self, name):
         call = daemon_pb2.Interruption()
         response = self.stub.stopCommand(call)
-        if response.status == daemon_pb2.Status.NOK:
+        if response.status == daemon_pb2.Status.StatusType.Value('NOK'):
             raise RemoteError("Error during stop {}.".format(name))
         else:
             logger.info("{} stopped!".format(name))

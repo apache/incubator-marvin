@@ -1,3 +1,5 @@
 include README.md
 include marvin_cli/VERSION
 graft marvin_cli/management/template
+graft marvin_cli/management/airflow_template
+graft marvin_cli/management/kubernetes_template

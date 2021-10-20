@@ -26,12 +26,6 @@ import logging
 
 DEFAULT_LOG_LEVEL = logging.INFO
 
-if os.environ.get('MARVIN_LOG') is None:
-    DEFAULT_LOG_DIR = '/tmp'
-else:
-    DEFAULT_LOG_DIR = os.environ['MARVIN_LOG']
-
-
 class Logger(logging.getLoggerClass()):
     """Custom logger class.
 
@@ -51,13 +45,11 @@ logging.setLoggerClass(Logger)
 
 
 def get_logger(name, namespace='marvin_ai',
-               log_level=DEFAULT_LOG_LEVEL, log_dir=DEFAULT_LOG_DIR):
+               log_level=DEFAULT_LOG_LEVEL):
     """Build a logger that outputs to a file and to the console,"""
 
     log_level = (os.getenv('{}_LOG_LEVEL'.format(namespace.upper())) or
                  os.getenv('LOG_LEVEL', log_level))
-    log_dir = (os.getenv('{}_LOG_DIR'.format(namespace.upper())) or
-               os.getenv('LOG_DIR', log_dir))
 
     logger = logging.getLogger('{}.{}'.format(namespace, name))
     logger.setLevel(log_level)
@@ -70,24 +62,5 @@ def get_logger(name, namespace='marvin_ai',
     console_handler.setLevel(log_level)
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
-
-    try:
-        log_path = os.path.abspath(log_dir)
-        log_filename = '{name}.{pid}.log'.format(
-            name=namespace, pid=os.getpid())
-
-        file_path = str(os.path.join(log_path, log_filename))
-
-        if not os.path.exists(log_path):
-            os.makedirs(log_path)
-
-        # Create a file handler
-        file_handler = logging.FileHandler(file_path)
-        file_handler.setLevel(log_level)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-    except OSError as e:
-        logger.error('Could not create log file {file}: {error}'.format(
-            file=file_path, error=e.strerror))
 
     return logger
