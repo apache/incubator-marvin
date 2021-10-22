@@ -34,5 +34,5 @@ def test_git_init(chdir_mocked, system_mocked):
 
 @mock.patch('marvin_cli.utils.git.os.system')
 def test_bumpversion(system_mocked):
-    bump_version('patch', True, True)
-    system_mocked.assert_called_with('bump2version patch --verbose --dry-run')
+    bump_version('patch', 'mocked', True, True)
+    system_mocked.assert_called_with('bump2version mocked patch --verbose --dry-run')

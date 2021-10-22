@@ -68,7 +68,7 @@ mocked_data = {
 
 def test_create_or_get_benchmark_folder():
     path = create_or_get_benchmark_folder()
-    assert path == os.path.join(os.getcwd(), 'benchmarks')
+    assert path == os.path.join(os.environ['MARVIN_HOME'], 'benchmarks')
 
 def test_create_or_return_poi():
     timestamp = 'mocked_timestamp'

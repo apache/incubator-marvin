@@ -47,21 +47,22 @@ def test_search_docker_container():
 @mock.patch('marvin_cli.utils.docker._search_docker_container')
 def test_search_engine_container(search_mocked):
     search_engine_container('marvin_mocked')
-    search_mocked.assert_called_with('marvin-cont-mocked')
+    search_mocked.assert_called_with('marvin-cont-marvin_mocked')
 
 @mock.patch('marvin_cli.utils.docker._search_docker_image')
 def test_search_engine_images(search_mocked):
     search_engine_images('marvin_mocked')
-    search_mocked.assert_called_with('marvin-mocked')
+    search_mocked.assert_called_with('marvin-marvin_mocked')
 
 @mock.patch('marvin_cli.utils.docker._get_client')
 @mock.patch('marvin_cli.utils.docker.generate_engine_package')
 def test_create_engine_image(generate_mocked, client_mocked):
-    create_engine_image('marvin_mocked')
+    mocked_engine_path = 'mocked/path/'
+    create_engine_image('marvin_mocked', mocked_engine_path)
     client_mocked.assert_called()
-    generate_mocked.assert_called_with('marvin_mocked')
+    generate_mocked.assert_called_with('marvin_marvin_mocked', mocked_engine_path)
 
 @mock.patch('marvin_cli.utils.docker._get_client')
 def test_create_daemon_container(client_mocked):
-    create_daemon_container('marvin_mocked', 'mocked')
+    create_daemon_container('marvin_mocked')
     client_mocked.assert_called()

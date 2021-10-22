@@ -44,8 +44,8 @@ def test_package_to_name():
 
 @mock.patch('marvin_cli.utils.misc.os.path.join')
 def test_get_version(join_mocked):
-    get_version(mocked_package)
-    join_mocked.assert_called_with(os.getcwd(), mocked_package, 'VERSION')
+    get_version(mocked_package, mocked_path)
+    join_mocked.assert_called_with(mocked_path, mocked_package, 'VERSION')
 
 @mock.patch('marvin_cli.utils.misc.tarfile.open')
 def test_package_folder(open_mocked):
@@ -59,8 +59,8 @@ def test_extract_folder(open_mocked):
 
 @mock.patch('marvin_cli.utils.misc.subprocess.Popen')
 def test_call_logs(popen_mocked):
-    call_logs(mocked_package, True, 0)
-    popen_mocked.assert_called_with(['docker', 'logs', '--follow', 'marvin-cont-mocked'], stdout=-1)
+    call_logs(mocked_package)
+    popen_mocked.assert_called_with(['docker', 'logs', '--follow', 'marvin-cont-' + mocked_package], stdout=-1)
 
 @mock.patch('marvin_cli.utils.misc.wget.download')
 def test_get_executor_path_or_download(wget_mocked):

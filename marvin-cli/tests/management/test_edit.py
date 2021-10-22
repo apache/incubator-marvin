@@ -23,7 +23,6 @@ except ImportError:
     import unittest.mock as mock
 
 from marvin_cli.management.edit import config
-from marvin_cli.management.edit import metadata
 mocked_obj = {
     'editor': 'mocked'
 }
@@ -33,12 +32,6 @@ def test_config():
     with ctx:
         runner = click.testing.CliRunner()
         runner.invoke(config)
-
-def test_metadata():
-    ctx = click.Context(click.Command('edit-metadata'), obj=mocked_obj)
-    with ctx:
-        runner = click.testing.CliRunner()
-        runner.invoke(metadata)
 
 
 
