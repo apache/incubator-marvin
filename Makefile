@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-.PHONY: help python-daemon-base engine-server python-daemon
+.PHONY: help python-daemon-base engine-server python-daemon executor-base
 
 help:
 	@echo "    python-daemon-base"
@@ -22,6 +22,8 @@ help:
 	@echo "        Builds the python-daemon and make it available for be included into docker images."
 	@echo "    engine-server"
 	@echo "        Builds a jar with the engine interpreter server."
+	@echo "    executor-base"
+	@echo "        Builds a docker image that can run engine executor."
 
 python-daemon-base:
 	$(MAKE) python-daemon
@@ -33,3 +35,7 @@ engine-server:
 
 python-daemon:
 	tar -zcvf build/daemon/python-daemon.tar.gz python-daemon
+
+executor-base:
+	$(MAKE) engine-server
+	docker build -t marvin-executor -f build/executor/Dockerfile build/executor

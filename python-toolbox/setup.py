@@ -24,8 +24,8 @@ from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
 # Package basic info
-PACKAGE_NAME = 'marvin_cli'
-PACKAGE_DESCRIPTION = 'Apache Marvin-AI CLI'
+PACKAGE_NAME = 'marvin_python_toolbox'
+PACKAGE_DESCRIPTION = 'Apache Marvin-AI Python Toolbox'
 
 URL = ''
 

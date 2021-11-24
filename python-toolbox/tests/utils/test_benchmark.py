@@ -21,10 +21,10 @@ try:
 except ImportError:
     import unittest.mock as mock
 
-from marvin_cli.utils.benchmark import create_or_get_benchmark_folder
-from marvin_cli.utils.benchmark import calculate_cpu_percent, calculate_disk_io, calculate_network_bytes
-from marvin_cli.utils.benchmark import create_or_return_poi, create_poi
-from marvin_cli.utils.benchmark import make_graph, read_csv, read_poi, filter_data
+from marvin_python_toolbox.utils.benchmark import create_or_get_benchmark_folder
+from marvin_python_toolbox.utils.benchmark import calculate_cpu_percent, calculate_disk_io, calculate_network_bytes
+from marvin_python_toolbox.utils.benchmark import create_or_return_poi, create_poi
+from marvin_python_toolbox.utils.benchmark import make_graph, read_csv, read_poi, filter_data
 
 mocked_data = {
     "memory_stats": {
@@ -76,24 +76,24 @@ def test_create_or_return_poi():
     assert path == os.path.join(create_or_get_benchmark_folder(), 
                                 'poi_{0}.json'.format(timestamp))
 
-@mock.patch("marvin_cli.utils.benchmark.os.path.exists")
-@mock.patch("marvin_cli.utils.benchmark.open")
+@mock.patch("marvin_python_toolbox.utils.benchmark.os.path.exists")
+@mock.patch("marvin_python_toolbox.utils.benchmark.open")
 def test_read_csv(open_mocked, exists_mocked):
     path = os.path.join(create_or_get_benchmark_folder(), 'benchmark_mocked.csv')
     read_csv('mocked')
     exists_mocked.assert_called_with(path)
     open_mocked.assert_called_with(path, 'r')
 
-@mock.patch("marvin_cli.utils.benchmark.open")
+@mock.patch("marvin_python_toolbox.utils.benchmark.open")
 def test_read_poi(open_mocked):
     timestamp = 'mocked'
     path = create_or_return_poi(timestamp)
     read_poi('mocked')
     open_mocked.assert_called_with(path, 'r')
 
-@mock.patch("marvin_cli.utils.benchmark.read_csv")
-@mock.patch("marvin_cli.utils.benchmark.read_poi")
-@mock.patch("marvin_cli.utils.benchmark.plt.show")
+@mock.patch("marvin_python_toolbox.utils.benchmark.read_csv")
+@mock.patch("marvin_python_toolbox.utils.benchmark.read_poi")
+@mock.patch("marvin_python_toolbox.utils.benchmark.plt.show")
 def test_make_graph(show_mocked, poi_mocked, csv_mocked):
     timestamp = 'mocked'
     make_graph('mocked_name', 'mocked_label', timestamp)
@@ -101,9 +101,9 @@ def test_make_graph(show_mocked, poi_mocked, csv_mocked):
     csv_mocked.assert_called_with(timestamp)
     show_mocked.assert_called_once()
 
-@mock.patch("marvin_cli.utils.benchmark.open")
-@mock.patch("marvin_cli.utils.benchmark.json.load")
-@mock.patch("marvin_cli.utils.benchmark.json.dump")
+@mock.patch("marvin_python_toolbox.utils.benchmark.open")
+@mock.patch("marvin_python_toolbox.utils.benchmark.json.load")
+@mock.patch("marvin_python_toolbox.utils.benchmark.json.dump")
 def test_create_poi(dump_mocked, load_mocked, open_mocked):
     timestamp = 'mocked'
     create_poi('mock', 'ed', timestamp)
@@ -112,8 +112,8 @@ def test_create_poi(dump_mocked, load_mocked, open_mocked):
     open_mocked.assert_called()
 
 
-@mock.patch("marvin_cli.utils.benchmark.calculate_network_bytes")
-@mock.patch("marvin_cli.utils.benchmark.calculate_disk_io")
+@mock.patch("marvin_python_toolbox.utils.benchmark.calculate_network_bytes")
+@mock.patch("marvin_python_toolbox.utils.benchmark.calculate_disk_io")
 def test_filter_data(disk_io_mocked, net_bytes_mocked):
     disk_io_mocked.return_value = (0,0)
     net_bytes_mocked.return_value = (0,0)
@@ -121,17 +121,17 @@ def test_filter_data(disk_io_mocked, net_bytes_mocked):
     disk_io_mocked.assert_called_once()
     net_bytes_mocked.assert_called_once()
 
-@mock.patch("marvin_cli.utils.benchmark.get_internal_keys")
+@mock.patch("marvin_python_toolbox.utils.benchmark.get_internal_keys")
 def test_calculate_disk_io(int_keys_mocked):
     calculate_disk_io(mocked_data)
     int_keys_mocked.assert_called_with(mocked_data, "blkio_stats", "io_service_bytes_recursive")
 
-@mock.patch("marvin_cli.utils.benchmark.get_internal_keys")
+@mock.patch("marvin_python_toolbox.utils.benchmark.get_internal_keys")
 def test_calculate_network_bytes(int_keys_mocked):
     calculate_network_bytes(mocked_data)
     int_keys_mocked.assert_called_with(mocked_data, "networks")
 
-@mock.patch("marvin_cli.utils.benchmark.get_internal_keys")
+@mock.patch("marvin_python_toolbox.utils.benchmark.get_internal_keys")
 def test_calculate_cpu_percent(int_keys_mocked):
     calculate_cpu_percent(mocked_data)
     int_keys_mocked.assert_called()

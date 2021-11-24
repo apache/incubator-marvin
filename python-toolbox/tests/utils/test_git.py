@@ -14,24 +14,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import click
-import click.testing
 
 try:
     import mock
 except ImportError:
     import unittest.mock as mock
 
-from marvin_cli.management.edit import config
-mocked_obj = {
-    'editor': 'mocked'
-}
+from marvin_python_toolbox.utils.git import git_init
+from marvin_python_toolbox.utils.git import bump_version
 
-def test_config():
-    ctx = click.Context(click.Command('edit-config'), obj=mocked_obj)
-    with ctx:
-        runner = click.testing.CliRunner()
-        runner.invoke(config)
+mocked_path = '/path/to/nowhere'
 
+@mock.patch('marvin_python_toolbox.utils.git.os.system')
+@mock.patch('marvin_python_toolbox.utils.git.os.chdir')
+def test_git_init(chdir_mocked, system_mocked):
+    git_init(mocked_path)
+    system_mocked.assert_called_with('git init .')
+    chdir_mocked.assert_called()
 
-
+@mock.patch('marvin_python_toolbox.utils.git.os.system')
+def test_bumpversion(system_mocked):
+    bump_version('patch', 'mocked', True, True)
+    system_mocked.assert_called_with('bump2version mocked patch --verbose --dry-run')

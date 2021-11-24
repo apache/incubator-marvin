@@ -1,4 +1,4 @@
-# Marvin CLI v0.0.5
+# Marvin Python Toolbox v0.0.5
 
 ![](https://github.com/apache/incubator-marvin-website/blob/master/site/assets/themes/apache/img/logo.png?raw=true)
 

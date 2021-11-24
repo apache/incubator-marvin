@@ -14,7 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
 import click
 import click.testing
 
@@ -23,12 +22,16 @@ try:
 except ImportError:
     import unittest.mock as mock
 
-from marvin_cli.management.engine import generate
+from marvin_python_toolbox.management.edit import config
+mocked_obj = {
+    'editor': 'mocked'
+}
 
-@mock.patch('marvin_cli.management.engine.cookiecutter')
-def test_generate(cookie_mocked):
-    args = ['-n', 'mocked', '-d', 'mocked', '-m',
-            'mocked', '-e', 'mocked']
-    runner = click.testing.CliRunner()
-    result = runner.invoke(generate, args)
-    cookie_mocked.assert_called()
+def test_config():
+    ctx = click.Context(click.Command('edit-config'), obj=mocked_obj)
+    with ctx:
+        runner = click.testing.CliRunner()
+        runner.invoke(config)
+
+
+

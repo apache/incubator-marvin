@@ -17,19 +17,19 @@
 
 import os
 import click
-from marvin_cli.utils.misc import package_to_name, create_tmp_marvin_folder
-from marvin_cli.utils.misc import retrieve_tmp_info
-from marvin_cli.utils.config import parse_ini
-from marvin_cli.utils.config import read_cli_conf, generate_default_conf
-from marvin_cli.utils.docker import search_engine_container
-from marvin_cli.utils.docker import search_engine_images
-from marvin_cli.utils.docker import create_engine_image
-from marvin_cli.utils.docker import create_daemon_container
-from marvin_cli.management.engine import cli as cli_engine
-from marvin_cli.management.notebook import cli as cli_notebook
-from marvin_cli.management.edit import cli as cli_edit
-from marvin_cli.management.test import cli as cli_test
-from marvin_cli.management.generate import cli as cli_generate
+from marvin_python_toolbox.utils.misc import package_to_name, create_tmp_marvin_folder
+from marvin_python_toolbox.utils.misc import retrieve_tmp_info
+from marvin_python_toolbox.utils.config import parse_ini
+from marvin_python_toolbox.utils.config import read_cli_conf, generate_default_conf
+from marvin_python_toolbox.utils.docker import search_engine_container
+from marvin_python_toolbox.utils.docker import search_engine_images
+from marvin_python_toolbox.utils.docker import create_engine_image
+from marvin_python_toolbox.utils.docker import create_daemon_container
+from marvin_python_toolbox.management.engine import cli as cli_engine
+from marvin_python_toolbox.management.notebook import cli as cli_notebook
+from marvin_python_toolbox.management.edit import cli as cli_edit
+from marvin_python_toolbox.management.test import cli as cli_test
+from marvin_python_toolbox.management.generate import cli as cli_generate
 
 EXCLUDE_BY_TYPE = {
     'toolbox': ['engine-dryrun', 'engine-grpcserver', 'engine-httpserver', 'notebook',

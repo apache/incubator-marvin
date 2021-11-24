@@ -22,19 +22,19 @@ try:
 except ImportError:
     import unittest.mock as mock
 
-from marvin_cli.utils.misc import make_tarfile
-from marvin_cli.utils.misc import package_to_name
-from marvin_cli.utils.misc import get_version
-from marvin_cli.utils.misc import package_folder
-from marvin_cli.utils.misc import extract_folder
-from marvin_cli.utils.misc import call_logs
-from marvin_cli.utils.misc import get_executor_path_or_download
+from marvin_python_toolbox.utils.misc import make_tarfile
+from marvin_python_toolbox.utils.misc import package_to_name
+from marvin_python_toolbox.utils.misc import get_version
+from marvin_python_toolbox.utils.misc import package_folder
+from marvin_python_toolbox.utils.misc import extract_folder
+from marvin_python_toolbox.utils.misc import call_logs
+from marvin_python_toolbox.utils.misc import get_executor_path_or_download
 
 mocked_package = 'marvin_mocked'
 mocked_path = '/path/to/nowhere'
 mocked_url = 'https://some.url/marvin.jar'
 
-@mock.patch('marvin_cli.utils.misc.tarfile.open')
+@mock.patch('marvin_python_toolbox.utils.misc.tarfile.open')
 def test_make_tarfile(open_mocked):
     make_tarfile(mocked_path, mocked_path)
     open_mocked.assert_called_with(mocked_path, 'w:gz')
@@ -42,27 +42,27 @@ def test_make_tarfile(open_mocked):
 def test_package_to_name():
     assert package_to_name(mocked_package) == 'mocked'
 
-@mock.patch('marvin_cli.utils.misc.os.path.join')
+@mock.patch('marvin_python_toolbox.utils.misc.os.path.join')
 def test_get_version(join_mocked):
     get_version(mocked_package, mocked_path)
     join_mocked.assert_called_with(mocked_path, mocked_package, 'VERSION')
 
-@mock.patch('marvin_cli.utils.misc.tarfile.open')
+@mock.patch('marvin_python_toolbox.utils.misc.tarfile.open')
 def test_package_folder(open_mocked):
     package_folder(mocked_path, mocked_path)
     open_mocked.assert_called_with(mocked_path, 'w:gz')
 
-@mock.patch('marvin_cli.utils.misc.tarfile.open')
+@mock.patch('marvin_python_toolbox.utils.misc.tarfile.open')
 def test_extract_folder(open_mocked):
     extract_folder(mocked_path, mocked_path)
     open_mocked.assert_called_with(mocked_path)
 
-@mock.patch('marvin_cli.utils.misc.subprocess.Popen')
+@mock.patch('marvin_python_toolbox.utils.misc.subprocess.Popen')
 def test_call_logs(popen_mocked):
     call_logs(mocked_package)
     popen_mocked.assert_called_with(['docker', 'logs', '--follow', 'marvin-cont-' + mocked_package], stdout=-1)
 
-@mock.patch('marvin_cli.utils.misc.wget.download')
+@mock.patch('marvin_python_toolbox.utils.misc.wget.download')
 def test_get_executor_path_or_download(wget_mocked):
     get_executor_path_or_download(mocked_url)
     wget_mocked.assert_called_with(mocked_url, out=os.path.join(os.environ['MARVIN_DATA_PATH'], 'marvin.jar'))

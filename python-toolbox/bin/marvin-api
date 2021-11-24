@@ -16,7 +16,7 @@
 # limitations under the License.
 
 import click
-import marvin_cli.utils.api as api
+import marvin_python_toolbox.utils.api as api
 
 @click.group('main')
 def cli():

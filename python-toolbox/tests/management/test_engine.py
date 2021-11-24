@@ -14,25 +14,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
+import click
+import click.testing
 
 try:
     import mock
 except ImportError:
     import unittest.mock as mock
 
-from marvin_cli.utils.git import git_init
-from marvin_cli.utils.git import bump_version
+from marvin_python_toolbox.management.engine import generate
 
-mocked_path = '/path/to/nowhere'
-
-@mock.patch('marvin_cli.utils.git.os.system')
-@mock.patch('marvin_cli.utils.git.os.chdir')
-def test_git_init(chdir_mocked, system_mocked):
-    git_init(mocked_path)
-    system_mocked.assert_called_with('git init .')
-    chdir_mocked.assert_called()
-
-@mock.patch('marvin_cli.utils.git.os.system')
-def test_bumpversion(system_mocked):
-    bump_version('patch', 'mocked', True, True)
-    system_mocked.assert_called_with('bump2version mocked patch --verbose --dry-run')
+@mock.patch('marvin_python_toolbox.management.engine.cookiecutter')
+def test_generate(cookie_mocked):
+    args = ['-n', 'mocked', '-d', 'mocked', '-m',
+            'mocked', '-e', 'mocked']
+    runner = click.testing.CliRunner()
+    result = runner.invoke(generate, args)
+    cookie_mocked.assert_called()

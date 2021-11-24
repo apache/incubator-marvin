@@ -1,0 +1,5 @@
+include README.md
+include marvin_python_toolbox/VERSION
+graft marvin_python_toolbox/management/template
+graft marvin_python_toolbox/management/airflow_template
+graft marvin_python_toolbox/management/kubernetes_template
