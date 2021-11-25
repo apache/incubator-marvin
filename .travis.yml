@@ -59,7 +59,7 @@ matrix:
         - travis_retry pip install tox
         - make install
       script:
-        - tox
+        - tox -rvve py36
         - codecov
     # Python CLI - Linux
     - language: python
@@ -88,5 +88,5 @@ matrix:
         - make install
         - marvin
       script:
-        - travis_wait 30 tox
+        - travis_wait 30 tox -rvve py36
         - codecov
