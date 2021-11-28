@@ -51,8 +51,6 @@ matrix:
         - export SPARK_HOME=../spark-2.1.1-bin-hadoop2.6
         - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz -y    ; fi
         - travis_retry pip install --upgrade pip
-        - travis_retry pip install virtualenvwrapper --ignore-installed six
-        - source virtualenvwrapper.sh
       install:
         - travis_retry pip install codecov
         - travis_retry pip install unidecode
@@ -79,8 +77,6 @@ matrix:
         - export SPARK_HOME=../spark-2.1.1-bin-hadoop2.6
         - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz -y    ; fi
         - travis_retry pip install --upgrade pip
-        - travis_retry pip install virtualenvwrapper --ignore-installed six
-        - source virtualenvwrapper.sh
       install:
         - travis_retry pip install codecov
         - travis_retry pip install unidecode
