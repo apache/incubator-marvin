@@ -54,10 +54,10 @@ matrix:
       install:
         - travis_retry pip install codecov
         - travis_retry pip install unidecode
-        - travis_retry pip install tox
+        - travis_retry pip install tox tox-travis
         - make install
       script:
-        - tox
+        - travis_wait 30 tox -rvve py36
         - codecov
     # Python CLI - Linux
     - language: python
@@ -80,9 +80,9 @@ matrix:
       install:
         - travis_retry pip install codecov
         - travis_retry pip install unidecode
-        - travis_retry pip install tox
+        - travis_retry pip install tox tox-travis
         - make install
         - marvin
       script:
-        - travis_wait 30 tox
+        - travis_wait 30 tox -rvve py36
         - codecov
