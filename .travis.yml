@@ -49,7 +49,7 @@ matrix:
         - export MARVIN_HOME=./marvin_home
         - export MARVIN_DATA_PATH=./marvin_data
         - export SPARK_HOME=../spark-2.1.1-bin-hadoop2.6
-        - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz rustc cargo -y    ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz rustc cargo libssl-dev -y    ; fi
         - travis_retry pip install --upgrade pip
       install:
         - travis_retry pip install codecov
@@ -75,7 +75,7 @@ matrix:
         - export MARVIN_HOME=./marvin_home
         - export MARVIN_DATA_PATH=./marvin_data
         - export SPARK_HOME=../spark-2.1.1-bin-hadoop2.6
-        - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz rustc cargo -y    ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz rustc cargo libssl-dev -y    ; fi
         - travis_retry pip install --upgrade pip
       install:
         - travis_retry pip install codecov
