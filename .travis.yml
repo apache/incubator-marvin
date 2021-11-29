@@ -49,12 +49,13 @@ matrix:
         - export MARVIN_HOME=./marvin_home
         - export MARVIN_DATA_PATH=./marvin_data
         - export SPARK_HOME=../spark-2.1.1-bin-hadoop2.6
-        - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz rustc cargo libssl-dev -y    ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install build-essential libsasl2-dev python-pip graphviz rustc cargo libssl-dev libffi-dev python-dev -y    ; fi
         - travis_retry pip install --upgrade pip
       install:
         - travis_retry pip install codecov
         - travis_retry pip install unidecode
         - travis_retry pip install tox tox-travis
+        - travis_retry pip install cryptography --no-binary cryptography
         - make install
       script:
         - travis_wait 30 tox -rvve py36
@@ -75,12 +76,13 @@ matrix:
         - export MARVIN_HOME=./marvin_home
         - export MARVIN_DATA_PATH=./marvin_data
         - export SPARK_HOME=../spark-2.1.1-bin-hadoop2.6
-        - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libsasl2-dev python-pip graphviz rustc cargo libssl-dev -y    ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install build-essential libsasl2-dev python-pip graphviz rustc cargo libssl-dev libffi-dev python-dev -y    ; fi
         - travis_retry pip install --upgrade pip
       install:
         - travis_retry pip install codecov
         - travis_retry pip install unidecode
         - travis_retry pip install tox tox-travis
+        - travis_retry pip install cryptography --no-binary cryptography
         - make install
         - marvin
       script:
