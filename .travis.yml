@@ -59,6 +59,7 @@ matrix:
         - travis_retry pip install tox
         - make install
       script:
+        - /home/travis/virtualenv/python3.6.7/bin/python -m virtualenv --no-download --python /home/travis/virtualenv/python3.6.7/bin/python py36
         - tox -vvv
         - codecov
     # Python CLI - Linux
