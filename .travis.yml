@@ -50,7 +50,7 @@ matrix:
         - export MARVIN_HOME=./marvin_home
         - export MARVIN_DATA_PATH=./marvin_data
         - export SPARK_HOME=../spark-2.1.1-bin-hadoop2.6
-        - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install build-essential libsasl2-dev python-pip graphviz libssl-dev libffi-dev -y    ; fi
+        - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install build-essential libsasl2-dev python3 python3-pip graphviz libssl-dev libffi-dev python3-dev -y    ; fi
         - travis_retry pip install --upgrade pip
       install:
         - travis_retry pip install codecov
