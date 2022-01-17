@@ -36,8 +36,9 @@ matrix:
     # Python Daemon - Linux
     - language: python
       os: linux
+      dist: focal
       python:
-        - "3.8"
+        - 3.6
       before_install:
         - travis_retry curl https://d3kbcqa49mib13.cloudfront.net/spark-2.1.1-bin-hadoop2.6.tgz -o ./spark-2.1.1-bin-hadoop2.6.tgz
         - sudo tar -xf ./spark-2.1.1-bin-hadoop2.6.tgz
@@ -57,13 +58,14 @@ matrix:
         - travis_retry pip install tox tox-travis
         - make install
       script:
-        - travis_wait 30 tox -rvve py38
+        - travis_wait 30 tox -rvve py36
         - codecov
     # Python CLI - Linux
     - language: python
       os: linux
+      dist: focal
       python:
-        - "3.8"
+        - 3.6
       before_install:
         - travis_retry curl https://d3kbcqa49mib13.cloudfront.net/spark-2.1.1-bin-hadoop2.6.tgz -o ./spark-2.1.1-bin-hadoop2.6.tgz
         - sudo tar -xf ./spark-2.1.1-bin-hadoop2.6.tgz
@@ -84,5 +86,5 @@ matrix:
         - make install
         - marvin
       script:
-        - travis_wait 30 tox -rvve py38
+        - travis_wait 30 tox -rvve py36
         - codecov
