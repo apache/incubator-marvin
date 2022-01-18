@@ -51,14 +51,15 @@ def read_cli_conf():
         return json.load(conf_file)
 
 def generate_default_conf():
-    filepath = os.path.join(os.environ['MARVIN_DATA_PATH'], '.conf', 'cli_conf.json')
+    filefolder = os.path.join(os.environ['MARVIN_DATA_PATH'], '.conf')
+    filepath = os.path.join(filefolder, 'cli_conf.json')
     config = {
         'default_host': 'localhost',
         'editor': 'nano',
         'executor_url': 'https://s3.amazonaws.com/marvin-engine-executor/marvin-engine-executor-assembly-0.0.5.jar'
     }
 
-    if not os.path.exists(filepath):
+    if not os.path.exists(filefolder):
         os.makedirs(filepath)
 
     with open(filepath, 'w') as conf:
