@@ -57,6 +57,10 @@ def generate_default_conf():
         'editor': 'nano',
         'executor_url': 'https://s3.amazonaws.com/marvin-engine-executor/marvin-engine-executor-assembly-0.0.5.jar'
     }
+
+    if not os.path.exists(filepath):
+        os.makedirs(filepath)
+
     with open(filepath, 'w') as conf:
         json.dump(config, conf, indent=4)
 
