@@ -85,7 +85,7 @@ setup(
         'six>=1.10.0',
         'scikit-learn==0.18.2',
         'scipy==0.19.1',
-        'numpy==1.13.1',
+        'numpy==1.21.0',
         'pandas==0.20.3',
         'matplotlib==2.0.2',
         'marvin-python-toolbox==0',
