@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/apache/incubator-marvin.svg)](https://travis-ci.org/apache/incubator-marvin) [![codecov](https://codecov.io/gh/apache/incubator-marvin/branch/develop/graph/badge.svg)](https://codecov.io/gh/apache/incubator-marvin/branch/develop)
+[![Build Status](https://app.travis-ci.com/apache/incubator-marvin.svg)](https://app.travis-ci.com/apache/incubator-marvin) [![codecov](https://codecov.io/gh/apache/incubator-marvin/branch/develop/graph/badge.svg)](https://codecov.io/gh/apache/incubator-marvin/branch/develop)
 
 # Marvin Engine Executor (Server)
 
